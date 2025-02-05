@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artanis AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Orbitron', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-black text-gray-100 antialiased">
+    <!-- Hero Section -->
+    <section class="relative isolate overflow-hidden min-h-[100vh] flex items-center">
+        <div class="absolute inset-0 -z-10 bg-gradient-to-b from-indigo-900/50 to-black"></div>
+        <div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
+            <div class="mx-auto max-w-2xl text-center">
+                <div class="relative">
+                    <div class="absolute inset-0 -z-10 bg-cyan-500/30 blur-3xl rounded-full transform scale-150"></div>
+                    <img src="img/artanis.png" alt="Artanis AI" class="relative w-40 h-40 mx-auto mb-8 filter brightness-110">
+                </div>
+                <h2 class="text-4xl font-medium tracking-wide text-white sm:text-6xl font-display">ARTANIS</h2>
+                <p class="mt-6 text-xl leading-8 text-gray-300 mb-12">AI you can control</p>
+                <a target="_blank" href="mailto:team@artanis.ai?subject=En%20Taro%20Artanis&body=Dear%20Artanis%20team%2C%0D%0A%0D%0AI%20would%20love%20to%20control%20AI!%20Here's%20why..." 
+                   class="relative inline-flex items-center px-8 py-4 text-lg font-semibold text-blue-100 font-display tracking-wide bg-gray-900/80 hover:bg-gray-800/80 transition-all duration-200 group overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 backdrop-blur-sm"></div>
+                    <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                    <div class="absolute left-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                    <div class="absolute right-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                    <div class="absolute inset-0 bg-blue-500/20 blur-xl group-hover:bg-blue-500/30 transition-colors duration-200"></div>
+                    <span class="relative">Contact The High Council</span>
+                </a>
+            </div>
+        </div>
+        <button onclick="document.getElementById('feeds').scrollIntoView({behavior: 'smooth'})"
+                class="absolute bottom-8 left-1/2 -translate-x-1/2 w-12 h-12 group cursor-pointer">
+            <div class="absolute inset-0 bg-blue-500/20 rounded-full blur-xl animate-pulse"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-blue-500/50 to-transparent rounded-full animate-ping opacity-75 duration-1000"></div>
+            <svg class="relative w-full h-full text-blue-400 group-hover:text-blue-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </button>
+    </section>
+
+    <style>
+        @keyframes sci-fi-pulse {
+            0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+            50% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+        }
+        
+        .sci-fi-pulse {
+            animation: sci-fi-pulse 2s ease-in-out infinite;
+        }
+    </style>
+
+    <!-- Updates Section -->
+    <section id="feeds" class="py-24 px-6">
+        <div class="mx-auto max-w-7xl">
+            <h3 class="text-3xl font-medium text-center text-white mb-16 font-display tracking-wide uppercase">Knowledge Archives</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                    <div class="flex items-center justify-between mb-6">
+                        <h4 class="text-2xl font-medium text-white font-display tracking-wide">AI Chronicles</h4>
+                        <a href="https://artanis.substack.com/" target="_blank" rel="noopener noreferrer" 
+                           class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-blue-100 font-display tracking-wide bg-gray-900/80 hover:bg-gray-800/80 transition-all duration-200 group overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 backdrop-blur-sm"></div>
+                            <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                            <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                            <div class="absolute left-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                            <div class="absolute right-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                            <div class="absolute inset-0 bg-blue-500/20 blur-xl group-hover:bg-blue-500/30 transition-colors duration-200"></div>
+                            <span class="relative">Subscribe</span>
+                        </a>
+                    </div>
+                    <ul id="substack-feed" class="space-y-4"></ul>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-6">
+                        <h4 class="text-2xl font-medium text-white font-display tracking-wide">Mission Logs</h4>
+                        <a href="https://buttondown.com/artanis" target="_blank" rel="noopener noreferrer" 
+                           class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-blue-100 font-display tracking-wide bg-gray-900/80 hover:bg-gray-800/80 transition-all duration-200 group overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 backdrop-blur-sm"></div>
+                            <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                            <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                            <div class="absolute left-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                            <div class="absolute right-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                            <div class="absolute inset-0 bg-blue-500/20 blur-xl group-hover:bg-blue-500/30 transition-colors duration-200"></div>
+                            <span class="relative">Subscribe</span>
+                        </a>
+                    </div>
+                    <ul id="buttondown-feed" class="space-y-4"></ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Team Section -->
+    <section id="team" class="py-24 px-6">
+        <div class="mx-auto max-w-7xl">
+            <h3 class="text-3xl font-medium text-center text-white mb-16 font-display tracking-wide uppercase">The High Council</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <a href="https://www.linkedin.com/in/sam-miller-5415b0124/" target="_blank" rel="noopener noreferrer" 
+                   class="group flex flex-col items-center transition-transform duration-200 hover:-translate-y-1">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-blue-500/10 rounded-2xl blur-lg"></div>
+                        <div class="relative">
+                            <img src="img/sam.png" alt="Dr Sam Miller" class="w-40 h-40 rounded-2xl object-cover mb-6 transition-all duration-300 filter sepia-[30%] hue-rotate-[190deg]">
+                            <div class="absolute inset-0 rounded-2xl bg-white/5 ring-1 ring-white/10 group-hover:bg-white/10 group-hover:ring-white/20 transition-all duration-300"></div>
+                        </div>
+                        <img src="img/gm.png" alt="Grandmaster" class="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-8">
+                    </div>
+                    <h4 class="text-2xl font-bold text-white group-hover:text-amber-100 transition-colors">Dr Sam Miller</h4>
+                    <p class="text-lg text-blue-300/80">CEO</p>
+                </a>
+                <a href="https://www.linkedin.com/in/yousefamar/" target="_blank" rel="noopener noreferrer"
+                   class="group flex flex-col items-center transition-transform duration-200 hover:-translate-y-1">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-blue-500/10 rounded-2xl blur-lg"></div>
+                        <div class="relative">
+                            <img src="img/yousef.png" alt="Dr Yousef Amar" class="w-40 h-40 rounded-2xl object-cover mb-6 transition-all duration-300 filter sepia-[30%] hue-rotate-[190deg]">
+                            <div class="absolute inset-0 rounded-2xl bg-white/5 ring-1 ring-white/10 group-hover:bg-white/10 group-hover:ring-white/20 transition-all duration-300"></div>
+                        </div>
+                        <img src="img/gm.png" alt="Grandmaster" class="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-8">
+                    </div>
+                    <h4 class="text-2xl font-bold text-white group-hover:text-amber-100 transition-colors">Dr Yousef Amar</h4>
+                    <p class="text-lg text-blue-300/80">CTO</p>
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="py-32 px-6 bg-gradient-to-b from-black to-gray-900">
+        <div class="mx-auto max-w-7xl text-center">
+            <h3 class="text-3xl font-medium text-white mb-6 font-display tracking-wide uppercase">Join Our Cause</h3>
+            <p class="text-lg text-gray-300 mb-8">En Taro Artanis! Ready to forge the future together?</p>
+            <a target="_blank" href="mailto:team@artanis.ai?subject=En%20Taro%20Artanis&body=Dear%20Artanis%20team%2C%0D%0A%0D%0AI%20would%20love%20to%20control%20AI!%20Here's%20why..." 
+               class="relative inline-flex items-center px-8 py-4 text-lg font-semibold text-blue-100 font-display tracking-wide bg-gray-900/80 hover:bg-gray-800/80 transition-all duration-200 group overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 backdrop-blur-sm"></div>
+                <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                <div class="absolute left-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                <div class="absolute right-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                <div class="absolute inset-0 bg-blue-500/20 blur-xl group-hover:bg-blue-500/30 transition-colors duration-200"></div>
+                <span class="relative">Open Communications</span>
+            </a>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 py-12 px-6">
+        <div class="mx-auto max-w-7xl text-center">
+            <p class="text-gray-400">&copy; 2025 Artanis Ltd. All rights reserved.</p>
+            <div class="mt-4 space-x-4">
+                <a href="https://app.artanis.ai/terms.html" class="text-gray-400 hover:text-white transition-colors">Terms</a>
+                <span class="text-gray-400">&bull;</span>
+                <a href="https://app.artanis.ai/privacy.html" class="text-gray-400 hover:text-white transition-colors">Privacy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) {
+                return 'Today';
+            } else if (diffDays === 1) {
+                return 'Yesterday';
+            } else if (diffDays < 7) {
+                return `${diffDays} days ago`;
+            } else if (diffDays < 30) {
+                const weeks = Math.floor(diffDays / 7);
+                return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+            } else {
+                const options = { month: 'short', day: 'numeric' };
+                if (date.getFullYear() !== now.getFullYear()) {
+                    options.year = 'numeric';
+                }
+                return date.toLocaleDateString('en-US', options);
+            }
+        }
+
+        function renderBlogItem(item) {
+            return `
+                <li class="mb-6">
+                    <div class="border border-blue-500/30 rounded-lg p-4 bg-gray-900/50 hover:bg-gray-800/50 transition-colors backdrop-blur-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                        <div class="absolute left-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                        <div class="absolute right-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block group">
+                            <div class="flex gap-4">
+                                <div class="flex-1 min-w-0">
+                                    <h5 class="text-sm font-medium text-blue-400 group-hover:text-blue-300 mb-2 font-display tracking-wide">${item.title}</h5>
+                                    <p class="text-gray-400 text-xs line-clamp-2">${item.description || ''}</p>
+                                    <div class="mt-2 text-xs text-blue-500/70">${formatDate(item.pubDate)}</div>
+                                </div>
+                                ${item.thumbnail ? `
+                                <div class="relative flex-shrink-0 w-16 h-16 opacity-80 group-hover:opacity-100 transition-opacity duration-200">
+                                    <div class="absolute inset-0 border border-blue-500/30 rounded-lg">
+                                        <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                                        <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                                        <div class="absolute left-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                                        <div class="absolute right-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                                    </div>
+                                    <div class="absolute inset-0 bg-white rounded-lg"></div>
+                                    <img src="${item.thumbnail}" alt="" class="relative w-full h-full object-contain p-2 rounded-lg">
+                                </div>
+                                ` : ''}
+                            </div>
+                        </a>
+                    </div>
+                </li>
+            `;
+        }
+
+        function renderMissionLogItem(item) {
+            return `
+                <li class="mb-6">
+                    <div class="border border-blue-500/30 rounded-lg p-3 bg-gray-900/50 hover:bg-gray-800/50 transition-colors backdrop-blur-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                        <div class="absolute left-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                        <div class="absolute right-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
+                        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block group">
+                            <div class="flex gap-4">
+                                <div class="flex-1 min-w-0">
+                                    <h5 class="text-sm font-medium text-blue-400 group-hover:text-blue-300 font-display tracking-wide">${item.title}</h5>
+                                    <div class="mt-1 text-xs text-blue-500/70">${formatDate(item.pubDate)}</div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </li>
+            `;
+        }
+
+        async function fetchRSS(url, elementId, renderFunction) {
+            try {
+                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                const feedContainer = document.getElementById(elementId);
+                feedContainer.innerHTML = data.items.slice(0, 100).map(renderFunction).join('');
+            } catch (error) {
+                console.error('Error fetching RSS feed:', error);
+            }
+        }
+
+        fetchRSS('https://artanis.substack.com/feed', 'substack-feed', renderBlogItem);
+        fetchRSS('https://buttondown.com/artanis/rss', 'buttondown-feed', renderMissionLogItem);
+    </script>
+</body>
+</html>
