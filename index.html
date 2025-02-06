@@ -206,12 +206,7 @@
                         <div class="absolute right-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
                         <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block group">
                             <div class="flex gap-4">
-                                <div class="flex-1 min-w-0">
-                                    <h5 class="text-sm font-medium text-blue-400 group-hover:text-blue-300 mb-2 font-display tracking-wide">${item.title}</h5>
-                                    <p class="text-gray-400 text-xs line-clamp-2">${item.description || ''}</p>
-                                    <div class="mt-2 text-xs text-blue-500/70">${formatDate(item.pubDate)}</div>
-                                </div>
-                                ${item.thumbnail ? `
+                                ${item.enclosure?.link ? `
                                 <div class="relative flex-shrink-0 w-16 h-16 opacity-80 group-hover:opacity-100 transition-opacity duration-200">
                                     <div class="absolute inset-0 border border-blue-500/30 rounded-lg">
                                         <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
@@ -220,9 +215,14 @@
                                         <div class="absolute right-0 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent"></div>
                                     </div>
                                     <div class="absolute inset-0 bg-white rounded-lg"></div>
-                                    <img src="${item.thumbnail}" alt="" class="relative w-full h-full object-contain p-2 rounded-lg">
+                                    <img src="${item.enclosure.link}" alt="" class="relative w-full h-full object-contain p-1 rounded-lg">
                                 </div>
                                 ` : ''}
+                                <div class="flex-1 min-w-0">
+                                    <h5 class="text-sm font-medium text-blue-400 group-hover:text-blue-300 mb-2 font-display tracking-wide">${item.title}</h5>
+                                    <p class="text-gray-400 text-xs line-clamp-2">${item.description || ''}</p>
+                                    <div class="mt-2 text-xs text-blue-500/70">${formatDate(item.pubDate)}</div>
+                                </div>
                             </div>
                         </a>
                     </div>
