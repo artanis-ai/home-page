@@ -24,12 +24,19 @@
     <style>
         @keyframes marquee {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+            100% { transform: translateX(-100%); }
         }
-        .animate-marquee {
-            animation: marquee 40s linear infinite;
+        .marquee-container {
+            display: flex;
+            overflow: hidden;
+            user-select: none;
         }
-        .animate-marquee:hover {
+        .marquee-content {
+            display: flex;
+            animation: marquee 60s linear infinite;
+            white-space: nowrap;
+        }
+        .marquee-content:hover {
             animation-play-state: paused;
         }
     </style>
@@ -71,8 +78,9 @@
     </section>
 
     <!-- Client Marquee -->
-    <section class="py-12 border-y border-gray-100 bg-white overflow-hidden">
-            <div class="flex whitespace-nowrap animate-marquee">
+    <section class="py-12 border-y border-gray-100 bg-white">
+        <div class="marquee-container">
+            <div class="marquee-content">
                 <div class="flex items-center gap-12 px-6">
                     <span class="text-gray-400 font-medium">Charterhouse</span>
                     <span class="text-gray-400 font-medium">MoveGB</span>
@@ -112,17 +120,18 @@
                     <span class="text-gray-400 font-medium">Jubel</span>
                 </div>
             </div>
+        </div>
     </section>
 
     <!-- Substack Section -->
     <section class="py-24 px-6 bg-white">
         <div class="mx-auto max-w-6xl">
-            <div class="flex items-center justify-between mb-12">
-                <h2 class="text-3xl font-bold text-gray-900">Blog</h2>
+            <h2 class="text-3xl font-bold text-gray-900 text-center mb-12">Blog</h2>
+            <ul id="substack-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"></ul>
+            <div class="text-center">
                 <a href="https://artanis.substack.com/" target="_blank" rel="noopener noreferrer"
-                   class="text-primary hover:text-primary/80 font-medium transition-colors">Subscribe →</a>
+                   class="text-primary hover:text-primary/80 font-medium transition-colors">Subscribe</a>
             </div>
-            <ul id="substack-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></ul>
         </div>
     </section>
 
