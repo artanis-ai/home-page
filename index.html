@@ -24,7 +24,7 @@
     <style>
         @keyframes marquee {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
+            100% { transform: translateX(-50%); }
         }
         .marquee-container {
             display: flex;
@@ -33,7 +33,7 @@
         }
         .marquee-content {
             display: flex;
-            animation: marquee 60s linear infinite;
+            animation: marquee 30s linear infinite;
             white-space: nowrap;
         }
         .marquee-content:hover {
