@@ -123,14 +123,37 @@
         </div>
     </section>
 
-    <!-- Substack Section -->
+    <!-- Blog & Newsletter Section -->
     <section class="py-24 px-6 bg-white">
-        <div class="mx-auto max-w-6xl">
-            <h2 class="text-3xl font-bold text-gray-900 text-center mb-12">Blog</h2>
-            <ul id="substack-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"></ul>
-            <div class="text-center">
-                <a href="https://artanis.substack.com/" target="_blank" rel="noopener noreferrer"
-                   class="text-primary hover:text-primary/80 font-medium transition-colors">Subscribe</a>
+        <div class="mx-auto max-w-7xl">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Blog -->
+                <div>
+                    <div class="flex items-center justify-between mb-8">
+                        <h2 class="text-3xl font-bold text-gray-900">Blog</h2>
+                        <a href="https://artanis.substack.com/subscribe" target="_blank" rel="noopener noreferrer"
+                           class="text-primary hover:text-primary/80 font-medium transition-colors text-sm">Subscribe</a>
+                    </div>
+                    <ul id="substack-feed" class="space-y-4 mb-4"></ul>
+                    <div class="text-center">
+                        <a href="https://artanis.substack.com/archive" target="_blank" rel="noopener noreferrer"
+                           class="text-primary hover:text-primary/80 font-medium transition-colors text-sm">More</a>
+                    </div>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <div class="flex items-center justify-between mb-8">
+                        <h2 class="text-3xl font-bold text-gray-900">Monthly Updates</h2>
+                        <a href="https://buttondown.com/artanis#subscribe-form" target="_blank" rel="noopener noreferrer"
+                           class="text-primary hover:text-primary/80 font-medium transition-colors text-sm">Subscribe</a>
+                    </div>
+                    <ul id="buttondown-feed" class="space-y-4 mb-4"></ul>
+                    <div class="text-center">
+                        <a href="https://buttondown.com/artanis/archive/" target="_blank" rel="noopener noreferrer"
+                           class="text-primary hover:text-primary/80 font-medium transition-colors text-sm">More</a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -219,33 +242,49 @@
 
         function renderBlogItem(item) {
             return `
-                <li class="bg-white border border-gray-200 rounded-lg p-6 hover:border-gray-300 hover:shadow-md transition-all">
+                <li class="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 hover:shadow-md transition-all">
                     <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block group">
-                        ${item.enclosure?.link ? `
-                        <div class="mb-4">
-                            <img src="${item.enclosure.link}" alt="" class="w-full h-40 object-cover rounded">
+                        <div class="flex gap-4">
+                            ${item.enclosure?.link ? `
+                            <div class="flex-shrink-0">
+                                <img src="${item.enclosure.link}" alt="" class="w-24 h-24 object-cover rounded">
+                            </div>
+                            ` : ''}
+                            <div class="flex-1 min-w-0">
+                                <h5 class="text-base font-semibold text-gray-900 group-hover:text-primary mb-1 transition-colors line-clamp-2">${item.title}</h5>
+                                ${item.description ? `<p class="text-sm text-gray-600 mb-2 line-clamp-2">${item.description}</p>` : ''}
+                                <div class="text-xs text-gray-500">${formatDate(item.pubDate)}</div>
+                            </div>
                         </div>
-                        ` : ''}
-                        <h5 class="text-lg font-semibold text-gray-900 group-hover:text-primary mb-2 transition-colors">${item.title}</h5>
-                        <p class="text-sm text-gray-600 line-clamp-2 mb-3">${item.description || ''}</p>
+                    </a>
+                </li>
+            `;
+        }
+
+        function renderNewsletterItem(item) {
+            return `
+                <li class="border border-gray-200 rounded-lg p-4 bg-white hover:border-primary/50 hover:shadow-sm transition-all">
+                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block group">
+                        <h5 class="text-base font-medium text-gray-900 group-hover:text-primary transition-colors mb-2">${item.title}</h5>
                         <div class="text-xs text-gray-500">${formatDate(item.pubDate)}</div>
                     </a>
                 </li>
             `;
         }
 
-        async function fetchRSS(url, elementId) {
+        async function fetchRSS(url, elementId, renderFunction, limit) {
             try {
                 const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`);
                 const data = await response.json();
                 const feedContainer = document.getElementById(elementId);
-                feedContainer.innerHTML = data.items.slice(0, 6).map(renderBlogItem).join('');
+                feedContainer.innerHTML = data.items.slice(0, limit).map(renderFunction).join('');
             } catch (error) {
                 console.error('Error fetching RSS feed:', error);
             }
         }
 
-        fetchRSS('https://artanis.substack.com/feed', 'substack-feed');
+        fetchRSS('https://artanis.substack.com/feed', 'substack-feed', renderBlogItem, 4);
+        fetchRSS('https://buttondown.com/artanis/rss', 'buttondown-feed', renderNewsletterItem, 6);
     </script>
 </body>
 </html>
