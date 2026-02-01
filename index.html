@@ -27,17 +27,23 @@
             100% { transform: translateX(-50%); }
         }
         .marquee-container {
-            display: flex;
             overflow: hidden;
             user-select: none;
+            mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
         }
         .marquee-content {
             display: flex;
-            animation: marquee 30s linear infinite;
-            white-space: nowrap;
+            width: max-content;
+            animation: marquee 40s linear infinite;
         }
         .marquee-content:hover {
             animation-play-state: paused;
+        }
+        .marquee-group {
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
         }
     </style>
 </head>
@@ -79,45 +85,67 @@
 
     <!-- Client Marquee -->
     <section class="py-12 border-y border-gray-100 bg-white">
+        <style>
+            .client-logo {
+                height: 32px;
+                width: auto;
+                filter: brightness(0) opacity(0.5);
+                transition: filter 0.2s;
+            }
+            .client-logo:hover {
+                filter: brightness(0) opacity(0.9);
+            }
+            .client-logo-color {
+                height: 32px;
+                width: auto;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            }
+            .client-logo-color:hover {
+                opacity: 1;
+            }
+        </style>
         <div class="marquee-container">
             <div class="marquee-content">
-                <div class="flex items-center gap-12 px-6">
-                    <span class="text-gray-400 font-medium">Charterhouse</span>
-                    <span class="text-gray-400 font-medium">MoveGB</span>
-                    <span class="text-gray-400 font-medium">MindsDB</span>
-                    <span class="text-gray-400 font-medium">SalesAPE</span>
-                    <span class="text-gray-400 font-medium">Stylus</span>
-                    <span class="text-gray-400 font-medium">Telus</span>
-                    <span class="text-gray-400 font-medium">HG Capital</span>
-                    <span class="text-gray-400 font-medium">Evoke Medical Care</span>
-                    <span class="text-gray-400 font-medium">Sophos</span>
-                    <span class="text-gray-400 font-medium">Contextual AI</span>
-                    <span class="text-gray-400 font-medium">Medsnapp</span>
-                    <span class="text-gray-400 font-medium">Kliq</span>
-                    <span class="text-gray-400 font-medium">Sawa</span>
-                    <span class="text-gray-400 font-medium">From Today</span>
-                    <span class="text-gray-400 font-medium">Odyssey</span>
-                    <span class="text-gray-400 font-medium">FE Fundinfo</span>
-                    <span class="text-gray-400 font-medium">Jubel</span>
+                <div class="marquee-group">
+                    <a href="https://www.charterhouse.co.uk/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/charterhouse.png" alt="Charterhouse" class="client-logo"></a>
+                    <a href="https://www.movegb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/move-gb.png" alt="MoveGB" class="client-logo"></a>
+                    <a href="https://mindsdb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/mindsdb.png" alt="MindsDB" class="client-logo"></a>
+                    <a href="https://www.salesape.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/salesape.png" alt="SalesAPE" class="client-logo"></a>
+                    <a href="https://stylus.education/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/stylus.png" alt="Stylus" class="client-logo"></a>
+                    <a href="https://www.telus.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/telus.png" alt="TELUS" class="client-logo"></a>
+                    <a href="https://hgcapital.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/hg.png" alt="HG Capital" class="client-logo"></a>
+                    <a href="https://evokemedicalcare.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/evoke.png" alt="Evoke Medical Care" class="client-logo"></a>
+                    <a href="https://sophoseducation.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sophos.png" alt="Sophos" class="client-logo"></a>
+                    <a href="https://contextual.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/contextual.png" alt="Contextual AI" class="client-logo"></a>
+                    <a href="https://www.medsnapp.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/medsnapp.png" alt="MedSnapp" class="client-logo"></a>
+                    <a href="https://www.joinkliq.io/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/kliq.png" alt="Kliq" class="client-logo"></a>
+                    <a href="https://sawa.global/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sawa.webp" alt="Sawa" class="client-logo"></a>
+                    <a href="https://fromtoday.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/from-today.png" alt="From Today" class="client-logo"></a>
+                    <a href="https://www.odysseydining.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/odyssey.png" alt="Odyssey" class="client-logo"></a>
+                    <a href="https://fefundinfo.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/fe-fundinfo.png" alt="FE Fundinfo" class="client-logo"></a>
+                    <a href="https://jubelbeer.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/jubel.png" alt="Jubel" class="client-logo"></a>
+                    <a href="https://rulebase.co/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/rulebase.svg" alt="Rulebase" class="client-logo-color"></a>
                 </div>
-                <div class="flex items-center gap-12 px-6">
-                    <span class="text-gray-400 font-medium">Charterhouse</span>
-                    <span class="text-gray-400 font-medium">MoveGB</span>
-                    <span class="text-gray-400 font-medium">MindsDB</span>
-                    <span class="text-gray-400 font-medium">SalesAPE</span>
-                    <span class="text-gray-400 font-medium">Stylus</span>
-                    <span class="text-gray-400 font-medium">Telus</span>
-                    <span class="text-gray-400 font-medium">HG Capital</span>
-                    <span class="text-gray-400 font-medium">Evoke Medical Care</span>
-                    <span class="text-gray-400 font-medium">Sophos</span>
-                    <span class="text-gray-400 font-medium">Contextual AI</span>
-                    <span class="text-gray-400 font-medium">Medsnapp</span>
-                    <span class="text-gray-400 font-medium">Kliq</span>
-                    <span class="text-gray-400 font-medium">Sawa</span>
-                    <span class="text-gray-400 font-medium">From Today</span>
-                    <span class="text-gray-400 font-medium">Odyssey</span>
-                    <span class="text-gray-400 font-medium">FE Fundinfo</span>
-                    <span class="text-gray-400 font-medium">Jubel</span>
+                <div class="marquee-group" aria-hidden="true">
+                    <a href="https://www.charterhouse.co.uk/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/charterhouse.png" alt="Charterhouse" class="client-logo"></a>
+                    <a href="https://www.movegb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/move-gb.png" alt="MoveGB" class="client-logo"></a>
+                    <a href="https://mindsdb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/mindsdb.png" alt="MindsDB" class="client-logo"></a>
+                    <a href="https://www.salesape.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/salesape.png" alt="SalesAPE" class="client-logo"></a>
+                    <a href="https://stylus.education/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/stylus.png" alt="Stylus" class="client-logo"></a>
+                    <a href="https://www.telus.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/telus.png" alt="TELUS" class="client-logo"></a>
+                    <a href="https://hgcapital.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/hg.png" alt="HG Capital" class="client-logo"></a>
+                    <a href="https://evokemedicalcare.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/evoke.png" alt="Evoke Medical Care" class="client-logo"></a>
+                    <a href="https://sophoseducation.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sophos.png" alt="Sophos" class="client-logo"></a>
+                    <a href="https://contextual.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/contextual.png" alt="Contextual AI" class="client-logo"></a>
+                    <a href="https://www.medsnapp.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/medsnapp.png" alt="MedSnapp" class="client-logo"></a>
+                    <a href="https://www.joinkliq.io/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/kliq.png" alt="Kliq" class="client-logo"></a>
+                    <a href="https://sawa.global/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sawa.webp" alt="Sawa" class="client-logo"></a>
+                    <a href="https://fromtoday.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/from-today.png" alt="From Today" class="client-logo"></a>
+                    <a href="https://www.odysseydining.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/odyssey.png" alt="Odyssey" class="client-logo"></a>
+                    <a href="https://fefundinfo.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/fe-fundinfo.png" alt="FE Fundinfo" class="client-logo"></a>
+                    <a href="https://jubelbeer.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/jubel.png" alt="Jubel" class="client-logo"></a>
+                    <a href="https://rulebase.co/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/rulebase.svg" alt="Rulebase" class="client-logo-color"></a>
                 </div>
             </div>
         </div>

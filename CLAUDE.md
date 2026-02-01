@@ -47,7 +47,9 @@ The site has a simple, focused structure with 5 main sections:
 - **No text next to logo** - logo includes the wordmark
 
 **Customer Marquee:**
-- 17 companies total: Charterhouse, MoveGB, MindsDB, SalesAPE, Stylus, Telus, HG Capital, Evoke Medical Care, Sophos, Contextual AI, Medsnapp, Kliq, Sawa, From Today, Odyssey, FE Fundinfo, Jubel
+- 18 companies total: Charterhouse, MoveGB, MindsDB, SalesAPE, Stylus, Telus, HG Capital, Evoke Medical Care, Sophos, Contextual AI, Medsnapp, Kliq, Sawa, From Today, Odyssey, FE Fundinfo, Jubel, Rulebase
+- Uses clickable logo images stored in `img/clients/` directory
+- PNG logos have `filter: invert(1)` applied (they're designed for dark mode)
 - Duplicated list for seamless infinite scroll animation
 - **No label** - just the marquee
 - Update both sets when adding/removing clients
