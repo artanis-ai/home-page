@@ -186,8 +186,8 @@
                             </div>
                             ` : ''}
                             <div class="flex-1 min-w-0">
-                                <h4 class="text-base font-semibold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2">${item.title}</h4>
-                                ${item.description ? `<p class="mt-1 text-sm text-slate-600 line-clamp-2">${item.description}</p>` : ''}
+                                <h4 class="text-base font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">${item.title}</h4>
+                                ${item.description ? `<p class="mt-1 text-sm text-slate-600">${item.description}</p>` : ''}
                                 <p class="mt-2 text-xs text-slate-500">${formatDate(item.pubDate)}</p>
                             </div>
                         </div>
@@ -207,19 +207,19 @@
             `;
         }
 
-        async function fetchRSS(url, elementId, renderFunction, limit) {
+        async function fetchRSS(url, elementId, renderFunction) {
             try {
                 const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`);
                 const data = await response.json();
                 const feedContainer = document.getElementById(elementId);
-                feedContainer.innerHTML = data.items.slice(0, limit).map(renderFunction).join('');
+                feedContainer.innerHTML = data.items.map(renderFunction).join('');
             } catch (error) {
                 console.error('Error fetching RSS feed:', error);
             }
         }
 
-        fetchRSS('https://artanis.substack.com/feed', 'substack-feed', renderBlogItem, 4);
-        fetchRSS('https://buttondown.com/artanis/rss', 'buttondown-feed', renderNewsletterItem, 6);
+        fetchRSS('https://artanis.substack.com/feed', 'substack-feed', renderBlogItem);
+        fetchRSS('https://buttondown.com/artanis/rss', 'buttondown-feed', renderNewsletterItem);
     </script>
 </body>
 </html>
