@@ -4,18 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artanis AI</title>
-    <meta name="description" content="Stack trace for AI">
+    <meta name="description" content="Stack trace for AI. Find what's failing in your AI pipeline and fix it.">
+    <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="img/favicon-96x96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <script>
         tailwind.config = {
             theme: {
+                fontSize: {
+                    xs: ['0.75rem', { lineHeight: '1rem' }],
+                    sm: ['0.875rem', { lineHeight: '1.5rem' }],
+                    base: ['1rem', { lineHeight: '1.75rem' }],
+                    lg: ['1.125rem', { lineHeight: '2rem' }],
+                    xl: ['1.25rem', { lineHeight: '2rem' }],
+                    '2xl': ['1.5rem', { lineHeight: '2rem' }],
+                    '3xl': ['2rem', { lineHeight: '2.5rem' }],
+                    '4xl': ['2.5rem', { lineHeight: '3.5rem' }],
+                    '5xl': ['3rem', { lineHeight: '3.5rem' }],
+                    '6xl': ['3.75rem', { lineHeight: '1' }],
+                    '7xl': ['4.5rem', { lineHeight: '1.1' }],
+                    '8xl': ['6rem', { lineHeight: '1' }],
+                    '9xl': ['8rem', { lineHeight: '1' }],
+                },
                 extend: {
+                    borderRadius: {
+                        '4xl': '2rem',
+                    },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#2563eb',
+                        display: ['Lexend', 'sans-serif'],
                     },
                 },
             },
@@ -45,274 +66,448 @@
             flex-shrink: 0;
             align-items: center;
         }
+        .client-logo {
+            height: 32px;
+            width: auto;
+            filter: brightness(0) opacity(0.4);
+            transition: filter 0.2s;
+        }
+        .client-logo:hover {
+            filter: brightness(0) opacity(0.8);
+        }
+        .client-logo-color {
+            height: 32px;
+            width: auto;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .client-logo-color:hover {
+            opacity: 0.9;
+        }
+
+        /* How It Works scroll animations — driven by JS scroll progress */
+        .how-it-works-screenshot,
+        .how-it-works-slack,
+        .how-it-works-arrow,
+        .how-it-works-doc {
+            will-change: transform, opacity;
+        }
+        .how-it-works-arrow-1,
+        .how-it-works-arrow-2 {
+            will-change: transform, opacity;
+        }
     </style>
 </head>
-<body class="bg-white text-gray-900 antialiased">
+<body class="bg-white antialiased">
+
     <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-        <div class="mx-auto max-w-7xl px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <img src="img/artanis.png" alt="Artanis" class="h-10">
+    <header class="py-10">
+        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-50 flex justify-between">
+            <div class="flex items-center md:gap-x-12">
+                <a href="#" aria-label="Home">
+                    <img src="img/artanis.png" alt="Artanis" class="h-10 w-auto">
+                </a>
+                <div class="hidden md:flex md:gap-x-6">
+                    <a href="blog.html" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">News</a>
+                    <a href="team.html" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">Team</a>
+                    <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">Docs</a>
                 </div>
-                <nav class="flex items-center gap-8">
-                    <a href="https://artanis.substack.com/" target="_blank" rel="noopener noreferrer"
-                       class="text-gray-700 hover:text-primary font-medium transition-colors">Blog</a>
-                    <a href="#contact"
-                       class="bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary/90 transition-colors">
-                        Contact Us
-                    </a>
-                </nav>
+            </div>
+            <div class="flex items-center gap-x-5 md:gap-x-8">
+                <a href="https://app.artanis.ai"
+                   class="hidden md:inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">
+                    Log in
+                </a>
+                <a href="https://accounts.artanis.ai/waitlist"
+                   class="inline-flex items-center justify-center rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                    Sign Up
+                </a>
+                <button type="button" class="-mr-1 md:hidden" aria-label="Toggle Navigation" onclick="toggleMobileMenu()">
+                    <svg aria-hidden="true" class="h-3.5 w-3.5 overflow-visible stroke-slate-700" fill="none" stroke-width="2" stroke-linecap="round">
+                        <path d="M0 1H14M0 7H14M0 13H14"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 md:hidden">
+            <div class="mt-4 rounded-2xl bg-white p-4 text-lg tracking-tight text-slate-900 shadow-xl ring-1 ring-slate-900/5">
+                <a href="blog.html" class="block w-full p-2">News</a>
+                <a href="team.html" class="block w-full p-2">Team</a>
+                <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="block w-full p-2">Docs</a>
+                <hr class="m-2 border-slate-300/40">
+                <a href="https://app.artanis.ai" class="block w-full p-2" onclick="closeMobileMenu()">Log In</a>
+                <a href="https://accounts.artanis.ai/waitlist" class="block w-full p-2" onclick="closeMobileMenu()">Sign Up</a>
             </div>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="py-24 px-6 bg-gradient-to-b from-white to-gray-50">
-        <div class="mx-auto max-w-4xl text-center">
-            <h1 class="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
-                Stack trace for AI
+    <!-- Hero -->
+    <section class="pb-16 pt-20 text-center lg:pt-32">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <h1 class="mx-auto max-w-4xl font-display text-5xl font-medium tracking-tight text-slate-900 sm:text-7xl">
+                <span class="relative whitespace-nowrap text-blue-600">
+                    <svg aria-hidden="true" viewBox="0 0 418 42" class="absolute left-0 top-2/3 h-[0.58em] w-full fill-blue-300/70" preserveAspectRatio="none">
+                        <path d="M203.371.916c-26.013-2.078-76.686 1.963-124.73 9.946L67.3 12.749C35.421 18.062 18.2 21.766 6.004 25.934 1.244 27.561.828 27.778.874 28.61c.07 1.214.828 1.121 9.595-1.176 9.072-2.377 17.15-3.92 39.246-7.496C123.565 7.986 157.869 4.492 195.942 5.046c7.461.108 19.25 1.696 19.17 2.582-.107 1.183-7.874 4.31-25.75 10.366-21.992 7.45-35.43 12.534-36.701 13.884-2.173 2.308-.202 4.407 4.442 4.734 2.654.187 3.263.157 15.593-.78 35.401-2.686 57.944-3.488 88.365-3.143 46.327.526 75.721 2.23 130.788 7.584 19.787 1.924 20.814 1.98 24.557 1.332l.066-.011c1.201-.203 1.53-1.825.399-2.335-2.911-1.31-4.893-1.604-22.048-3.261-57.509-5.556-87.871-7.36-132.059-7.842-23.239-.254-33.617-.116-50.627.674-11.629.54-42.371 2.494-46.696 2.967-2.359.259 8.133-3.625 26.504-9.81 23.239-7.825 27.934-10.149 28.304-14.005.417-4.348-3.529-6-16.878-7.066Z" />
+                    </svg>
+                    <span class="relative">Stack trace</span>
+                </span>
+                for AI
             </h1>
-            <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                Find what's failing in your AI pipeline and fix it
+            <p class="mx-auto mt-6 max-w-2xl text-lg tracking-tight text-slate-700">
+                Find what's failing in your AI pipeline and fix it. Plug into your existing observability platform, use our SDK, or call the REST API directly.
             </p>
-            <a href="#contact"
-               class="inline-block bg-primary text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary/90 transition-colors">
-                Contact us
-            </a>
-        </div>
-    </section>
-
-    <!-- Client Marquee -->
-    <section class="py-12 border-y border-gray-100 bg-white">
-        <style>
-            .client-logo {
-                height: 32px;
-                width: auto;
-                filter: brightness(0) opacity(0.5);
-                transition: filter 0.2s;
-            }
-            .client-logo:hover {
-                filter: brightness(0) opacity(0.9);
-            }
-            .client-logo-color {
-                height: 32px;
-                width: auto;
-                opacity: 0.7;
-                transition: opacity 0.2s;
-            }
-            .client-logo-color:hover {
-                opacity: 1;
-            }
-        </style>
-        <div class="marquee-container">
-            <div class="marquee-content">
-                <div class="marquee-group">
-                    <a href="https://www.charterhouse.co.uk/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/charterhouse.png" alt="Charterhouse" class="client-logo"></a>
-                    <a href="https://www.movegb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/move-gb.png" alt="MoveGB" class="client-logo"></a>
-                    <a href="https://mindsdb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/mindsdb.png" alt="MindsDB" class="client-logo"></a>
-                    <a href="https://www.salesape.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/salesape.png" alt="SalesAPE" class="client-logo"></a>
-                    <a href="https://stylus.education/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/stylus.png" alt="Stylus" class="client-logo"></a>
-                    <a href="https://www.telus.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/telus.png" alt="TELUS" class="client-logo"></a>
-                    <a href="https://hgcapital.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/hg.png" alt="HG Capital" class="client-logo"></a>
-                    <a href="https://evokemedicalcare.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/evoke.png" alt="Evoke Medical Care" class="client-logo"></a>
-                    <a href="https://sophoseducation.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sophos.png" alt="Sophos" class="client-logo"></a>
-                    <a href="https://contextual.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/contextual.png" alt="Contextual AI" class="client-logo"></a>
-                    <a href="https://www.medsnapp.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/medsnapp.png" alt="MedSnapp" class="client-logo"></a>
-                    <a href="https://www.joinkliq.io/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/kliq.png" alt="Kliq" class="client-logo"></a>
-                    <a href="https://sawa.global/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sawa.webp" alt="Sawa" class="client-logo"></a>
-                    <a href="https://fromtoday.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/from-today.png" alt="From Today" class="client-logo"></a>
-                    <a href="https://www.odysseydining.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/odyssey.png" alt="Odyssey" class="client-logo"></a>
-                    <a href="https://fefundinfo.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/fe-fundinfo.png" alt="FE Fundinfo" class="client-logo"></a>
-                    <a href="https://jubelbeer.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/jubel.png" alt="Jubel" class="client-logo"></a>
-                    <a href="https://rulebase.co/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/rulebase.svg" alt="Rulebase" class="client-logo-color"></a>
-                </div>
-                <div class="marquee-group" aria-hidden="true">
-                    <a href="https://www.charterhouse.co.uk/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/charterhouse.png" alt="Charterhouse" class="client-logo"></a>
-                    <a href="https://www.movegb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/move-gb.png" alt="MoveGB" class="client-logo"></a>
-                    <a href="https://mindsdb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/mindsdb.png" alt="MindsDB" class="client-logo"></a>
-                    <a href="https://www.salesape.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/salesape.png" alt="SalesAPE" class="client-logo"></a>
-                    <a href="https://stylus.education/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/stylus.png" alt="Stylus" class="client-logo"></a>
-                    <a href="https://www.telus.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/telus.png" alt="TELUS" class="client-logo"></a>
-                    <a href="https://hgcapital.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/hg.png" alt="HG Capital" class="client-logo"></a>
-                    <a href="https://evokemedicalcare.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/evoke.png" alt="Evoke Medical Care" class="client-logo"></a>
-                    <a href="https://sophoseducation.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sophos.png" alt="Sophos" class="client-logo"></a>
-                    <a href="https://contextual.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/contextual.png" alt="Contextual AI" class="client-logo"></a>
-                    <a href="https://www.medsnapp.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/medsnapp.png" alt="MedSnapp" class="client-logo"></a>
-                    <a href="https://www.joinkliq.io/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/kliq.png" alt="Kliq" class="client-logo"></a>
-                    <a href="https://sawa.global/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sawa.webp" alt="Sawa" class="client-logo"></a>
-                    <a href="https://fromtoday.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/from-today.png" alt="From Today" class="client-logo"></a>
-                    <a href="https://www.odysseydining.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/odyssey.png" alt="Odyssey" class="client-logo"></a>
-                    <a href="https://fefundinfo.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/fe-fundinfo.png" alt="FE Fundinfo" class="client-logo"></a>
-                    <a href="https://jubelbeer.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/jubel.png" alt="Jubel" class="client-logo"></a>
-                    <a href="https://rulebase.co/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/rulebase.svg" alt="Rulebase" class="client-logo-color"></a>
-                </div>
+            <div class="mt-10 flex justify-center">
+                <a href="https://accounts.artanis.ai/waitlist"
+                   class="inline-flex items-center justify-center rounded-full bg-blue-600 px-8 py-3 text-base font-semibold text-white hover:bg-blue-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                    Sign Up
+                </a>
             </div>
         </div>
-    </section>
 
-    <!-- Blog & Newsletter Section -->
-    <section class="py-24 px-6 bg-white">
-        <div class="mx-auto max-w-7xl">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <!-- Blog -->
-                <div>
-                    <div class="flex items-center justify-between mb-8">
-                        <h2 class="text-3xl font-bold text-gray-900">Blog</h2>
-                        <a href="https://artanis.substack.com/subscribe" target="_blank" rel="noopener noreferrer"
-                           class="text-primary hover:text-primary/80 font-medium transition-colors text-sm">Subscribe</a>
+        <!-- Trusted by -->
+        <div class="mt-36 lg:mt-44">
+            <p class="font-display text-base text-slate-900 text-center">
+                Trusted by
+            </p>
+            <div class="mt-8 marquee-container">
+                <div class="marquee-content">
+                    <div class="marquee-group">
+                        <a href="https://www.charterhouse.co.uk/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/charterhouse.png" alt="Charterhouse" class="client-logo"></a>
+                        <a href="https://www.movegb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/move-gb.png" alt="MoveGB" class="client-logo"></a>
+                        <a href="https://mindsdb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/mindsdb.png" alt="MindsDB" class="client-logo"></a>
+                        <a href="https://www.salesape.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/salesape.png" alt="SalesAPE" class="client-logo"></a>
+                        <a href="https://stylus.education/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/stylus.png" alt="Stylus" class="client-logo"></a>
+                        <a href="https://www.telus.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/telus.png" alt="TELUS" class="client-logo"></a>
+                        <a href="https://hgcapital.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/hg.png" alt="HG Capital" class="client-logo"></a>
+                        <a href="https://evokemedicalcare.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/evoke.png" alt="Evoke Medical Care" class="client-logo"></a>
+                        <a href="https://sophoseducation.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sophos.png" alt="Sophos" class="client-logo"></a>
+                        <a href="https://contextual.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/contextual.png" alt="Contextual AI" class="client-logo"></a>
+                        <a href="https://www.medsnapp.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/medsnapp.png" alt="MedSnapp" class="client-logo"></a>
+                        <a href="https://www.joinkliq.io/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/kliq.png" alt="Kliq" class="client-logo"></a>
+                        <a href="https://sawa.global/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sawa.webp" alt="Sawa" class="client-logo"></a>
+                        <a href="https://fromtoday.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/from-today.png" alt="From Today" class="client-logo"></a>
+                        <a href="https://www.odysseydining.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/odyssey.png" alt="Odyssey" class="client-logo"></a>
+                        <a href="https://fefundinfo.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/fe-fundinfo.png" alt="FE Fundinfo" class="client-logo"></a>
+                        <a href="https://jubelbeer.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/jubel.png" alt="Jubel" class="client-logo"></a>
+                        <a href="https://rulebase.co/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/rulebase.svg" alt="Rulebase" class="client-logo-color"></a>
                     </div>
-                    <ul id="substack-feed" class="space-y-4 mb-4"></ul>
-                    <div class="text-center">
-                        <a href="https://artanis.substack.com/archive" target="_blank" rel="noopener noreferrer"
-                           class="text-primary hover:text-primary/80 font-medium transition-colors text-sm">More</a>
-                    </div>
-                </div>
-
-                <!-- Newsletter -->
-                <div>
-                    <div class="flex items-center justify-between mb-8">
-                        <h2 class="text-3xl font-bold text-gray-900">Monthly Updates</h2>
-                        <a href="https://buttondown.com/artanis#subscribe-form" target="_blank" rel="noopener noreferrer"
-                           class="text-primary hover:text-primary/80 font-medium transition-colors text-sm">Subscribe</a>
-                    </div>
-                    <ul id="buttondown-feed" class="space-y-4 mb-4"></ul>
-                    <div class="text-center">
-                        <a href="https://buttondown.com/artanis/archive/" target="_blank" rel="noopener noreferrer"
-                           class="text-primary hover:text-primary/80 font-medium transition-colors text-sm">More</a>
+                    <div class="marquee-group" aria-hidden="true">
+                        <a href="https://www.charterhouse.co.uk/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/charterhouse.png" alt="Charterhouse" class="client-logo"></a>
+                        <a href="https://www.movegb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/move-gb.png" alt="MoveGB" class="client-logo"></a>
+                        <a href="https://mindsdb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/mindsdb.png" alt="MindsDB" class="client-logo"></a>
+                        <a href="https://www.salesape.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/salesape.png" alt="SalesAPE" class="client-logo"></a>
+                        <a href="https://stylus.education/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/stylus.png" alt="Stylus" class="client-logo"></a>
+                        <a href="https://www.telus.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/telus.png" alt="TELUS" class="client-logo"></a>
+                        <a href="https://hgcapital.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/hg.png" alt="HG Capital" class="client-logo"></a>
+                        <a href="https://evokemedicalcare.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/evoke.png" alt="Evoke Medical Care" class="client-logo"></a>
+                        <a href="https://sophoseducation.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sophos.png" alt="Sophos" class="client-logo"></a>
+                        <a href="https://contextual.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/contextual.png" alt="Contextual AI" class="client-logo"></a>
+                        <a href="https://www.medsnapp.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/medsnapp.png" alt="MedSnapp" class="client-logo"></a>
+                        <a href="https://www.joinkliq.io/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/kliq.png" alt="Kliq" class="client-logo"></a>
+                        <a href="https://sawa.global/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sawa.webp" alt="Sawa" class="client-logo"></a>
+                        <a href="https://fromtoday.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/from-today.png" alt="From Today" class="client-logo"></a>
+                        <a href="https://www.odysseydining.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/odyssey.png" alt="Odyssey" class="client-logo"></a>
+                        <a href="https://fefundinfo.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/fe-fundinfo.png" alt="FE Fundinfo" class="client-logo"></a>
+                        <a href="https://jubelbeer.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/jubel.png" alt="Jubel" class="client-logo"></a>
+                        <a href="https://rulebase.co/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/rulebase.svg" alt="Rulebase" class="client-logo-color"></a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Team Section -->
-    <section class="py-24 px-6 bg-gray-50">
-        <div class="mx-auto max-w-6xl">
-            <h2 class="text-3xl font-bold text-center text-gray-900 mb-16">Team</h2>
-            <div class="flex flex-col gap-12">
-                <div class="flex flex-col md:flex-row gap-12 justify-center">
-                    <a href="https://www.linkedin.com/in/sam-miller-5415b0124/" target="_blank" rel="noopener noreferrer"
-                       class="group flex flex-col items-center w-full md:w-[320px] text-center">
-                        <img src="img/sam.jpg" alt="Dr Sam Miller"
-                             class="w-40 h-40 rounded-full object-cover transition-all duration-300 mb-6 group-hover:scale-105">
-                        <h4 class="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors mb-4">Dr Sam Miller</h4>
-                        <p class="text-gray-600">Sam holds an AI PhD from the Alan Turing Institute. During his PhD, he founded the VC backed fitness app, Atlas AI. His AI research has been used by teams at Google & Nvidia.</p>
-                    </a>
-                    <a href="https://www.linkedin.com/in/yousefamar/" target="_blank" rel="noopener noreferrer"
-                       class="group flex flex-col items-center w-full md:w-[320px] text-center">
-                        <img src="img/yousef.jpg" alt="Dr Yousef Amar"
-                             class="w-40 h-40 rounded-full object-cover transition-all duration-300 mb-6 group-hover:scale-105">
-                        <h4 class="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors mb-4">Dr Yousef Amar</h4>
-                        <p class="text-gray-600">Yousef's PhD is in Computer Science from Imperial College, after which he founded Krew AI. He is a full-stack engineer, with two of his products reaching #1 on Product Hunt.</p>
-                    </a>
-                    <a href="https://www.linkedin.com/in/olly-styles-090437132/" target="_blank" rel="noopener noreferrer"
-                       class="group flex flex-col items-center w-full md:w-[320px] text-center">
-                        <img src="img/olly.jpg" alt="Dr Olly Styles"
-                             class="w-40 h-40 rounded-full object-cover transition-all duration-300 mb-6 group-hover:scale-105">
-                        <h4 class="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors mb-4">Dr Olly Styles</h4>
-                        <p class="text-gray-600">Olly holds a PhD in Machine Learning from Warwick University. He co-founded Atlas AI, and was the Senior ML Engineer at EdTech unicorn, Multiverse.</p>
-                    </a>
+    <!-- How It Works -->
+    <section class="bg-slate-50 pt-20 sm:pt-32 pb-20 sm:pb-32 lg:pb-56 overflow-hidden">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl lg:mx-0">
+                <h2 class="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">From feedback to fix</h2>
+                <p class="mt-4 text-lg tracking-tight text-slate-700">A user reports an issue. Artanis shows you exactly what the cause was and how to fix it.</p>
+            </div>
+
+            <!-- Composite visual -->
+            <div class="mt-16 relative" id="how-it-works">
+                <!-- Screenshot (large, central) -->
+                <div class="how-it-works-screenshot relative" style="perspective: 1200px;">
+                    <img src="img/trace-screenshot.png" alt="Artanis trace view showing the root cause: report template has hardcoded 2025 dates" class="w-full lg:w-[85%] rounded-2xl shadow-2xl border border-slate-200/80" style="transform: rotateY(-3deg) rotateX(2deg);">
+                </div>
+
+                <!-- Slack message (floating, angled, overlapping top-left) -->
+                <div class="how-it-works-slack absolute top-[44%] -left-12 z-10 rotate-[-3deg] max-w-md hidden lg:block">
+                    <div class="rounded-xl bg-white border border-slate-200 shadow-2xl p-4">
+                        <div class="flex gap-3">
+                            <div class="flex-shrink-0 mt-0.5">
+                                <svg width="36" height="36" viewBox="0 0 127 127" aria-hidden="true">
+                                    <path d="M27.2 80c0 7.3-5.9 13.2-13.2 13.2C6.7 93.2.8 87.3.8 80c0-7.3 5.9-13.2 13.2-13.2h13.2V80zm6.6 0c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2v33c0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V80z" fill="#e01e5a"/>
+                                    <path d="M47 27c-7.3 0-13.2-5.9-13.2-13.2C33.8 6.5 39.7.6 47 .6c7.3 0 13.2 5.9 13.2 13.2V27H47zm0 6.7c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H14c-7.3 0-13.2-5.9-13.2-13.2 0-7.3 5.9-13.2 13.2-13.2h33z" fill="#36c5f0"/>
+                                    <path d="M99.9 46.9c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H99.9V46.9zm-6.6 0c0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2v-33c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2v33z" fill="#2eb67d"/>
+                                    <path d="M80.1 99.8c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V99.8h13.2zm0-6.6c-7.3 0-13.2-5.9-13.2-13.2 0-7.3 5.9-13.2 13.2-13.2h33c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2h-33z" fill="#ecb22e"/>
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[15px] font-bold text-slate-900">Sarah J.</p>
+                                <p class="text-[15px] text-slate-900 mt-0.5 leading-snug">Hey, AcmeAI is still using &lsquo;2025&rsquo; on all the new reports. It&rsquo;s 2026!</p>
+                                <p class="text-xs text-slate-500 mt-1.5">#general &bull; Today at 10:03 AM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arrow pointing from Slack message to error attribution -->
+                <!-- Document screenshot (floating, overlaid right) -->
+                <div class="how-it-works-doc absolute -bottom-44 -right-12 z-10 rotate-[2deg] max-w-lg hidden lg:block">
+                    <img src="img/doc-screenshot.png" alt="Quarterly Usage Report Template showing hardcoded Q4 2025 date" class="w-full rounded-xl shadow-2xl border border-slate-200/80">
+                </div>
+
+                <!-- Arrow: drawn pointing right with a curve, then rotated+positioned via CSS -->
+                <!--
+                    Arrow 1: Slack message → "Missing or Stale Documentation"
+                    Nearly horizontal, slight downward angle (~3deg)
+                    Center spine: (0,45) C(70,50)(150,47)(175,46) — subtle curve
+                    Shaft tapers: ±2 at tail → ±8 at head
+                    Head: ±20 from spine, tip at (220,46)
+                -->
+                <svg class="how-it-works-arrow how-it-works-arrow-1 absolute z-20 hidden lg:block" width="250" height="100" style="top: 50%; left: 22%; transform: rotate(13deg); transform-origin: left center;" viewBox="0 0 220 100" fill="none">
+                    <path d="
+                        M 0,43
+                        C 70,45 150,40 175,38
+                        L 175,26
+                        L 220,46
+                        L 175,66
+                        L 175,54
+                        C 150,54 70,55 0,47
+                        Z
+                    " fill="#2563eb" opacity="0.9"/>
+                </svg>
+
+                <!--
+                    Arrow 2: Error area → "Q4 2025" in doc overlay
+                    Steep downward (~65deg rotation)
+                    Center spine: (0,35) C(60,55)(140,48)(175,45) — downward curve
+                    Shaft tapers: ±2 at tail → ±8 at head
+                    Head: ±20 from spine, tip at (220,45)
+                -->
+                <svg class="how-it-works-arrow how-it-works-arrow-2 absolute z-20 hidden" width="280" height="100" style="top: 60%; left: 53.5%; transform: rotate(70deg); transform-origin: left center;" viewBox="0 0 220 100" fill="none">
+                    <path d="
+                        M 0,33
+                        C 60,48 140,40 175,37
+                        L 175,25
+                        L 220,45
+                        L 175,65
+                        L 175,53
+                        C 140,56 60,62 0,37
+                        Z
+                    " fill="#2563eb" opacity="0.9"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Integrate -->
+    <section class="py-20 sm:py-32">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl lg:mx-0">
+                <h2 class="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">Integrate in 10 mins</h2>
+                <p class="mt-4 text-lg tracking-tight text-slate-700">Use our SDK or connect your existing observability platform — no code changes required.</p>
+            </div>
+            <div class="mt-16 rounded-2xl bg-slate-900 overflow-hidden shadow-xl">
+                <!-- Tabs -->
+                <div class="flex overflow-x-auto border-b border-white/10 bg-white/5">
+                    <button onclick="switchTab('python')" data-tab="python" class="code-tab whitespace-nowrap px-5 py-3 text-sm font-medium text-white border-b-2 border-blue-400">Python</button>
+                    <button onclick="switchTab('typescript')" data-tab="typescript" class="code-tab whitespace-nowrap px-5 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent">TypeScript</button>
+                    <button onclick="switchTab('langfuse')" data-tab="langfuse" class="code-tab whitespace-nowrap px-5 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent">Langfuse</button>
+                    <button onclick="switchTab('langsmith')" data-tab="langsmith" class="code-tab whitespace-nowrap px-5 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent">Langsmith</button>
+                    <button onclick="switchTab('helicone')" data-tab="helicone" class="code-tab whitespace-nowrap px-5 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent">Helicone</button>
+                </div>
+                <!-- Panels -->
+                <div class="p-6 sm:p-8 overflow-x-auto">
+                    <pre id="panel-python" class="text-sm leading-relaxed"><code><span class="text-slate-500"># pip install artanis-ai</span>
+<span class="text-blue-400">from</span> <span class="text-green-300">artanis</span> <span class="text-blue-400">import</span> <span class="text-slate-200">Artanis</span>
+
+<span class="text-slate-200">artanis</span> <span class="text-slate-400">=</span> <span class="text-slate-200">Artanis</span><span class="text-slate-400">(</span><span class="text-slate-200">api_key</span><span class="text-slate-400">=</span><span class="text-green-300">"sk_..."</span><span class="text-slate-400">)</span>
+
+<span class="text-slate-200">trace</span> <span class="text-slate-400">=</span> <span class="text-slate-200">artanis</span><span class="text-slate-400">.</span><span class="text-sky-300">trace</span><span class="text-slate-400">(</span><span class="text-green-300">"rag-answer"</span><span class="text-slate-400">)</span>
+<span class="text-slate-200">trace</span><span class="text-slate-400">.</span><span class="text-sky-300">input</span><span class="text-slate-400">(</span><span class="text-slate-200">question</span><span class="text-slate-400">=</span><span class="text-green-300">"What is AI?"</span><span class="text-slate-400">,</span> <span class="text-slate-200">model</span><span class="text-slate-400">=</span><span class="text-green-300">"gpt-4"</span><span class="text-slate-400">)</span>
+
+<span class="text-slate-200">response</span> <span class="text-slate-400">=</span> <span class="text-slate-200">llm</span><span class="text-slate-400">.</span><span class="text-sky-300">generate</span><span class="text-slate-400">(</span><span class="text-slate-200">prompt</span><span class="text-slate-400">)</span>
+<span class="text-slate-200">trace</span><span class="text-slate-400">.</span><span class="text-sky-300">output</span><span class="text-slate-400">(</span><span class="text-slate-200">response</span><span class="text-slate-400">)</span></code></pre>
+
+                    <pre id="panel-typescript" class="hidden text-sm leading-relaxed"><code><span class="text-slate-500">// npm install @artanis-ai/sdk</span>
+<span class="text-blue-400">import</span> <span class="text-slate-400">{</span> <span class="text-slate-200">Artanis</span> <span class="text-slate-400">}</span> <span class="text-blue-400">from</span> <span class="text-green-300">"@artanis-ai/sdk"</span><span class="text-slate-400">;</span>
+
+<span class="text-blue-400">const</span> <span class="text-slate-200">artanis</span> <span class="text-slate-400">=</span> <span class="text-blue-400">new</span> <span class="text-slate-200">Artanis</span><span class="text-slate-400">({</span> <span class="text-slate-200">apiKey</span><span class="text-slate-400">:</span> <span class="text-green-300">"sk_..."</span> <span class="text-slate-400">});</span>
+
+<span class="text-blue-400">const</span> <span class="text-slate-200">trace</span> <span class="text-slate-400">=</span> <span class="text-slate-200">artanis</span><span class="text-slate-400">.</span><span class="text-sky-300">trace</span><span class="text-slate-400">(</span><span class="text-green-300">"rag-answer"</span><span class="text-slate-400">);</span>
+<span class="text-slate-200">trace</span><span class="text-slate-400">.</span><span class="text-sky-300">input</span><span class="text-slate-400">({</span> <span class="text-slate-200">question</span><span class="text-slate-400">:</span> <span class="text-green-300">"What is AI?"</span><span class="text-slate-400">,</span> <span class="text-slate-200">model</span><span class="text-slate-400">:</span> <span class="text-green-300">"gpt-4"</span> <span class="text-slate-400">});</span>
+
+<span class="text-blue-400">const</span> <span class="text-slate-200">response</span> <span class="text-slate-400">=</span> <span class="text-blue-400">await</span> <span class="text-slate-200">llm</span><span class="text-slate-400">.</span><span class="text-sky-300">generate</span><span class="text-slate-400">(</span><span class="text-slate-200">prompt</span><span class="text-slate-400">);</span>
+<span class="text-slate-200">trace</span><span class="text-slate-400">.</span><span class="text-sky-300">output</span><span class="text-slate-400">(</span><span class="text-slate-200">response</span><span class="text-slate-400">);</span></code></pre>
+
+                    <pre id="panel-langfuse" class="hidden text-sm leading-relaxed"><code><span class="text-slate-500"># No code changes needed</span>
+<span class="text-slate-500">#</span>
+<span class="text-slate-500"># 1. In Artanis, go to Settings → Integrations</span>
+<span class="text-slate-500"># 2. Click Configure next to Langfuse</span>
+<span class="text-slate-500"># 3. Select your region (EU or US)</span>
+<span class="text-slate-500"># 4. Enter your Langfuse API keys:</span>
+<span class="text-slate-500">#    - Public Key  (pk-lf-...)</span>
+<span class="text-slate-500">#    - Secret Key  (sk-lf-...)</span>
+<span class="text-slate-500">#</span>
+<span class="text-slate-500"># Traces sync automatically every 10 minutes.</span></code></pre>
+
+                    <pre id="panel-langsmith" class="hidden text-sm leading-relaxed"><code><span class="text-slate-500"># No code changes needed</span>
+<span class="text-slate-500">#</span>
+<span class="text-slate-500"># 1. In Artanis, go to Settings → Integrations</span>
+<span class="text-slate-500"># 2. Click Configure next to LangSmith</span>
+<span class="text-slate-500"># 3. Enter your API key (lsv2_pt_...)</span>
+<span class="text-slate-500"># 4. Copy the generated webhook URL</span>
+<span class="text-slate-500"># 5. In LangSmith, open your project</span>
+<span class="text-slate-500">#    → Automations → Create rule → Webhook action</span>
+<span class="text-slate-500">#    → Paste the URL</span>
+<span class="text-slate-500">#</span>
+<span class="text-slate-500"># Traces flow in real-time.</span></code></pre>
+
+                    <pre id="panel-helicone" class="hidden text-sm leading-relaxed"><code><span class="text-slate-500"># No code changes needed</span>
+<span class="text-slate-500">#</span>
+<span class="text-slate-500"># 1. In Artanis, go to Settings → Integrations</span>
+<span class="text-slate-500"># 2. Click Configure next to Helicone</span>
+<span class="text-slate-500"># 3. Copy your webhook URL and paste it at</span>
+<span class="text-slate-500">#    us.helicone.ai/webhooks</span>
+<span class="text-slate-500"># 4. Set sample rate to 100%</span>
+<span class="text-slate-500"># 5. Turn on "Include Enhanced Data"</span>
+<span class="text-slate-500"># 6. Copy the HMAC key back to Artanis</span>
+<span class="text-slate-500">#</span>
+<span class="text-slate-500"># Traces flow automatically.</span></code></pre>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="py-32 px-6 bg-white">
-        <div class="mx-auto max-w-4xl text-center">
-            <h2 class="text-3xl font-bold text-gray-900 mb-6">Get in Touch</h2>
-            <p class="text-lg text-gray-700 mb-8">Want to systematically identify and fix failures in your AI pipeline? Let's talk.</p>
-            <a href="mailto:team@artanis.ai?subject=Interested%20in%20Artanis&body=Hi%20Artanis%20team%2C%0D%0A%0D%0AI%27d%20like%20to%20learn%20more%20about%20identifying%20and%20fixing%20failures%20in%20my%20AI%20pipeline."
-               target="_blank" rel="noopener noreferrer"
-               class="inline-block bg-primary text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary/90 transition-colors">
-                Contact Us
-            </a>
+    <!-- CTA -->
+    <section id="contact" class="relative overflow-hidden bg-blue-600 py-20 sm:py-32">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
+            <div class="mx-auto max-w-lg text-center">
+                <h2 class="font-display text-3xl tracking-tight text-white sm:text-4xl">Get Started</h2>
+                <p class="mt-4 text-lg tracking-tight text-white">
+                    Start identifying and fixing failures in your AI pipeline today.
+                </p>
+                <a href="https://accounts.artanis.ai/waitlist"
+                   class="mt-10 inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-blue-50 active:bg-blue-200 active:text-slate-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                    Sign Up
+                </a>
+            </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="border-t border-gray-200 py-12 px-6 bg-white">
-        <div class="mx-auto max-w-7xl text-center">
-            <p class="text-gray-600">&copy; 2025 Artanis Ltd. All rights reserved.</p>
-            <div class="mt-4 space-x-4">
-                <a href="https://app.artanis.ai/terms.html" class="text-gray-500 hover:text-gray-900 transition-colors">Terms</a>
-                <span class="text-gray-300">&bull;</span>
-                <a href="https://app.artanis.ai/privacy.html" class="text-gray-500 hover:text-gray-900 transition-colors">Privacy</a>
+    <footer class="bg-slate-50">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col items-center py-10 sm:flex-row sm:justify-between">
+                <p class="text-sm text-slate-500">
+                    &copy; 2025 Artanis Ltd. All rights reserved.
+                </p>
+                <div class="mt-6 flex gap-x-6 text-sm sm:mt-0">
+                    <a href="https://app.artanis.ai/terms.html" class="text-slate-500 hover:text-slate-900">Terms</a>
+                    <a href="https://app.artanis.ai/privacy.html" class="text-slate-500 hover:text-slate-900">Privacy</a>
+                </div>
             </div>
         </div>
     </footer>
 
     <script>
-        function formatDate(dateStr) {
-            const date = new Date(dateStr);
-            const now = new Date();
-            const diffTime = Math.abs(now - date);
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+        function closeMobileMenu() {
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
 
-            if (diffDays === 0) {
-                return 'Today';
-            } else if (diffDays === 1) {
-                return 'Yesterday';
-            } else if (diffDays < 7) {
-                return `${diffDays} days ago`;
-            } else if (diffDays < 30) {
-                const weeks = Math.floor(diffDays / 7);
-                return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
-            } else {
-                const options = { month: 'short', day: 'numeric' };
-                if (date.getFullYear() !== now.getFullYear()) {
-                    options.year = 'numeric';
+        // Code tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('[id^="panel-"]').forEach(p => p.classList.add('hidden'));
+            document.getElementById('panel-' + tab).classList.remove('hidden');
+            document.querySelectorAll('.code-tab').forEach(btn => {
+                btn.classList.remove('text-white', 'border-blue-400');
+                btn.classList.add('text-slate-400', 'border-transparent');
+            });
+            const active = document.querySelector('[data-tab="' + tab + '"]');
+            active.classList.remove('text-slate-400', 'border-transparent');
+            active.classList.add('text-white', 'border-blue-400');
+        }
+
+        // How It Works scroll-driven animation + mouse parallax
+        (function() {
+            const container = document.getElementById('how-it-works');
+            if (!container) return;
+
+            const screenshot = container.querySelector('.how-it-works-screenshot');
+            const slack = container.querySelector('.how-it-works-slack');
+            const arrow1 = container.querySelector('.how-it-works-arrow-1');
+            const arrow2 = container.querySelector('.how-it-works-arrow-2');
+            const doc = container.querySelector('.how-it-works-doc');
+
+            function lerp(a, b, t) { return a + (b - a) * t; }
+            function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+            // Mouse parallax: mx/my range from -1 to 1 (center of container = 0)
+            let mx = 0, my = 0, targetMx = 0, targetMy = 0;
+            container.addEventListener('mousemove', function(e) {
+                const rect = container.getBoundingClientRect();
+                targetMx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+                targetMy = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+            });
+            container.addEventListener('mouseleave', function() {
+                targetMx = 0;
+                targetMy = 0;
+            });
+
+            function update() {
+                // Smooth mouse tracking
+                mx += (targetMx - mx) * 0.08;
+                my += (targetMy - my) * 0.08;
+
+                const rect = container.getBoundingClientRect();
+                const vh = window.innerHeight;
+                const raw = (vh - rect.top) / (vh + rect.height * 0.5);
+                const p = clamp(raw, 0, 1);
+
+                // Screenshot: always visible, mouse tilts perspective
+                screenshot.querySelector('img').style.transform = `rotateY(${-3 + mx * 3}deg) rotateX(${2 - my * 3}deg)`;
+
+                // 1) Slack comment: appears first — foreground parallax
+                const slackP = clamp((p - 0) / 0.25, 0, 1);
+                const slackEased = 1 - Math.pow(1 - slackP, 3);
+                slack.style.opacity = slackEased;
+                slack.style.transform = `rotate(-3deg) translateX(${lerp(-200, 0, slackEased) + mx * 8}px) translateY(${lerp(-80, 0, slackEased) + my * 5}px) scale(${lerp(0.8, 1, slackEased)})`;
+
+                // 2) Arrow 1: appears after slack
+                const a1P = clamp((p - 0.12) / 0.2, 0, 1);
+                const a1Eased = 1 - Math.pow(1 - a1P, 3);
+                if (arrow1) {
+                    arrow1.style.opacity = a1Eased;
+                    arrow1.style.transform = `rotate(13deg) scale(${lerp(0.3, 1, a1Eased)}) translate(${mx * 6}px, ${my * 4}px)`;
                 }
-                return date.toLocaleDateString('en-US', options);
+
+                // 3) Arrow 2: appears after arrow 1
+                const a2P = clamp((p - 0.22) / 0.2, 0, 1);
+                const a2Eased = 1 - Math.pow(1 - a2P, 3);
+                if (arrow2) {
+                    arrow2.style.opacity = a2Eased;
+                    arrow2.style.transform = `rotate(70deg) scale(${lerp(0.3, 1, a2Eased)}) translate(${mx * 5}px, ${my * 3}px)`;
+                }
+
+                // 4) Doc: appears last — foreground parallax
+                const docP = clamp((p - 0.3) / 0.2, 0, 1);
+                const docEased = 1 - Math.pow(1 - docP, 3);
+                if (doc) {
+                    doc.style.opacity = docEased;
+                    doc.style.transform = `rotate(2deg) translateX(${lerp(100, 0, docEased) + mx * 8}px) translateY(${my * 5}px) scale(${lerp(0.85, 1, docEased)})`;
+                }
+
+                requestAnimationFrame(update);
             }
-        }
-
-        function renderBlogItem(item) {
-            return `
-                <li class="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 hover:shadow-md transition-all">
-                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block group">
-                        <div class="flex gap-4">
-                            ${item.enclosure?.link ? `
-                            <div class="flex-shrink-0">
-                                <img src="${item.enclosure.link}" alt="" class="w-24 h-24 object-cover rounded">
-                            </div>
-                            ` : ''}
-                            <div class="flex-1 min-w-0">
-                                <h5 class="text-base font-semibold text-gray-900 group-hover:text-primary mb-1 transition-colors line-clamp-2">${item.title}</h5>
-                                ${item.description ? `<p class="text-sm text-gray-600 mb-2 line-clamp-2">${item.description}</p>` : ''}
-                                <div class="text-xs text-gray-500">${formatDate(item.pubDate)}</div>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-            `;
-        }
-
-        function renderNewsletterItem(item) {
-            return `
-                <li class="border border-gray-200 rounded-lg p-4 bg-white hover:border-primary/50 hover:shadow-sm transition-all">
-                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block group">
-                        <h5 class="text-base font-medium text-gray-900 group-hover:text-primary transition-colors mb-2">${item.title}</h5>
-                        <div class="text-xs text-gray-500">${formatDate(item.pubDate)}</div>
-                    </a>
-                </li>
-            `;
-        }
-
-        async function fetchRSS(url, elementId, renderFunction, limit) {
-            try {
-                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`);
-                const data = await response.json();
-                const feedContainer = document.getElementById(elementId);
-                feedContainer.innerHTML = data.items.slice(0, limit).map(renderFunction).join('');
-            } catch (error) {
-                console.error('Error fetching RSS feed:', error);
-            }
-        }
-
-        fetchRSS('https://artanis.substack.com/feed', 'substack-feed', renderBlogItem, 4);
-        fetchRSS('https://buttondown.com/artanis/rss', 'buttondown-feed', renderNewsletterItem, 6);
+            requestAnimationFrame(update);
+        })();
     </script>
 </body>
 </html>
