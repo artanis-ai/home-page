@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team - Artanis AI</title>
     <meta name="description" content="Meet the Artanis team. Three PhDs who've built AI products from research to production.">
+    <link rel="icon" href="img/favicon.ico" sizes="any">
     <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
     <link rel="icon" type="image/png" sizes="96x96" href="img/favicon-96x96.png">
     <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
@@ -38,70 +39,88 @@
                         sans: ['Inter', 'sans-serif'],
                         display: ['Lexend', 'sans-serif'],
                     },
+                    colors: {
+                        primary: '#9B4340',
+                        'primary-light': '#C4716A',
+                        'primary-dark': '#7A3835',
+                        accent: '#D4A76A',
+                        'accent-light': '#F0D9A8',
+                        'earth-dark': '#4E3222',
+                        earth: '#6B4226',
+                        'earth-light': '#8B5E3C',
+                        'earth-warm': '#7A5238',
+                        forest: '#4A7C59',
+                        'forest-light': '#6BA37A',
+                        cream: '#FFFBF5',
+                        warm: '#F5EDE3',
+                        'text-dark': '#2D1810',
+                        'text-mid': '#6B5744',
+                        'text-muted': '#9A8B7A',
+                    },
                 },
             },
         }
     </script>
 </head>
-<body class="bg-white antialiased">
+<body class="bg-cream antialiased">
 
     <!-- Header -->
-    <header class="py-10">
-        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-50 flex justify-between">
+    <header class="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-warm">
+        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
             <div class="flex items-center md:gap-x-12">
                 <a href="/" aria-label="Home">
                     <img src="img/artanis.png" alt="Artanis" class="h-10 w-auto">
                 </a>
                 <div class="hidden md:flex md:gap-x-6">
-                    <a href="blog.html" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">Blog</a>
-                    <a href="team.html" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">Team</a>
-                    <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">Docs <svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>
+                    <a href="blog.html" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Blog</a>
+                    <a href="team.html" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Team</a>
+                    <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Docs <svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>
                 </div>
             </div>
             <div class="flex items-center gap-x-5 md:gap-x-8">
                 <a href="https://app.artanis.ai"
-                   class="hidden md:inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">
+                   class="hidden md:inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">
                     Log in
                 </a>
                 <a href="https://accounts.artanis.ai/waitlist"
-                   class="inline-flex items-center justify-center rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                    Sign Up
+                   class="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-dark focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors">
+                    Sign up
                 </a>
                 <button type="button" class="-mr-1 md:hidden" aria-label="Toggle Navigation" onclick="toggleMobileMenu()">
-                    <svg aria-hidden="true" class="h-3.5 w-3.5 overflow-visible stroke-slate-700" fill="none" stroke-width="2" stroke-linecap="round">
+                    <svg aria-hidden="true" class="h-3.5 w-3.5 overflow-visible stroke-text-dark" fill="none" stroke-width="2" stroke-linecap="round">
                         <path d="M0 1H14M0 7H14M0 13H14"></path>
                     </svg>
                 </button>
             </div>
         </nav>
         <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 md:hidden">
-            <div class="mt-4 rounded-2xl bg-white p-4 text-lg tracking-tight text-slate-900 shadow-xl ring-1 ring-slate-900/5">
-                <a href="blog.html" class="block w-full p-2" onclick="closeMobileMenu()">Blog</a>
-                <a href="team.html" class="block w-full p-2" onclick="closeMobileMenu()">Team</a>
+        <div id="mobile-menu" class="hidden mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 md:hidden pb-4">
+            <div class="rounded-2xl bg-white p-4 text-lg tracking-tight text-text-dark shadow-xl ring-1 ring-earth-dark/5">
+                <a href="blog.html" class="block w-full p-2">Blog</a>
+                <a href="team.html" class="block w-full p-2">Team</a>
                 <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="block w-full p-2">Docs <svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>
-                <hr class="m-2 border-slate-300/40">
+                <hr class="m-2 border-warm">
                 <a href="https://app.artanis.ai" class="block w-full p-2" onclick="closeMobileMenu()">Log In</a>
-                <a href="https://accounts.artanis.ai/waitlist" class="block w-full p-2" onclick="closeMobileMenu()">Sign Up</a>
+                <a href="https://accounts.artanis.ai/waitlist" class="block w-full p-2" onclick="closeMobileMenu()">Sign up</a>
             </div>
         </div>
     </header>
 
     <!-- Team -->
-    <section class="py-20 sm:py-32">
+    <section class="bg-warm py-20 sm:py-32">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-2xl lg:mx-0">
-                <h2 class="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">Team</h2>
-                <p class="mt-6 text-lg leading-8 text-slate-700">Three PhDs who've built AI products from research to production.</p>
+                <h2 class="font-display text-3xl tracking-tight text-text-dark sm:text-4xl">Team</h2>
+                <p class="mt-6 text-lg leading-8 text-text-mid">Three PhDs who've built AI products from research to production.</p>
             </div>
             <ul role="list" class="mx-auto mt-20 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3">
                 <li>
                     <img class="aspect-square w-full rounded-2xl object-cover object-top" src="img/sam.jpg" alt="Dr Sam Miller">
-                    <h3 class="mt-6 text-lg font-semibold leading-8 tracking-tight text-slate-900">Dr Sam Miller</h3>
-                    <p class="mt-2 text-base leading-7 text-slate-600">Sam holds an AI PhD from the Alan Turing Institute. During his PhD, he founded the VC backed fitness app, Atlas AI. His AI research has been used by teams at Google & Nvidia.</p>
+                    <h3 class="mt-6 text-lg font-semibold leading-8 tracking-tight text-text-dark">Dr Sam Miller</h3>
+                    <p class="mt-2 text-base leading-7 text-text-mid">Sam holds an AI PhD from the Alan Turing Institute. During his PhD, he founded the VC backed fitness app, Atlas AI. His AI research has been used by teams at Google & Nvidia.</p>
                     <ul role="list" class="mt-6 flex gap-x-6">
                         <li>
-                            <a href="https://www.linkedin.com/in/sam-miller-5415b0124/" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-slate-500">
+                            <a href="https://www.linkedin.com/in/sam-miller-5415b0124/" target="_blank" rel="noopener noreferrer" class="text-text-muted hover:text-primary">
                                 <span class="sr-only">LinkedIn</span>
                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                     <path fill-rule="evenodd" d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z" clip-rule="evenodd" />
@@ -109,7 +128,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="https://scholar.google.com/citations?user=tnNwc4AAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-slate-500">
+                            <a href="https://scholar.google.com/citations?user=tnNwc4AAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" class="text-text-muted hover:text-primary">
                                 <span class="sr-only">Google Scholar</span>
                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z" />
@@ -117,7 +136,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="https://github.com/sammiller06" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-slate-500">
+                            <a href="https://github.com/sammiller06" target="_blank" rel="noopener noreferrer" class="text-text-muted hover:text-primary">
                                 <span class="sr-only">GitHub</span>
                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
@@ -128,11 +147,11 @@
                 </li>
                 <li>
                     <img class="aspect-square w-full rounded-2xl object-cover object-top" src="img/yousef.jpg" alt="Dr Yousef Amar">
-                    <h3 class="mt-6 text-lg font-semibold leading-8 tracking-tight text-slate-900">Dr Yousef Amar</h3>
-                    <p class="mt-2 text-base leading-7 text-slate-600">Yousef's PhD is in Computer Science from Imperial College, after which he founded Krew AI. He is a full-stack engineer, with two of his products reaching #1 on Product Hunt.</p>
+                    <h3 class="mt-6 text-lg font-semibold leading-8 tracking-tight text-text-dark">Dr Yousef Amar</h3>
+                    <p class="mt-2 text-base leading-7 text-text-mid">Yousef's PhD is in Computer Science from Imperial College, after which he founded Krew AI. He is a full-stack engineer, with two of his products reaching #1 on Product Hunt.</p>
                     <ul role="list" class="mt-6 flex gap-x-6">
                         <li>
-                            <a href="https://www.linkedin.com/in/yousefamar/" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-slate-500">
+                            <a href="https://www.linkedin.com/in/yousefamar/" target="_blank" rel="noopener noreferrer" class="text-text-muted hover:text-primary">
                                 <span class="sr-only">LinkedIn</span>
                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                     <path fill-rule="evenodd" d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z" clip-rule="evenodd" />
@@ -140,7 +159,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="https://scholar.google.co.uk/citations?user=leiXo_IAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-slate-500">
+                            <a href="https://scholar.google.co.uk/citations?user=leiXo_IAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" class="text-text-muted hover:text-primary">
                                 <span class="sr-only">Google Scholar</span>
                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z" />
@@ -148,7 +167,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="https://github.com/yousefamar" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-slate-500">
+                            <a href="https://github.com/yousefamar" target="_blank" rel="noopener noreferrer" class="text-text-muted hover:text-primary">
                                 <span class="sr-only">GitHub</span>
                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
@@ -156,7 +175,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="https://yousefamar.com/" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-slate-500">
+                            <a href="https://yousefamar.com/" target="_blank" rel="noopener noreferrer" class="text-text-muted hover:text-primary">
                                 <span class="sr-only">Personal website</span>
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
@@ -167,11 +186,11 @@
                 </li>
                 <li>
                     <img class="aspect-square w-full rounded-2xl object-cover object-top" src="img/olly.jpg" alt="Dr Olly Styles">
-                    <h3 class="mt-6 text-lg font-semibold leading-8 tracking-tight text-slate-900">Dr Olly Styles</h3>
-                    <p class="mt-2 text-base leading-7 text-slate-600">Olly holds a PhD in Machine Learning from Warwick University. He co-founded Atlas AI, and was the Senior ML Engineer at EdTech unicorn, Multiverse.</p>
+                    <h3 class="mt-6 text-lg font-semibold leading-8 tracking-tight text-text-dark">Dr Olly Styles</h3>
+                    <p class="mt-2 text-base leading-7 text-text-mid">Olly holds a PhD in Machine Learning from Warwick University. He co-founded Atlas AI, and was the Senior ML Engineer at EdTech unicorn, Multiverse.</p>
                     <ul role="list" class="mt-6 flex gap-x-6">
                         <li>
-                            <a href="https://www.linkedin.com/in/olly-styles-090437132/" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-slate-500">
+                            <a href="https://www.linkedin.com/in/olly-styles-090437132/" target="_blank" rel="noopener noreferrer" class="text-text-muted hover:text-primary">
                                 <span class="sr-only">LinkedIn</span>
                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                     <path fill-rule="evenodd" d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z" clip-rule="evenodd" />
@@ -179,7 +198,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="https://scholar.google.co.uk/citations?user=nwYhVo0AAAAJ&hl=en" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-slate-500">
+                            <a href="https://scholar.google.co.uk/citations?user=nwYhVo0AAAAJ&hl=en" target="_blank" rel="noopener noreferrer" class="text-text-muted hover:text-primary">
                                 <span class="sr-only">Google Scholar</span>
                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z" />
@@ -187,7 +206,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="https://github.com/olly-styles" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-slate-500">
+                            <a href="https://github.com/olly-styles" target="_blank" rel="noopener noreferrer" class="text-text-muted hover:text-primary">
                                 <span class="sr-only">GitHub</span>
                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
@@ -195,7 +214,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="https://olly-styles.github.io/" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-slate-500">
+                            <a href="https://olly-styles.github.io/" target="_blank" rel="noopener noreferrer" class="text-text-muted hover:text-primary">
                                 <span class="sr-only">Personal website</span>
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
@@ -209,15 +228,15 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-slate-50">
+    <footer style="background: #0f0a05;">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col items-center border-t border-slate-400/10 py-10 sm:flex-row sm:justify-between">
-                <p class="text-sm text-slate-500">
-                    &copy; 2025 Artanis Ltd. All rights reserved.
+            <div class="flex flex-col items-center py-10 sm:flex-row sm:justify-between">
+                <p class="text-sm text-warm/50">
+                    &copy; 2026 Artanis Ltd. All rights reserved.
                 </p>
                 <div class="mt-6 flex gap-x-6 text-sm sm:mt-0">
-                    <a href="https://app.artanis.ai/terms.html" class="text-slate-500 hover:text-slate-900">Terms</a>
-                    <a href="https://app.artanis.ai/privacy.html" class="text-slate-500 hover:text-slate-900">Privacy</a>
+                    <a href="https://app.artanis.ai/terms.html" class="text-warm/50 hover:text-warm transition-colors">Terms</a>
+                    <a href="https://app.artanis.ai/privacy.html" class="text-warm/50 hover:text-warm transition-colors">Privacy</a>
                 </div>
             </div>
         </div>

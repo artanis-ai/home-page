@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog - Artanis AI</title>
     <meta name="description" content="Thoughts on AI evaluation, observability, and building reliable AI systems.">
+    <link rel="icon" href="img/favicon.ico" sizes="any">
     <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
     <link rel="icon" type="image/png" sizes="96x96" href="img/favicon-96x96.png">
     <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
@@ -38,88 +39,106 @@
                         sans: ['Inter', 'sans-serif'],
                         display: ['Lexend', 'sans-serif'],
                     },
+                    colors: {
+                        primary: '#9B4340',
+                        'primary-light': '#C4716A',
+                        'primary-dark': '#7A3835',
+                        accent: '#D4A76A',
+                        'accent-light': '#F0D9A8',
+                        'earth-dark': '#4E3222',
+                        earth: '#6B4226',
+                        'earth-light': '#8B5E3C',
+                        'earth-warm': '#7A5238',
+                        forest: '#4A7C59',
+                        'forest-light': '#6BA37A',
+                        cream: '#FFFBF5',
+                        warm: '#F5EDE3',
+                        'text-dark': '#2D1810',
+                        'text-mid': '#6B5744',
+                        'text-muted': '#9A8B7A',
+                    },
                 },
             },
         }
     </script>
 </head>
-<body class="bg-white antialiased">
+<body class="bg-cream antialiased">
 
     <!-- Header -->
-    <header class="py-10">
-        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-50 flex justify-between">
+    <header class="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-warm">
+        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
             <div class="flex items-center md:gap-x-12">
                 <a href="/" aria-label="Home">
                     <img src="img/artanis.png" alt="Artanis" class="h-10 w-auto">
                 </a>
                 <div class="hidden md:flex md:gap-x-6">
-                    <a href="blog.html" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">Blog</a>
-                    <a href="team.html" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">Team</a>
-                    <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">Docs <svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>
+                    <a href="blog.html" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Blog</a>
+                    <a href="team.html" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Team</a>
+                    <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Docs <svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>
                 </div>
             </div>
             <div class="flex items-center gap-x-5 md:gap-x-8">
                 <a href="https://app.artanis.ai"
-                   class="hidden md:inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">
+                   class="hidden md:inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">
                     Log in
                 </a>
                 <a href="https://accounts.artanis.ai/waitlist"
-                   class="inline-flex items-center justify-center rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                    Sign Up
+                   class="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-dark focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors">
+                    Sign up
                 </a>
                 <button type="button" class="-mr-1 md:hidden" aria-label="Toggle Navigation" onclick="toggleMobileMenu()">
-                    <svg aria-hidden="true" class="h-3.5 w-3.5 overflow-visible stroke-slate-700" fill="none" stroke-width="2" stroke-linecap="round">
+                    <svg aria-hidden="true" class="h-3.5 w-3.5 overflow-visible stroke-text-dark" fill="none" stroke-width="2" stroke-linecap="round">
                         <path d="M0 1H14M0 7H14M0 13H14"></path>
                     </svg>
                 </button>
             </div>
         </nav>
         <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 md:hidden">
-            <div class="mt-4 rounded-2xl bg-white p-4 text-lg tracking-tight text-slate-900 shadow-xl ring-1 ring-slate-900/5">
-                <a href="blog.html" class="block w-full p-2" onclick="closeMobileMenu()">Blog</a>
-                <a href="team.html" class="block w-full p-2" onclick="closeMobileMenu()">Team</a>
+        <div id="mobile-menu" class="hidden mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 md:hidden pb-4">
+            <div class="rounded-2xl bg-white p-4 text-lg tracking-tight text-text-dark shadow-xl ring-1 ring-earth-dark/5">
+                <a href="blog.html" class="block w-full p-2">Blog</a>
+                <a href="team.html" class="block w-full p-2">Team</a>
                 <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="block w-full p-2">Docs <svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>
-                <hr class="m-2 border-slate-300/40">
+                <hr class="m-2 border-warm">
                 <a href="https://app.artanis.ai" class="block w-full p-2" onclick="closeMobileMenu()">Log In</a>
-                <a href="https://accounts.artanis.ai/waitlist" class="block w-full p-2" onclick="closeMobileMenu()">Sign Up</a>
+                <a href="https://accounts.artanis.ai/waitlist" class="block w-full p-2" onclick="closeMobileMenu()">Sign up</a>
             </div>
         </div>
     </header>
 
     <!-- Blog & Newsletter -->
-    <section class="bg-slate-50 py-20 sm:py-32">
+    <section class="bg-warm py-20 sm:py-32">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-2xl lg:mx-0">
-                <h2 class="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">Blog</h2>
-                <p class="mt-4 text-lg tracking-tight text-slate-700">Thoughts on AI evaluation, observability, and building reliable AI systems.</p>
+                <h2 class="font-display text-3xl tracking-tight text-text-dark sm:text-4xl">Blog</h2>
+                <p class="mt-4 text-lg tracking-tight text-text-mid">Thoughts on AI evaluation, observability, and building reliable AI systems.</p>
             </div>
             <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-12">
                 <!-- Blog -->
                 <div>
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-lg font-semibold text-slate-900">Latest Posts</h3>
+                        <h3 class="text-lg font-semibold text-text-dark">Latest Posts</h3>
                         <a href="https://artanis.substack.com/subscribe" target="_blank" rel="noopener noreferrer"
-                           class="text-sm font-semibold text-blue-600 hover:text-blue-500">Subscribe</a>
+                           class="text-sm font-semibold text-primary hover:text-primary-light">Subscribe</a>
                     </div>
                     <ul id="substack-feed" class="space-y-4"></ul>
                     <div class="mt-6 text-center">
                         <a href="https://artanis.substack.com/archive" target="_blank" rel="noopener noreferrer"
-                           class="text-sm font-semibold text-blue-600 hover:text-blue-500">View all posts &rarr;</a>
+                           class="text-sm font-semibold text-primary hover:text-primary-light">View all posts &rarr;</a>
                     </div>
                 </div>
 
                 <!-- Newsletter -->
                 <div>
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-lg font-semibold text-slate-900">Monthly Updates</h3>
+                        <h3 class="text-lg font-semibold text-text-dark">Monthly Updates</h3>
                         <a href="https://buttondown.com/artanis#subscribe-form" target="_blank" rel="noopener noreferrer"
-                           class="text-sm font-semibold text-blue-600 hover:text-blue-500">Subscribe</a>
+                           class="text-sm font-semibold text-primary hover:text-primary-light">Subscribe</a>
                     </div>
                     <ul id="buttondown-feed" class="space-y-4"></ul>
                     <div class="mt-6 text-center">
                         <a href="https://buttondown.com/artanis/archive/" target="_blank" rel="noopener noreferrer"
-                           class="text-sm font-semibold text-blue-600 hover:text-blue-500">View all updates &rarr;</a>
+                           class="text-sm font-semibold text-primary hover:text-primary-light">View all updates &rarr;</a>
                     </div>
                 </div>
             </div>
@@ -127,15 +146,15 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-slate-50">
+    <footer style="background: #0f0a05;">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col items-center border-t border-slate-400/10 py-10 sm:flex-row sm:justify-between">
-                <p class="text-sm text-slate-500">
-                    &copy; 2025 Artanis Ltd. All rights reserved.
+            <div class="flex flex-col items-center py-10 sm:flex-row sm:justify-between">
+                <p class="text-sm text-warm/50">
+                    &copy; 2026 Artanis Ltd. All rights reserved.
                 </p>
                 <div class="mt-6 flex gap-x-6 text-sm sm:mt-0">
-                    <a href="https://app.artanis.ai/terms.html" class="text-slate-500 hover:text-slate-900">Terms</a>
-                    <a href="https://app.artanis.ai/privacy.html" class="text-slate-500 hover:text-slate-900">Privacy</a>
+                    <a href="https://app.artanis.ai/terms.html" class="text-warm/50 hover:text-warm transition-colors">Terms</a>
+                    <a href="https://app.artanis.ai/privacy.html" class="text-warm/50 hover:text-warm transition-colors">Privacy</a>
                 </div>
             </div>
         </div>
@@ -178,7 +197,7 @@
         function renderBlogItem(item) {
             return `
                 <li>
-                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block rounded-2xl bg-white p-5 shadow-xl shadow-slate-900/10 hover:shadow-slate-900/20 transition-shadow group">
+                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block rounded-2xl bg-cream p-5 shadow-xl shadow-earth/10 hover:shadow-earth/20 hover:border-primary-light border border-transparent transition-all group">
                         <div class="flex gap-4">
                             ${item.enclosure?.link ? `
                             <div class="flex-shrink-0">
@@ -186,9 +205,9 @@
                             </div>
                             ` : ''}
                             <div class="flex-1 min-w-0">
-                                <h4 class="text-base font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">${item.title}</h4>
-                                ${item.description ? `<p class="mt-1 text-sm text-slate-600">${item.description}</p>` : ''}
-                                <p class="mt-2 text-xs text-slate-500">${formatDate(item.pubDate)}</p>
+                                <h4 class="text-base font-semibold text-text-dark group-hover:text-primary transition-colors">${item.title}</h4>
+                                ${item.description ? `<p class="mt-1 text-sm text-text-mid">${item.description}</p>` : ''}
+                                <p class="mt-2 text-xs text-text-muted">${formatDate(item.pubDate)}</p>
                             </div>
                         </div>
                     </a>
@@ -199,9 +218,9 @@
         function renderNewsletterItem(item) {
             return `
                 <li>
-                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block rounded-2xl bg-white p-5 shadow-xl shadow-slate-900/10 hover:shadow-slate-900/20 transition-shadow group">
-                        <h4 class="text-base font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">${item.title}</h4>
-                        <p class="mt-2 text-xs text-slate-500">${formatDate(item.pubDate)}</p>
+                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block rounded-2xl bg-cream p-5 shadow-xl shadow-earth/10 hover:shadow-earth/20 hover:border-primary-light border border-transparent transition-all group">
+                        <h4 class="text-base font-semibold text-text-dark group-hover:text-primary transition-colors">${item.title}</h4>
+                        <p class="mt-2 text-xs text-text-muted">${formatDate(item.pubDate)}</p>
                     </a>
                 </li>
             `;

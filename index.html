@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artanis AI</title>
-    <meta name="description" content="Stack trace for AI. Find what's failing in your AI pipeline and fix it.">
+    <title>Artanis AI - Stop Playing Whack-a-Mole with Your AI</title>
+    <meta name="description" content="Stop playing whack-a-mole with your AI. Fix one thing, break another. Artanis helps domain experts build evals that keep AI aligned — for good.">
+    <link rel="icon" href="img/favicon.ico" sizes="any">
     <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
     <link rel="icon" type="image/png" sizes="96x96" href="img/favicon-96x96.png">
     <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -31,6 +32,24 @@
                     '9xl': ['8rem', { lineHeight: '1' }],
                 },
                 extend: {
+                    colors: {
+                        primary: '#9B4340',
+                        'primary-light': '#C4716A',
+                        'primary-dark': '#7A3835',
+                        accent: '#D4A76A',
+                        'accent-light': '#F0D9A8',
+                        'earth-dark': '#4E3222',
+                        earth: '#6B4226',
+                        'earth-light': '#8B5E3C',
+                        'earth-warm': '#7A5238',
+                        forest: '#4A7C59',
+                        'forest-light': '#6BA37A',
+                        cream: '#FFFBF5',
+                        warm: '#F5EDE3',
+                        'text-dark': '#2D1810',
+                        'text-mid': '#6B5744',
+                        'text-muted': '#9A8B7A',
+                    },
                     borderRadius: {
                         '4xl': '2rem',
                     },
@@ -43,6 +62,108 @@
         }
     </script>
     <style>
+        /* Mole sprite animation */
+        .mole-hole {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            pointer-events: none;
+            clip-path: circle(60px at 80px 70px);
+        }
+
+        .mole-hole.hittable {
+            pointer-events: auto;
+        }
+
+        body.mallet-active, body.mallet-active * {
+            cursor: none !important;
+        }
+
+        /* JS-driven mallet cursor */
+        #mallet-cursor {
+            position: fixed;
+            width: 64px;
+            height: 64px;
+            pointer-events: none;
+            z-index: 9999;
+            background: url('img/mallet.png') no-repeat center / contain;
+            transform-origin: 30% 78%;
+            transition: transform 0.15s ease-out;
+            display: none;
+        }
+
+        #mallet-cursor.swinging {
+            transform: rotate(-90deg);
+            transition: transform 0.01s linear;
+        }
+
+        .mole-sprite {
+            width: 100px;
+            height: 100px;
+            margin: 10px 0 0 10px;
+            background: url('img/mole-spritesheet.png') no-repeat 0 0;
+            background-size: 2000px 100px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.08s ease;
+        }
+
+        /* Emerge: frames 1-9 (9 frames, 8 steps) */
+        @keyframes mole-emerge {
+            from { background-position: 0 0; }
+            to { background-position: -800px 0; }
+        }
+
+        /* Idle: frames 7,8 (2 frames, 2 steps) */
+        @keyframes mole-idle {
+            from { background-position: -600px 0; }
+            to { background-position: -800px 0; }
+        }
+
+        /* Hit: frames 10,11 (2 frames, 2 steps) */
+        @keyframes mole-hit {
+            from { background-position: -900px 0; }
+            to { background-position: -1100px 0; }
+        }
+
+        /* Retreat after hit: frames 12-20 (9 frames, 8 steps) */
+        @keyframes mole-retreat-hit {
+            from { background-position: -1100px 0; }
+            to { background-position: -1900px 0; }
+        }
+
+        /* Normal retreat: emerge in reverse, frames 8-1 (skip 9) */
+        @keyframes mole-retreat-normal {
+            from { background-position: -700px 0; }
+            to { background-position: 0 0; }
+        }
+
+        .mole-sprite.emerge {
+            animation: mole-emerge 0.7s steps(8) forwards;
+        }
+
+        .mole-sprite.idle {
+            animation: mole-idle 0.75s steps(2) infinite;
+        }
+
+        .mole-sprite.hit {
+            animation: mole-hit 0.2s steps(2) forwards;
+        }
+
+        .mole-sprite.retreat-hit {
+            animation: mole-retreat-hit 0.7s steps(8) forwards;
+        }
+
+        .mole-sprite.retreat-normal {
+            animation: mole-retreat-normal 0.6s steps(7) forwards;
+        }
+
+        /* Horizontal mirror for variation */
+        .mole-hole.mirrored .mole-sprite {
+            transform: scaleX(-1);
+        }
+
+        /* Marquee */
         @keyframes marquee {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
@@ -84,330 +205,500 @@
         .client-logo-color:hover {
             opacity: 0.9;
         }
+        .client-logo-dark {
+            height: 32px;
+            width: auto;
+            filter: brightness(0) invert(1) opacity(0.4);
+            transition: filter 0.2s;
+        }
+        .client-logo-dark:hover {
+            filter: brightness(0) invert(1) opacity(0.7);
+        }
+        .client-logo-dark-color {
+            height: 32px;
+            width: auto;
+            opacity: 0.4;
+            filter: invert(1);
+            transition: opacity 0.2s, filter 0.2s;
+        }
+        .client-logo-dark-color:hover {
+            opacity: 0.7;
+        }
 
-        /* How It Works scroll animations — driven by JS scroll progress */
-        .how-it-works-screenshot,
-        .how-it-works-slack,
-        .how-it-works-arrow,
-        .how-it-works-doc {
-            will-change: transform, opacity;
+        /* Section fade-in */
+        .section-fade {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease-out, transform 0.7s ease-out;
         }
-        .how-it-works-arrow-1,
-        .how-it-works-arrow-2 {
-            will-change: transform, opacity;
+        .section-fade.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Eval mole icon */
+        #eval-mole { transition: transform 0.1s, opacity 0.15s; }
+
+        /* Custom scrollbar for diff view */
+        .diff-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(139, 105, 20, 0.25) transparent;
+        }
+        .diff-scroll::-webkit-scrollbar { width: 6px; }
+        .diff-scroll::-webkit-scrollbar-track { background: transparent; }
+        .diff-scroll::-webkit-scrollbar-thumb { background: rgba(139, 105, 20, 0.25); border-radius: 3px; }
+        .diff-scroll::-webkit-scrollbar-thumb:hover { background: rgba(139, 105, 20, 0.4); }
+
+        /* Prevent text selection and double-tap zoom during gameplay */
+        .hero-gradient {
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        /* Hero gradient */
+        .hero-gradient {
+            background: linear-gradient(180deg, #C8E0EE 0%, #D4E6F0 40%, #D5E2D0 75%, #C5D6B8 100%);
+        }
+
+        /* Cloud drift */
+        @keyframes cloud-drift {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(30px); }
+            100% { transform: translateX(0); }
+        }
+        .cloud-drift {
+            animation: cloud-drift 20s ease-in-out infinite;
+        }
+        .cloud-drift:nth-child(2) { animation-duration: 28s; animation-delay: -5s; }
+        .cloud-drift:nth-child(3) { animation-duration: 24s; animation-delay: -12s; }
     </style>
 </head>
-<body class="bg-white antialiased">
+<body class="bg-cream antialiased">
+    <div id="mallet-cursor"></div>
 
     <!-- Header -->
-    <header class="py-10">
-        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-50 flex justify-between">
+    <header class="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-warm">
+        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
             <div class="flex items-center md:gap-x-12">
                 <a href="#" aria-label="Home">
                     <img src="img/artanis.png" alt="Artanis" class="h-10 w-auto">
                 </a>
                 <div class="hidden md:flex md:gap-x-6">
-                    <a href="blog.html" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">Blog</a>
-                    <a href="team.html" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">Team</a>
-                    <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">Docs <svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>
+                    <a href="blog.html" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Blog</a>
+                    <a href="team.html" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Team</a>
+                    <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Docs <svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>
                 </div>
             </div>
             <div class="flex items-center gap-x-5 md:gap-x-8">
                 <a href="https://app.artanis.ai"
-                   class="hidden md:inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">
+                   class="hidden md:inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">
                     Log in
                 </a>
                 <a href="https://accounts.artanis.ai/waitlist"
-                   class="inline-flex items-center justify-center rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                    Sign Up
+                   class="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-dark focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors">
+                    Sign up
                 </a>
                 <button type="button" class="-mr-1 md:hidden" aria-label="Toggle Navigation" onclick="toggleMobileMenu()">
-                    <svg aria-hidden="true" class="h-3.5 w-3.5 overflow-visible stroke-slate-700" fill="none" stroke-width="2" stroke-linecap="round">
+                    <svg aria-hidden="true" class="h-3.5 w-3.5 overflow-visible stroke-text-dark" fill="none" stroke-width="2" stroke-linecap="round">
                         <path d="M0 1H14M0 7H14M0 13H14"></path>
                     </svg>
                 </button>
             </div>
         </nav>
         <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 md:hidden">
-            <div class="mt-4 rounded-2xl bg-white p-4 text-lg tracking-tight text-slate-900 shadow-xl ring-1 ring-slate-900/5">
+        <div id="mobile-menu" class="hidden mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 md:hidden pb-4">
+            <div class="rounded-2xl bg-white p-4 text-lg tracking-tight text-text-dark shadow-xl ring-1 ring-earth-dark/5">
                 <a href="blog.html" class="block w-full p-2">Blog</a>
                 <a href="team.html" class="block w-full p-2">Team</a>
                 <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="block w-full p-2">Docs <svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>
-                <hr class="m-2 border-slate-300/40">
+                <hr class="m-2 border-warm">
                 <a href="https://app.artanis.ai" class="block w-full p-2" onclick="closeMobileMenu()">Log In</a>
-                <a href="https://accounts.artanis.ai/waitlist" class="block w-full p-2" onclick="closeMobileMenu()">Sign Up</a>
+                <a href="https://accounts.artanis.ai/waitlist" class="block w-full p-2" onclick="closeMobileMenu()">Sign up</a>
             </div>
         </div>
     </header>
 
+    <!-- Hero + Marquee: fill first viewport -->
+    <div class="flex flex-col overflow-hidden" style="height: calc(100vh - 4rem);">
+
     <!-- Hero -->
-    <section class="pb-16 pt-20 text-center lg:pt-32">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 class="mx-auto max-w-4xl font-display text-5xl font-medium tracking-tight text-slate-900 sm:text-7xl">
-                <span class="relative whitespace-nowrap text-blue-600">
-                    <svg aria-hidden="true" viewBox="0 0 418 42" class="absolute left-0 top-2/3 h-[0.58em] w-full fill-blue-300/70" preserveAspectRatio="none">
-                        <path d="M203.371.916c-26.013-2.078-76.686 1.963-124.73 9.946L67.3 12.749C35.421 18.062 18.2 21.766 6.004 25.934 1.244 27.561.828 27.778.874 28.61c.07 1.214.828 1.121 9.595-1.176 9.072-2.377 17.15-3.92 39.246-7.496C123.565 7.986 157.869 4.492 195.942 5.046c7.461.108 19.25 1.696 19.17 2.582-.107 1.183-7.874 4.31-25.75 10.366-21.992 7.45-35.43 12.534-36.701 13.884-2.173 2.308-.202 4.407 4.442 4.734 2.654.187 3.263.157 15.593-.78 35.401-2.686 57.944-3.488 88.365-3.143 46.327.526 75.721 2.23 130.788 7.584 19.787 1.924 20.814 1.98 24.557 1.332l.066-.011c1.201-.203 1.53-1.825.399-2.335-2.911-1.31-4.893-1.604-22.048-3.261-57.509-5.556-87.871-7.36-132.059-7.842-23.239-.254-33.617-.116-50.627.674-11.629.54-42.371 2.494-46.696 2.967-2.359.259 8.133-3.625 26.504-9.81 23.239-7.825 27.934-10.149 28.304-14.005.417-4.348-3.529-6-16.878-7.066Z" />
-                    </svg>
-                    <span class="relative">Stack trace</span>
-                </span>
-                for AI
-            </h1>
-            <p class="mx-auto mt-6 max-w-2xl text-lg tracking-tight text-slate-700">
-                Find what's failing in your AI pipeline and fix it. Plug into your existing observability platform, use our SDK, or call the REST API directly.
-            </p>
-            <div class="mt-10 flex justify-center">
-                <a href="https://accounts.artanis.ai/waitlist"
-                   class="inline-flex items-center justify-center rounded-full bg-blue-600 px-8 py-3 text-base font-semibold text-white hover:bg-blue-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                    Sign Up
-                </a>
+    <section class="hero-gradient relative overflow-hidden flex-1 min-h-0 pt-16 sm:pt-20 lg:pt-28">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="mx-auto max-w-3xl text-center">
+                <h1 class="font-display text-4xl font-bold tracking-tight text-text-dark sm:text-5xl lg:text-6xl">
+                    Stop playing<br>
+                    <span class="text-primary">whack-a-mole</span><br>
+                    with your AI
+                </h1>
+                <p class="mx-auto mt-6 max-w-2xl text-lg tracking-tight text-text-mid">
+								Fix one thing, break another. Sound familiar?<br>Artanis keeps your AI aligned, for good.
+                </p>
             </div>
         </div>
 
-        <!-- Trusted by -->
-        <div class="mt-36 lg:mt-44">
-            <p class="font-display text-base text-slate-900 text-center">
-                Trusted by
-            </p>
-            <div class="mt-8 marquee-container">
-                <div class="marquee-content">
-                    <div class="marquee-group">
-                        <a href="https://www.charterhouse.co.uk/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/charterhouse.png" alt="Charterhouse" class="client-logo"></a>
-                        <a href="https://www.movegb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/move-gb.png" alt="MoveGB" class="client-logo"></a>
-                        <a href="https://mindsdb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/mindsdb.png" alt="MindsDB" class="client-logo"></a>
-                        <a href="https://www.salesape.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/salesape.png" alt="SalesAPE" class="client-logo"></a>
-                        <a href="https://stylus.education/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/stylus.png" alt="Stylus" class="client-logo"></a>
-                        <a href="https://www.telus.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/telus.png" alt="TELUS" class="client-logo"></a>
-                        <a href="https://hgcapital.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/hg.png" alt="HG Capital" class="client-logo"></a>
-                        <a href="https://evokemedicalcare.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/evoke.png" alt="Evoke Medical Care" class="client-logo"></a>
-                        <a href="https://sophoseducation.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sophos.png" alt="Sophos" class="client-logo"></a>
-                        <a href="https://contextual.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/contextual.png" alt="Contextual AI" class="client-logo"></a>
-                        <a href="https://www.medsnapp.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/medsnapp.png" alt="MedSnapp" class="client-logo"></a>
-                        <a href="https://www.joinkliq.io/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/kliq.png" alt="Kliq" class="client-logo"></a>
-                        <a href="https://sawa.global/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sawa.webp" alt="Sawa" class="client-logo"></a>
-                        <a href="https://fromtoday.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/from-today.png" alt="From Today" class="client-logo"></a>
-                        <a href="https://www.odysseydining.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/odyssey.png" alt="Odyssey" class="client-logo"></a>
-                        <a href="https://fefundinfo.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/fe-fundinfo.png" alt="FE Fundinfo" class="client-logo"></a>
-                        <a href="https://jubelbeer.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/jubel.png" alt="Jubel" class="client-logo"></a>
-                        <a href="https://rulebase.co/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/rulebase.svg" alt="Rulebase" class="client-logo-color"></a>
-                    </div>
-                    <div class="marquee-group" aria-hidden="true">
-                        <a href="https://www.charterhouse.co.uk/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/charterhouse.png" alt="Charterhouse" class="client-logo"></a>
-                        <a href="https://www.movegb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/move-gb.png" alt="MoveGB" class="client-logo"></a>
-                        <a href="https://mindsdb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/mindsdb.png" alt="MindsDB" class="client-logo"></a>
-                        <a href="https://www.salesape.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/salesape.png" alt="SalesAPE" class="client-logo"></a>
-                        <a href="https://stylus.education/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/stylus.png" alt="Stylus" class="client-logo"></a>
-                        <a href="https://www.telus.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/telus.png" alt="TELUS" class="client-logo"></a>
-                        <a href="https://hgcapital.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/hg.png" alt="HG Capital" class="client-logo"></a>
-                        <a href="https://evokemedicalcare.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/evoke.png" alt="Evoke Medical Care" class="client-logo"></a>
-                        <a href="https://sophoseducation.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sophos.png" alt="Sophos" class="client-logo"></a>
-                        <a href="https://contextual.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/contextual.png" alt="Contextual AI" class="client-logo"></a>
-                        <a href="https://www.medsnapp.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/medsnapp.png" alt="MedSnapp" class="client-logo"></a>
-                        <a href="https://www.joinkliq.io/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/kliq.png" alt="Kliq" class="client-logo"></a>
-                        <a href="https://sawa.global/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sawa.webp" alt="Sawa" class="client-logo"></a>
-                        <a href="https://fromtoday.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/from-today.png" alt="From Today" class="client-logo"></a>
-                        <a href="https://www.odysseydining.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/odyssey.png" alt="Odyssey" class="client-logo"></a>
-                        <a href="https://fefundinfo.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/fe-fundinfo.png" alt="FE Fundinfo" class="client-logo"></a>
-                        <a href="https://jubelbeer.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/jubel.png" alt="Jubel" class="client-logo"></a>
-                        <a href="https://rulebase.co/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/rulebase.svg" alt="Rulebase" class="client-logo-color"></a>
-                    </div>
+        <!-- Clouds -->
+        <img src="img/cloud1.png" class="cloud-drift absolute w-24 sm:w-36 lg:w-auto opacity-40" style="top: 12%; left: 5%;" alt="">
+        <img src="img/cloud3.png" class="cloud-drift absolute w-20 sm:w-28 lg:w-auto opacity-30" style="top: 8%; right: 15%;" alt="">
+
+        <!-- Mole field -->
+        <div class="absolute bottom-0 left-0 right-0 h-56 sm:h-72 lg:h-80 pointer-events-none" id="mole-field">
+            <!-- Solid earth color behind grass (visible at bottom) -->
+            <div class="absolute bottom-0 left-0 right-0 h-16" style="background: #341f0e;"></div>
+            <!-- Ground (grass + dirt field) -->
+            <div class="absolute bottom-0 left-0 right-0 h-full" style="background: url('img/grass-field.png') repeat-x bottom / auto 100%;"></div>
+
+            <!-- Mole holes (positioned randomly by JS) -->
+            <div class="mole-hole" onmousedown="whackMole(this,event)"><div class="mole-sprite"></div></div>
+            <div class="mole-hole" onmousedown="whackMole(this,event)"><div class="mole-sprite"></div></div>
+            <div class="mole-hole" onmousedown="whackMole(this,event)"><div class="mole-sprite"></div></div>
+            <div class="mole-hole" onmousedown="whackMole(this,event)"><div class="mole-sprite"></div></div>
+            <div class="mole-hole" onmousedown="whackMole(this,event)"><div class="mole-sprite"></div></div>
+            <div class="mole-hole" onmousedown="whackMole(this,event)"><div class="mole-sprite"></div></div>
+        </div>
+    </section>
+
+    <!-- Customer Marquee -->
+    <section class="pb-6" style="background: #341f0e;">
+        <p class="text-sm text-warm/50 text-center mb-4 tracking-wide">Trusted by</p>
+        <div class="marquee-container">
+            <div class="marquee-content">
+                <div class="marquee-group">
+                    <a href="https://www.charterhouse.co.uk/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/charterhouse.png" alt="Charterhouse" class="client-logo-dark"></a>
+                    <a href="https://www.movegb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/move-gb.png" alt="MoveGB" class="client-logo-dark"></a>
+                    <a href="https://mindsdb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/mindsdb.png" alt="MindsDB" class="client-logo-dark"></a>
+                    <a href="https://www.salesape.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/salesape.png" alt="SalesAPE" class="client-logo-dark"></a>
+                    <a href="https://stylus.education/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/stylus.png" alt="Stylus" class="client-logo-dark"></a>
+                    <a href="https://www.telus.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/telus.png" alt="TELUS" class="client-logo-dark"></a>
+                    <a href="https://hgcapital.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/hg.png" alt="HG Capital" class="client-logo-dark"></a>
+                    <a href="https://evokemedicalcare.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/evoke.png" alt="Evoke Medical Care" class="client-logo-dark"></a>
+                    <a href="https://sophoseducation.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sophos.png" alt="Sophos" class="client-logo-dark"></a>
+                    <a href="https://contextual.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/contextual.png" alt="Contextual AI" class="client-logo-dark"></a>
+                    <a href="https://www.medsnapp.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/medsnapp.png" alt="MedSnapp" class="client-logo-dark"></a>
+                    <a href="https://www.joinkliq.io/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/kliq.png" alt="Kliq" class="client-logo-dark"></a>
+                    <a href="https://sawa.global/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sawa.webp" alt="Sawa" class="client-logo-dark"></a>
+                    <a href="https://fromtoday.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/from-today.png" alt="From Today" class="client-logo-dark"></a>
+                    <a href="https://www.odysseydining.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/odyssey.png" alt="Odyssey" class="client-logo-dark"></a>
+                    <a href="https://fefundinfo.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/fe-fundinfo.png" alt="FE Fundinfo" class="client-logo-dark"></a>
+                    <a href="https://jubelbeer.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/jubel.png" alt="Jubel" class="client-logo-dark"></a>
+                    <a href="https://rulebase.co/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/rulebase.svg" alt="Rulebase" class="client-logo-dark-color"></a>
+                </div>
+                <div class="marquee-group" aria-hidden="true">
+                    <a href="https://www.charterhouse.co.uk/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/charterhouse.png" alt="Charterhouse" class="client-logo-dark"></a>
+                    <a href="https://www.movegb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/move-gb.png" alt="MoveGB" class="client-logo-dark"></a>
+                    <a href="https://mindsdb.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/mindsdb.png" alt="MindsDB" class="client-logo-dark"></a>
+                    <a href="https://www.salesape.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/salesape.png" alt="SalesAPE" class="client-logo-dark"></a>
+                    <a href="https://stylus.education/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/stylus.png" alt="Stylus" class="client-logo-dark"></a>
+                    <a href="https://www.telus.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/telus.png" alt="TELUS" class="client-logo-dark"></a>
+                    <a href="https://hgcapital.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/hg.png" alt="HG Capital" class="client-logo-dark"></a>
+                    <a href="https://evokemedicalcare.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/evoke.png" alt="Evoke Medical Care" class="client-logo-dark"></a>
+                    <a href="https://sophoseducation.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sophos.png" alt="Sophos" class="client-logo-dark"></a>
+                    <a href="https://contextual.ai/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/contextual.png" alt="Contextual AI" class="client-logo-dark"></a>
+                    <a href="https://www.medsnapp.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/medsnapp.png" alt="MedSnapp" class="client-logo-dark"></a>
+                    <a href="https://www.joinkliq.io/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/kliq.png" alt="Kliq" class="client-logo-dark"></a>
+                    <a href="https://sawa.global/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/sawa.webp" alt="Sawa" class="client-logo-dark"></a>
+                    <a href="https://fromtoday.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/from-today.png" alt="From Today" class="client-logo-dark"></a>
+                    <a href="https://www.odysseydining.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/odyssey.png" alt="Odyssey" class="client-logo-dark"></a>
+                    <a href="https://fefundinfo.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/fe-fundinfo.png" alt="FE Fundinfo" class="client-logo-dark"></a>
+                    <a href="https://jubelbeer.com/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/jubel.png" alt="Jubel" class="client-logo-dark"></a>
+                    <a href="https://rulebase.co/" target="_blank" rel="noopener noreferrer" class="mx-6"><img src="img/clients/rulebase.svg" alt="Rulebase" class="client-logo-dark-color"></a>
                 </div>
             </div>
         </div>
     </section>
 
+    </div><!-- /Hero + Marquee viewport wrapper -->
+
+    <!-- Dirt transition -->
+    <div class="relative h-12 bg-warm overflow-hidden">
+        <svg class="absolute top-0 left-0 w-full" height="48" preserveAspectRatio="xMidYMin slice" viewBox="0 0 1200 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Base crumbling edge -->
+            <path d="M0 0h1200v6c-20 2-40 5-80 4s-60-4-90-2c-30 2-50 6-80 5s-50-5-80-4-40 4-70 5-50-2-80-1-40 3-70 4-50-1-80-2-40 3-70 2-50-3-80-1-40 4-70 3-50-2-80-3-40 2-70 1z" fill="#341f0e"/>
+            <!-- Scattered fragments - large -->
+            <rect x="85" y="12" width="6" height="5" rx="1" fill="#341f0e" opacity="0.7" transform="rotate(15 85 12)"/>
+            <rect x="230" y="10" width="8" height="4" rx="1" fill="#4E3222" opacity="0.6" transform="rotate(-20 230 10)"/>
+            <rect x="410" y="14" width="5" height="6" rx="1" fill="#341f0e" opacity="0.5" transform="rotate(35 410 14)"/>
+            <rect x="560" y="11" width="7" height="4" rx="1" fill="#4E3222" opacity="0.65" transform="rotate(-10 560 11)"/>
+            <rect x="720" y="13" width="6" height="5" rx="1" fill="#341f0e" opacity="0.55" transform="rotate(25 720 13)"/>
+            <rect x="890" y="10" width="8" height="5" rx="1" fill="#4E3222" opacity="0.6" transform="rotate(-30 890 10)"/>
+            <rect x="1050" y="12" width="5" height="4" rx="1" fill="#341f0e" opacity="0.5" transform="rotate(20 1050 12)"/>
+            <rect x="150" y="15" width="4" height="3" rx="1" fill="#6B4226" opacity="0.5" transform="rotate(-25 150 15)"/>
+            <!-- Scattered fragments - medium -->
+            <rect x="50" y="16" width="3" height="3" rx="1" fill="#4E3222" opacity="0.45" transform="rotate(40 50 16)"/>
+            <rect x="180" y="19" width="4" height="3" rx="1" fill="#341f0e" opacity="0.4" transform="rotate(-15 180 19)"/>
+            <rect x="320" y="17" width="3" height="4" rx="1" fill="#6B4226" opacity="0.35" transform="rotate(30 320 17)"/>
+            <rect x="480" y="20" width="4" height="3" rx="1" fill="#4E3222" opacity="0.4" transform="rotate(-35 480 20)"/>
+            <rect x="640" y="18" width="3" height="3" rx="1" fill="#341f0e" opacity="0.45" transform="rotate(10 640 18)"/>
+            <rect x="790" y="19" width="4" height="3" rx="1" fill="#6B4226" opacity="0.35" transform="rotate(-20 790 19)"/>
+            <rect x="950" y="17" width="3" height="4" rx="1" fill="#4E3222" opacity="0.4" transform="rotate(45 950 17)"/>
+            <rect x="1120" y="18" width="4" height="3" rx="1" fill="#341f0e" opacity="0.35" transform="rotate(-25 1120 18)"/>
+            <!-- Scattered fragments - small/dust -->
+            <circle cx="120" cy="22" r="1.5" fill="#4E3222" opacity="0.3"/>
+            <circle cx="270" cy="24" r="1" fill="#6B4226" opacity="0.25"/>
+            <circle cx="380" cy="23" r="1.5" fill="#341f0e" opacity="0.3"/>
+            <circle cx="520" cy="25" r="1" fill="#4E3222" opacity="0.2"/>
+            <circle cx="670" cy="22" r="1.5" fill="#6B4226" opacity="0.25"/>
+            <circle cx="830" cy="24" r="1" fill="#341f0e" opacity="0.3"/>
+            <circle cx="990" cy="23" r="1.5" fill="#4E3222" opacity="0.2"/>
+            <circle cx="1150" cy="25" r="1" fill="#6B4226" opacity="0.25"/>
+            <!-- Tiny specks -->
+            <circle cx="35" cy="27" r="0.8" fill="#8B5E3C" opacity="0.2"/>
+            <circle cx="210" cy="28" r="0.7" fill="#6B4226" opacity="0.15"/>
+            <circle cx="450" cy="29" r="0.8" fill="#8B5E3C" opacity="0.18"/>
+            <circle cx="600" cy="27" r="0.7" fill="#6B4226" opacity="0.15"/>
+            <circle cx="760" cy="28" r="0.8" fill="#8B5E3C" opacity="0.2"/>
+            <circle cx="1000" cy="30" r="0.7" fill="#6B4226" opacity="0.12"/>
+        </svg>
+    </div>
+
     <!-- How It Works -->
-    <section class="bg-slate-50 pt-20 sm:pt-32 pb-20 sm:pb-32 lg:pb-56 overflow-hidden">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-2xl lg:mx-0">
-                <h2 class="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">From feedback to fix</h2>
-                <p class="mt-4 text-lg tracking-tight text-slate-700">A user reports an issue. Artanis shows you exactly what the cause was and how to fix it.</p>
+    <section id="how-it-works" class="bg-warm py-24 pb-40 lg:pb-32">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 section-fade">
+            <div class="text-center max-w-3xl mx-auto">
+                <h2 class="font-display text-3xl font-bold tracking-tight text-text-dark sm:text-4xl">How it works</h2>
+                <p class="mt-4 text-lg text-text-mid">
+                    Four simple steps to make your AI better, every day.
+                </p>
             </div>
 
-            <!-- Composite visual -->
-            <div class="mt-16 relative" id="how-it-works">
-                <!-- Screenshot (large, central) -->
-                <div class="how-it-works-screenshot relative" style="perspective: 1200px;">
-                    <img src="img/trace-screenshot.png" alt="Artanis trace view showing the root cause: report template has hardcoded 2025 dates" class="w-full lg:w-[85%] rounded-2xl shadow-2xl border border-slate-200/80" style="transform: rotateY(-3deg) rotateX(2deg);">
-                </div>
-
-                <!-- Slack message (floating, angled, overlapping top-left) -->
-                <div class="how-it-works-slack absolute top-[44%] -left-12 z-10 rotate-[-3deg] max-w-md hidden lg:block">
-                    <div class="rounded-xl bg-white border border-slate-200 shadow-2xl p-4">
-                        <div class="flex gap-3">
-                            <div class="flex-shrink-0 mt-0.5">
-                                <svg width="36" height="36" viewBox="0 0 127 127" aria-hidden="true">
-                                    <path d="M27.2 80c0 7.3-5.9 13.2-13.2 13.2C6.7 93.2.8 87.3.8 80c0-7.3 5.9-13.2 13.2-13.2h13.2V80zm6.6 0c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2v33c0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V80z" fill="#e01e5a"/>
-                                    <path d="M47 27c-7.3 0-13.2-5.9-13.2-13.2C33.8 6.5 39.7.6 47 .6c7.3 0 13.2 5.9 13.2 13.2V27H47zm0 6.7c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H14c-7.3 0-13.2-5.9-13.2-13.2 0-7.3 5.9-13.2 13.2-13.2h33z" fill="#36c5f0"/>
-                                    <path d="M99.9 46.9c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H99.9V46.9zm-6.6 0c0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2v-33c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2v33z" fill="#2eb67d"/>
-                                    <path d="M80.1 99.8c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V99.8h13.2zm0-6.6c-7.3 0-13.2-5.9-13.2-13.2 0-7.3 5.9-13.2 13.2-13.2h33c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2h-33z" fill="#ecb22e"/>
-                                </svg>
+            <div class="mt-20 space-y-16 lg:space-y-20">
+                <!-- Step 1: Upload examples -->
+                <div class="relative flex flex-col lg:flex-row items-start gap-8 lg:gap-16">
+                    <div class="flex-shrink-0 flex items-start gap-4 lg:w-[45%]">
+                        <div class="relative flex-shrink-0">
+                            <div class="w-14 h-14 rounded-2xl bg-accent/20 flex items-center justify-center border border-accent/30">
+                                <span class="font-display text-xl font-bold text-earth">1</span>
                             </div>
-                            <div class="min-w-0">
-                                <p class="text-[15px] font-bold text-slate-900">Sarah J.</p>
-                                <p class="text-[15px] text-slate-900 mt-0.5 leading-snug">Hey, AcmeAI is still using &lsquo;2025&rsquo; on all the new reports. It&rsquo;s 2026!</p>
-                                <p class="text-xs text-slate-500 mt-1.5">#general &bull; Today at 10:03 AM</p>
+                        </div>
+                        <div>
+                            <h3 class="font-display text-xl font-semibold text-text-dark">Import your data</h3>
+                            <p class="mt-3 text-text-mid">Drag in your data from wherever it lives. We connect to all the tools you already use.</p>
+                        </div>
+                    </div>
+                    <div class="lg:w-[55%] w-full">
+                        <div class="bg-cream rounded-2xl p-6 border border-earth-light/15">
+                            <!-- Inner drop zone -->
+                            <div class="rounded-xl border-2 border-dashed border-earth-light/30 bg-warm/50 flex flex-col items-center justify-center py-6 px-4 mb-5">
+                                <svg class="w-8 h-8 text-text-muted mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.338-2.32 3 3 0 013.438 3.42A3.75 3.75 0 0118 19.5H6.75z"/></svg>
+                                <span class="text-sm text-text-muted">Drag & drop or <span class="text-accent font-medium">browse</span></span>
+                            </div>
+                            <!-- Scattered integration logos -->
+                            <div class="text-xs text-text-muted text-center mb-3">Or import from</div>
+                            <div class="relative h-20 mx-auto max-w-xs">
+                                <!-- OpenAI -->
+                                <div class="w-11 h-11 rounded-xl bg-warm flex items-center justify-center border border-earth-light/20 absolute shadow-sm" style="left:8%;top:5%;transform:rotate(-6deg)" title="OpenAI">
+                                    <svg class="w-5 h-5 text-text-dark" fill="currentColor" viewBox="0 0 16 16"><path d="M14.949 6.547a3.94 3.94 0 0 0-.348-3.273 4.11 4.11 0 0 0-4.4-1.934A4.1 4.1 0 0 0 8.423.2 4.15 4.15 0 0 0 6.305.086a4.1 4.1 0 0 0-1.891.948 4.04 4.04 0 0 0-1.158 1.753 4.1 4.1 0 0 0-1.563.679A4 4 0 0 0 .554 4.72a3.99 3.99 0 0 0 .502 4.731 3.94 3.94 0 0 0 .346 3.274 4.11 4.11 0 0 0 4.402 1.933c.382.425.852.764 1.377.995.526.231 1.095.35 1.67.346 1.78.002 3.358-1.132 3.901-2.804a4.1 4.1 0 0 0 1.563-.68 4 4 0 0 0 1.14-1.253 3.99 3.99 0 0 0-.506-4.716m-6.097 8.406a3.05 3.05 0 0 1-1.945-.694l.096-.054 3.23-1.838a.53.53 0 0 0 .265-.455v-4.49l1.366.778q.02.011.025.035v3.722c-.003 1.653-1.361 2.992-3.037 2.996m-6.53-2.75a2.95 2.95 0 0 1-.36-2.01l.095.057L5.29 12.09a.53.53 0 0 0 .527 0l3.949-2.246v1.555a.05.05 0 0 1-.022.041L6.473 13.3c-1.454.826-3.311.335-4.15-1.098m-.85-6.94A3.02 3.02 0 0 1 3.07 3.949v3.785a.51.51 0 0 0 .262.451l3.93 2.237-1.366.779a.05.05 0 0 1-.048 0L2.585 9.342a2.98 2.98 0 0 1-1.113-4.094zm11.216 2.571L8.747 5.576l1.362-.776a.05.05 0 0 1 .048 0l3.265 1.86a3 3 0 0 1 1.173 1.207 2.96 2.96 0 0 1-.27 3.2 3.05 3.05 0 0 1-1.36.997V8.279a.52.52 0 0 0-.276-.445m1.36-2.015-.097-.057-3.226-1.855a.53.53 0 0 0-.53 0L6.249 6.153V4.598a.04.04 0 0 1 .019-.04L9.533 2.7a3.07 3.07 0 0 1 3.257.139c.474.325.843.778 1.066 1.303.223.526.289 1.103.191 1.664zM5.503 8.575 4.139 7.8a.05.05 0 0 1-.026-.037V4.049c0-.57.166-1.127.476-1.607s.752-.864 1.275-1.105a3.08 3.08 0 0 1 3.234.41l-.096.054-3.23 1.838a.53.53 0 0 0-.265.455zm.742-1.577 1.758-1 1.762 1v2l-1.755 1-1.762-1z"/></svg>
+                                </div>
+                                <!-- Langfuse -->
+                                <div class="w-10 h-10 rounded-lg bg-warm flex items-center justify-center border border-earth-light/20 absolute shadow-sm" style="left:22%;top:38%;transform:rotate(4deg)" title="Langfuse">
+                                    <svg class="w-5 h-5 text-text-dark" fill="currentColor" fill-rule="evenodd" viewBox="0 0 24 24"><path d="M6.666 13.224c1.982.013 3.143.159 4.014.551a6.07 6.07 0 011.298.79l.425.36c1.002.819 2.202 1.276 3.52 1.027.21-.04.414-.093.613-.16a6.226 6.226 0 012.483.163l.317.094c.517.167.978.389 1.396.651l.234.155-.155.187c-1.012 1.157-2.411 1.882-3.93 2l-.168.01c-1.42.072-2.677-.344-3.828-1.128l.02-.017-.308-.223a8.446 8.446 0 01-.357-.274l-.191-.159-.343-.178c-1.24-.623-2.3-.943-3.105-1.15l-.794-.194-.223-.058-.018.048.016-.049-.01-.003-.016.053.013-.053a3.725 3.725 0 01-.749-.302l-.262-.144-.261-.163a2.396 2.396 0 01-.622-.578l-.11-.173-.097-.188a2.386 2.386 0 01-.213-.74l-.009-.1.22-.021.187-.014c.156-.01.313-.016.49-.019h.523zm-5.438 1.27c.08.327.172.633.27.915l.09.25c.165.438.373.856.62 1.248l-1.53 1.007c-.03.022-.07 0-.07-.047V14.8l.004-.023.015-.022.6-.26zm21.07-4.012l.05.195.039.174.015.108c.026.263.042.53.047.803l-.002.399c-.01.396-.045.786-.103 1.168l-.06.344a9.772 9.772 0 00-2.983-1.045l.03-.13c.047-.24.074-.486.08-.734a2.391 2.391 0 00-.02-.418l-.006-.033a11.45 11.45 0 002.562-.7l.35-.13zM12.13 6.022c1.17-.927 2.718-1.558 4.585-1.391a6.268 6.268 0 012.65.856l.22.14c.364.244.71.556 1.041.926l.183.221-.233.095-.212.122a6.501 6.501 0 01-.654.314c-.147.055-.3.108-.46.157a6.276 6.276 0 01-2.78.22c-.941-.238-1.958-.085-2.852.396-.406.21-.785.487-1.121.822l-.332.35-.182.18-.384.351a5.83 5.83 0 01-1.052.675c-.828.41-1.986.517-4.017.43l-.636-.032-.248-.017-.098-.01.112-.23c.136-.254.308-.502.522-.74.259-.288.537-.514.827-.69l.19-.101.128-.064.118-.053.209-.082a12.304 12.304 0 001.587-.762c1.105-.612 2.1-1.35 2.751-1.97l.138-.112zm-11.473.29l.023.01.27.229c.277.226.573.442.89.642l.352.212-.145.215c-.168.263-.321.549-.455.86l-.11.272a6.071 6.071 0 00-.175.54l-.056.223-.628-.612a.058.058 0 01-.015-.039V6.366c0-.036.025-.057.05-.055z"/><path d="M7.62 5.05a6.303 6.303 0 013.226.898l.235.146-.199.163a14.74 14.74 0 01-2.64 1.684l-.131.061-.306.136-.306.125a4.425 4.425 0 00-.65.294l-.127.069a4.265 4.265 0 00-2.149 3.406l-.01.21v.257l.027.541c0 .278.041.794.319 1.352l.09.168c.082.14.17.266.259.377.196.257.423.466.667.636l.247.16c.409.26.912.495 1.42.625l.765.184c.348.085.647.165.958.26.822.251 1.62.576 2.452 1.021l.162.136-.156.12c-.677.503-2.277 1.475-4.438 1.282a6.276 6.276 0 01-2.654-.861 5.79 5.79 0 01-1.653-1.478l-.131-.202a7.616 7.616 0 01-1.124-2.815l-.07-.377-.031.015a9.423 9.423 0 01-.03-2.903l.025.026.096-.696c.03-.137.062-.27.096-.4l.076-.27a6.233 6.233 0 01.88-1.82l.286-.376C4.103 5.99 5.548 5.192 7.158 5.07l.167-.011.296-.008zm7.85 8.03c.682-.044 1.446-.029 2.275.012l.42.022a8.9 8.9 0 01.73.071 12.967 12.967 0 013.036 1.023l.444.222c.304.184.56.362.764.515l.237.184.013.016.005.022v2.491l-.003.017-.004.01a.05.05 0 01-.021.018l-.027.005-.01-.003-.015-.01-.148-.127a9.245 9.245 0 00-1.431-.987l-.236-.126-.104-.077a6.994 6.994 0 00-2.269-1.074l-.25-.062a6.939 6.939 0 00-2.395-.118l-.157.021-.2.062-.178.045-.183.04c-1.274.238-2.348-.363-2.988-.869l-.298-.248.216-.165c.258-.187.529-.353.813-.495.506-.252 1.166-.384 1.964-.435zm7.846-7.004a.048.048 0 01.07.013l.008.027v3.057l-.006.024-.017.018a10.98 10.98 0 01-1.864.912c-.262.09-.479.157-.733.223-.514.135-1.058.258-1.526.347l-.317.057c-.285.034-.58.056-.885.066l-.338.006c-1.792.002-3.149-.083-4.145-.462l-.208-.085a6.075 6.075 0 01-.726-.384l-.14-.09c.122-.118.242-.241.36-.37l.157-.163c.161-.157.333-.3.512-.425.843-.566 1.851-.77 2.778-.535l.312.04a6.962 6.962 0 002.51-.202l.256-.074c.195-.06.38-.128.556-.2l.487-.209c.227-.103.437-.212.63-.326l.087-.035a10.827 10.827 0 002.182-1.23z"/></svg>
+                                </div>
+                                <!-- LangChain -->
+                                <div class="w-12 h-12 rounded-xl bg-warm flex items-center justify-center border border-earth-light/20 absolute shadow-sm" style="left:38%;top:2%;transform:rotate(-3deg)" title="LangChain">
+                                    <svg class="w-6 h-6 text-text-dark" fill="currentColor" viewBox="0 0 24 24"><path d="M6.0988 5.9175C2.7359 5.9175 0 8.6462 0 12s2.736 6.0825 6.0988 6.0825h11.8024C21.2641 18.0825 24 15.3538 24 12s-2.736-6.0825-6.0988-6.0825ZM5.9774 7.851c.493.0124 1.02.2496 1.273.6228.3673.4592.4778 1.0668.8944 1.4932.5604.6118 1.199 1.1505 1.7161 1.802.4892.5954.8386 1.2937 1.1436 1.9975.1244.2335.1257.5202.31.7197.0908.1204.5346.4483.4383.5645.0555.1204.4702.286.3263.4027-.1944.04-.4129.0476-.5616-.1074-.0549.126-.183.0596-.2819.0432a4 4 0 0 0-.025.0736c-.3288.0219-.5754-.3126-.732-.565-.3111-.168-.6642-.2702-.982-.446-.0182.2895.0452.6485-.231.8353-.014.5565.8436.0656.9222.4804-.061.0067-.1286-.0095-.1774.0373-.2239.2172-.4805-.1645-.7385-.007-.3464.174-.3808.3161-.8096.352-.0237-.0359-.0143-.0592.0059-.0811.1207-.1399.1295-.3046.3356-.3643-.2122-.0334-.3899.0833-.5686.1757-.2323.095-.2304-.2141-.5878.0164-.0396-.0322-.0208-.0615.0018-.0864.0908-.1107.2102-.127.345-.1208-.663-.3686-.9751.4507-1.2813.0432-.092.0243-.1265.1068-.1845.1652-.05-.0548-.0123-.1212-.0099-.1857-.0598-.028-.1356-.041-.1179-.1366-.1171-.0395-.1988.0295-.286.0952-.0787-.0608.0532-.1492.0776-.2125.0702-.1216.23-.025.3111-.1126.2306-.1308.552.0814.8155.0455.203.0255.4544-.1825.3526-.39-.2171-.2767-.179-.6386-.1839-.9695-.0268-.1929-.491-.4382-.6252-.6462-.1659-.1873-.295-.4047-.4243-.6182-.4666-.9008-.3198-2.0584-.9077-2.8947-.266.1466-.6125.0774-.8418-.119-.1238.1125-.1292.2598-.139.4161-.297-.2962-.2593-.8559-.022-1.1855.0969-.1302.2127-.2373.342-.3316.0292-.0213.0391-.0419.0385-.0747.1174-.5267.5764-.7391 1.0694-.7267m12.4071.46c.5575 0 1.0806.2159 1.474.6082s.61.9145.61 1.4704c0 .556-.2167 1.078-.61 1.4698v.0006l-.902.8995a2.08 2.08 0 0 1-.8597.5166l-.0164.0047-.0058.0164a2.05 2.05 0 0 1-.474.7308l-.9018.8995c-.3934.3924-.917.6083-1.4745.6083s-1.0806-.216-1.474-.6083c-.813-.8107-.813-2.1294 0-2.9402l.9019-.8995a2.056 2.056 0 0 1 .858-.5143l.017-.0053.0058-.0158a2.07 2.07 0 0 1 .4752-.7337l.9018-.8995c.3934-.3924.9171-.6083 1.4745-.6083zm0 .8965a1.18 1.18 0 0 0-.8388.3462l-.9018.8995a1.181 1.181 0 0 0-.3427.9252l.0053.0572c.0323.2652.149.5044.3374.6917.13.1296.2733.2114.4471.2686a.9.9 0 0 1 .014.1582.884.884 0 0 1-.2609.6304l-.0554.0554c-.3013-.1028-.5525-.253-.7794-.4792a2.06 2.06 0 0 1-.5761-1.0968l-.0099-.0578-.0461.0368a1.1 1.1 0 0 0-.0876.0794l-.9024.8995c-.4623.461-.4623 1.212 0 1.673.2311.2305.535.346.8394.3461.3043 0 .6077-.1156.8388-.3462l.9019-.8995c.4623-.461.4623-1.2113 0-1.673a1.17 1.17 0 0 0-.4367-.2749 1 1 0 0 1-.014-.1611c0-.2591.1023-.505.2901-.6923.3019.1028.57.2694.7962.495.3007.2999.4994.679.5756 1.0968l.0105.0578.0455-.0373a1.1 1.1 0 0 0 .0887-.0794l.902-.8996c.4622-.461.4628-1.2124 0-1.6735a1.18 1.18 0 0 0-.8395-.3462Zm-9.973 5.1567-.0006.0006c-.0793.3078-.1048.8318-.506.847-.033.1776.1228.2445.2655.1874.141-.0645.2081.0508.2557.1657.2177.0317.5394-.0725.5516-.3298-.325-.1867-.4253-.5418-.5662-.8709"/></svg>
+                                </div>
+                                <!-- Helicone -->
+                                <div class="w-10 h-10 rounded-lg bg-warm flex items-center justify-center border border-earth-light/20 absolute shadow-sm" style="left:56%;top:32%;transform:rotate(7deg)" title="Helicone">
+                                    <svg class="w-5 h-5 text-text-dark" fill="currentColor" viewBox="0 0 284 279"><path d="M144 20c-1.1-.5-2.3-.5-3.4 0L22.2 71.8l93.1 40.8 27 11.8 87.9-38.5 32.2-14.1L144 20z"/><path d="M22.2 71.8v108.3l93.1-67.5-93.1-40.8z"/><path d="M230.2 85.9l-87.9 38.5v96.5l87.9-135z"/><path d="M142.3 220.9v39.6l26.8-11.2 93.3-149.6V71.8l-32.2 14.1-87.9 135z"/><path d="M142.3 260.5v-124.3L33 214.6l109.3 45.9z"/><path d="M22.2 180.1v27.2c0 1.7 1 3.3 2.6 4l8.1 3.3 109.4-78.5v-11.8l-27-11.8-93.1 67.6z"/><path d="M169.1 249.3l90.6-38c1.6-.7 2.6-2.3 2.6-4V99.7l-93.2 149.6z"/></svg>
+                                </div>
+                                <!-- CSV (Lucide file-text) -->
+                                <div class="w-11 h-11 rounded-xl bg-warm flex items-center justify-center border border-earth-light/20 absolute shadow-sm" style="left:72%;top:0%;transform:rotate(-5deg)" title="CSV">
+                                    <svg class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 22a2 2 0 01-2-2V4a2 2 0 012-2h8a2.4 2.4 0 011.704.706l3.588 3.588A2.4 2.4 0 0120 8v12a2 2 0 01-2 2z"/><path d="M14 2v5a1 1 0 001 1h5"/><path d="M10 9H8M16 13H8M16 17H8"/></svg>
+                                </div>
+                                <!-- XLSX (Lucide file-spreadsheet) -->
+                                <div class="w-10 h-10 rounded-lg bg-warm flex items-center justify-center border border-earth-light/20 absolute shadow-sm" style="left:88%;top:28%;transform:rotate(3deg)" title="Excel">
+                                    <svg class="w-5 h-5 text-forest" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 22a2 2 0 01-2-2V4a2 2 0 012-2h8a2.4 2.4 0 011.704.706l3.588 3.588A2.4 2.4 0 0120 8v12a2 2 0 01-2 2z"/><path d="M14 2v5a1 1 0 001 1h5"/><path d="M8 13h2M14 13h2M8 17h2M14 17h2"/></svg>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Arrow pointing from Slack message to error attribution -->
-                <!-- Document screenshot (floating, overlaid right) -->
-                <div class="how-it-works-doc absolute -bottom-44 -right-12 z-10 rotate-[2deg] max-w-lg hidden lg:block">
-                    <img src="img/doc-screenshot.png" alt="Quarterly Usage Report Template showing hardcoded Q4 2025 date" class="w-full rounded-xl shadow-2xl border border-slate-200/80">
+                <!-- Step 2: Label what's good and bad -->
+                <div class="relative flex flex-col lg:flex-row items-start gap-8 lg:gap-16">
+                    <div class="flex-shrink-0 flex items-start gap-4 lg:w-[45%]">
+                        <div class="relative flex-shrink-0">
+                            <div class="w-14 h-14 rounded-2xl bg-accent/20 flex items-center justify-center border border-accent/30">
+                                <span class="font-display text-xl font-bold text-earth">2</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-display text-xl font-semibold text-text-dark">Review your AI's outputs</h3>
+                            <p class="mt-3 text-text-mid">Your team reviews real outputs and flags what's wrong. No coding needed, just tell Artanis what your AI should have done.</p>
+                        </div>
+                    </div>
+                    <div class="lg:w-[55%] w-full">
+                        <div class="bg-cream rounded-2xl p-6 border border-earth-light/15" id="label-demo">
+                            <div class="bg-warm rounded-xl border border-earth-light/20 overflow-hidden" style="min-height:335px;display:flex;flex-direction:column">
+                                <div class="px-4 py-2 border-b border-earth-light/15">
+                                    <span class="text-xs font-semibold text-text-muted uppercase tracking-wider" id="label-type-badge">Text Q&A</span>
+                                </div>
+                                <div class="grid grid-cols-2 divide-x divide-earth-light/15 flex-1 min-h-0">
+                                    <div class="p-4">
+                                        <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Input</div>
+                                        <div class="text-sm text-text-dark" id="label-input"></div>
+                                    </div>
+                                    <div class="p-4">
+                                        <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Output</div>
+                                        <div class="text-sm text-text-dark" id="label-output"></div>
+                                    </div>
+                                </div>
+                                <!-- Bottom action area (buttons or feedback) -->
+                                <div class="border-t border-earth-light/15" id="label-action-area">
+                                    <div id="label-buttons" class="px-4 py-3 flex items-center justify-center gap-6">
+                                        <button onclick="labelVote('down')" class="w-11 h-11 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors border-2 border-primary/30" title="Reject">
+                                            <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/><path d="M17 14V2"/></svg>
+                                        </button>
+                                        <button onclick="labelVote('up')" class="w-11 h-11 rounded-full bg-forest/10 hover:bg-forest/20 flex items-center justify-center transition-colors border-2 border-forest/30" title="Approve">
+                                            <svg class="w-5 h-5 text-forest" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/><path d="M7 10v12"/></svg>
+                                        </button>
+                                    </div>
+                                    <div id="label-feedback" class="hidden px-4 py-3">
+                                        <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">What went wrong?</div>
+                                        <div class="relative">
+                                            <textarea id="label-reason" class="w-full h-20 rounded-lg border border-earth-light/20 bg-cream px-3 py-2 pr-10 text-sm text-text-dark placeholder-text-muted focus:outline-none focus:border-accent resize-none" placeholder="e.g. Says 'Delete Account' but should say 'Cancel Subscription'"></textarea>
+                                            <button onclick="labelSubmitFeedback()" class="absolute right-2 bottom-3 w-7 h-7 rounded-full bg-primary hover:bg-primary-dark flex items-center justify-center transition-colors" title="Send">
+                                                <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"/><path d="M6 12h16"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Arrow: drawn pointing right with a curve, then rotated+positioned via CSS -->
-                <!--
-                    Arrow 1: Slack message → "Missing or Stale Documentation"
-                    Nearly horizontal, slight downward angle (~3deg)
-                    Center spine: (0,45) C(70,50)(150,47)(175,46) — subtle curve
-                    Shaft tapers: ±2 at tail → ±8 at head
-                    Head: ±20 from spine, tip at (220,46)
-                -->
-                <svg class="how-it-works-arrow how-it-works-arrow-1 absolute z-20 hidden lg:block" width="250" height="100" style="top: 50%; left: 22%; transform: rotate(13deg); transform-origin: left center;" viewBox="0 0 220 100" fill="none">
-                    <path d="
-                        M 0,43
-                        C 70,45 150,40 175,38
-                        L 175,26
-                        L 220,46
-                        L 175,66
-                        L 175,54
-                        C 150,54 70,55 0,47
-                        Z
-                    " fill="#2563eb" opacity="0.9"/>
-                </svg>
+                <!-- Step 3: Get suggested fixes -->
+                <div class="relative flex flex-col lg:flex-row items-start gap-8 lg:gap-16">
+                    <div class="flex-shrink-0 flex items-start gap-4 lg:w-[45%]">
+                        <div class="relative flex-shrink-0">
+                            <div class="w-14 h-14 rounded-2xl bg-accent/20 flex items-center justify-center border border-accent/30">
+                                <span class="font-display text-xl font-bold text-earth">3</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-display text-xl font-semibold text-text-dark">See what to fix</h3>
+                            <p class="mt-3 text-text-mid">Artanis shows you exactly how to change your prompts and why. Accept the fixes, tweak them, or try again.</p>
+                        </div>
+                    </div>
+                    <div class="lg:w-[55%] w-full">
+                        <div class="bg-cream rounded-2xl p-6 border border-earth-light/15">
+                            <div class="bg-warm rounded-xl border border-earth-light/20 overflow-hidden font-mono text-xs leading-relaxed">
+                                <div class="px-4 py-2 bg-earth-dark/5 border-b border-earth-light/15 flex items-center justify-between">
+                                    <span class="text-text-muted text-xs font-sans">system_prompt.txt</span>
+                                    <span class="text-xs text-accent font-sans font-medium">3 changes</span>
+                                </div>
+                                <div class="max-h-56 overflow-y-auto diff-scroll">
+                                    <table class="w-full border-collapse"><tbody>
+                                    <tr><td class="diff-ln text-text-muted/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">1</td><td class="px-3 py-0.5 text-text-mid/60"> You are a helpful customer support assistant for Acme Inc.</td></tr>
+                                    <tr><td class="diff-ln text-text-muted/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">2</td><td class="px-3 py-0.5 text-text-mid/60"> Always be polite and professional.</td></tr>
+                                    <tr><td class="diff-ln text-text-muted/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">3</td><td class="px-3 py-0.5 text-text-mid/60"> </td></tr>
+                                    <tr class="bg-primary/10"><td class="diff-ln text-primary/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">4</td><td class="px-3 py-0.5 text-text-dark"><span class="text-primary/60 select-none mr-1">-</span>When users ask to cancel, direct them to Settings > Delete Account.</td></tr>
+                                    <tr class="bg-forest/10"><td class="diff-ln text-forest/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">4</td><td class="px-3 py-0.5 text-text-dark"><span class="text-forest/60 select-none mr-1">+</span>When users ask to cancel, direct them to Settings > Billing > Cancel Subscription.</td></tr>
+                                    <tr><td class="diff-ln text-text-muted/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">5</td><td class="px-3 py-0.5 text-text-mid/60"> </td></tr>
+                                    <tr><td class="diff-ln text-text-muted/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">6</td><td class="px-3 py-0.5 text-text-mid/60"> For refund requests, check if the order is within the 30-day window.</td></tr>
+                                    <tr class="bg-primary/10"><td class="diff-ln text-primary/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">7</td><td class="px-3 py-0.5 text-text-dark"><span class="text-primary/60 select-none mr-1">-</span>If outside the window, tell the user refunds are not possible.</td></tr>
+                                    <tr class="bg-forest/10"><td class="diff-ln text-forest/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">7</td><td class="px-3 py-0.5 text-text-dark"><span class="text-forest/60 select-none mr-1">+</span>If outside the window, offer store credit as an alternative.</td></tr>
+                                    <tr><td class="diff-ln text-text-muted/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">8</td><td class="px-3 py-0.5 text-text-mid/60"> </td></tr>
+                                    <tr><td class="diff-ln text-text-muted/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">9</td><td class="px-3 py-0.5 text-text-mid/60"> Always verify the user's identity before making account changes.</td></tr>
+                                    <tr><td class="diff-ln text-text-muted/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">10</td><td class="px-3 py-0.5 text-text-mid/60"> Do not share internal pricing or discount codes.</td></tr>
+                                    <tr><td class="diff-ln text-text-muted/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">11</td><td class="px-3 py-0.5 text-text-mid/60"> </td></tr>
+                                    <tr class="bg-primary/10"><td class="diff-ln text-primary/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">12</td><td class="px-3 py-0.5 text-text-dark"><span class="text-primary/60 select-none mr-1">-</span>For shipping issues, ask the user to contact the carrier directly.</td></tr>
+                                    <tr class="bg-forest/10"><td class="diff-ln text-forest/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">12</td><td class="px-3 py-0.5 text-text-dark"><span class="text-forest/60 select-none mr-1">+</span>For shipping issues, file a support ticket and provide the tracking link.</td></tr>
+                                    <tr><td class="diff-ln text-text-muted/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">13</td><td class="px-3 py-0.5 text-text-mid/60"> </td></tr>
+                                    <tr><td class="diff-ln text-text-muted/40 select-none text-right pr-3 pl-2 align-top" style="width:2rem">14</td><td class="px-3 py-0.5 text-text-mid/60"> Escalate to a human agent if the user asks three times.</td></tr>
+                                    </tbody></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                <!--
-                    Arrow 2: Error area → "Q4 2025" in doc overlay
-                    Steep downward (~65deg rotation)
-                    Center spine: (0,35) C(60,55)(140,48)(175,45) — downward curve
-                    Shaft tapers: ±2 at tail → ±8 at head
-                    Head: ±20 from spine, tip at (220,45)
-                -->
-                <svg class="how-it-works-arrow how-it-works-arrow-2 absolute z-20 hidden" width="280" height="100" style="top: 60%; left: 53.5%; transform: rotate(70deg); transform-origin: left center;" viewBox="0 0 220 100" fill="none">
-                    <path d="
-                        M 0,33
-                        C 60,48 140,40 175,37
-                        L 175,25
-                        L 220,45
-                        L 175,65
-                        L 175,53
-                        C 140,56 60,62 0,37
-                        Z
-                    " fill="#2563eb" opacity="0.9"/>
-                </svg>
+                <!-- Step 4: Catch regressions -->
+                <div class="relative flex flex-col lg:flex-row items-start gap-8 lg:gap-16">
+                    <div class="flex-shrink-0 flex items-start gap-4 lg:w-[45%]">
+                        <div class="relative flex-shrink-0">
+                            <div class="w-14 h-14 rounded-2xl bg-forest/15 flex items-center justify-center border border-forest/25">
+                                <span class="font-display text-xl font-bold text-forest">4</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-display text-xl font-semibold text-text-dark">Stay on track</h3>
+                            <p class="mt-3 text-text-mid">Every fix is tested against everything you've already approved. If something breaks, you'll know before your users do.</p>
+                        </div>
+                    </div>
+                    <div class="lg:w-[55%] w-full">
+                        <div class="bg-cream rounded-2xl p-6 border border-earth-light/15">
+                            <div class="bg-warm rounded-xl border border-earth-light/20 overflow-hidden" id="eval-card">
+                                <div class="px-4 py-2 bg-earth-dark/5 border-b border-earth-light/15 flex items-center justify-between">
+                                    <span class="text-xs font-semibold text-text-muted uppercase tracking-wider">Eval results</span>
+                                    <span class="text-xs text-forest font-medium" id="eval-counter">4/5 passing</span>
+                                </div>
+                                <div class="divide-y divide-earth-light/10" id="eval-table">
+                                    <div class="px-4 py-2.5 flex items-center justify-between"><span class="text-sm text-text-mid truncate mr-3">What is your refund policy?</span><svg class="w-5 h-5 text-forest flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div>
+                                    <div class="px-4 py-2.5 flex items-center justify-between"><span class="text-sm text-text-mid truncate mr-3">Cancel my subscription</span><svg class="w-5 h-5 text-forest flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div>
+                                    <div class="px-4 py-2.5 flex items-center justify-between"><span class="text-sm text-text-mid truncate mr-3">I was charged twice</span><svg class="w-5 h-5 text-forest flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div>
+                                    <!-- The mole row (second last) -->
+                                    <div class="px-4 py-2.5 flex items-center justify-between bg-primary/5 transition-all cursor-pointer" id="mole-row" onclick="whackEvalMole()">
+                                        <span class="text-sm text-text-dark font-medium truncate mr-3">My package arrived damaged</span>
+                                        <div class="relative flex-shrink-0" style="width:20px;height:20px" id="mole-icon-container">
+                                            <svg id="eval-mole" class="text-primary" viewBox="0 0 20 20" fill="currentColor" style="width:20px;height:20px">
+                                                <path d="m 9.633613,2.1965503 c -2.396669,0 -4.326351,2.4223678 -4.326351,5.4311928 v 1.915645 c 0.762418,-0.138524 1.54773,-0.200424 2.319239,-0.01292 0.20273,0.04927 0.397866,0.12293 0.593762,0.19327 0.574037,-0.132587 1.163061,-0.241823 1.77922,-0.241846 0.616277,2.3e-5 1.207151,0.109208 1.781286,0.241846 0.195718,-0.07025 0.389156,-0.14405 0.591695,-0.19327 0.771921,-0.18765 1.557501,-0.126395 2.320272,0.0124 v -1.915129 c 0,-3.008825 -1.929682,-5.4311928 -4.326351,-5.4311928 z m 0.07286,2.7373008 h 0.587044 c 0.771809,0 1.39268,0.457592 1.39268,1.026293 0,0.568702 -0.620871,1.026294 -1.39268,1.026294 h -0.587044 c -0.771809,0 -1.39268,-0.457592 -1.39268,-1.026294 0,-0.568701 0.620871,-1.026293 1.39268,-1.026293 z"/>
+                                                <path d="m 3.980728,10.335588 a 3.2629189,3.2629189 0 0 0 -3.2628492,3.26285 3.2629189,3.2629189 0 0 0 3.2628492,3.26285 3.2629189,3.2629189 0 0 0 0.485242,-0.03617 3.2629189,3.2629189 0 0 0 1.888774,0.602548 3.2629189,3.2629189 0 0 0 0.844909,-0.111105 3.2629189,3.2629189 0 0 0 1.715141,0.486792 3.2629189,3.2629189 0 0 0 1.085205,-0.185518 3.2629189,3.2629189 0 0 0 1.085722,0.185518 3.2629189,3.2629189 0 0 0 1.715141,-0.486792 3.2629189,3.2629189 0 0 0 0.844393,0.111105 3.2629189,3.2629189 0 0 0 1.88929,-0.602548 3.2629189,3.2629189 0 0 0 0.484725,0.03617 3.2629189,3.2629189 0 0 0 3.26285,-3.26285 3.2629189,3.2629189 0 0 0 -3.26285,-3.26285 3.2629189,3.2629189 0 0 0 -1.085205,0.186035 3.262919,3.9961591 76.340408 0 0 -2.324923,-0.02015 3.262919,3.9961591 76.340408 0 0 -0.720369,0.235645 3.8495111,1.9797486 0 0 0 -1.888774,-0.254765 3.8495111,1.9797486 0 0 0 -1.888773,0.254765 3.9961591,3.2629189 13.659592 0 0 -0.72037,-0.235645 3.9961591,3.2629189 13.659592 0 0 -2.324406,0.02015 3.2629189,3.2629189 0 0 0 -1.085722,-0.186035 z"/>
+                                            </svg>
+                                            <!-- Tick (hidden, shown after whack) -->
+                                            <svg id="eval-tick" class="w-5 h-5 text-forest absolute inset-0 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="px-4 py-2.5 flex items-center justify-between"><span class="text-sm text-text-mid truncate mr-3">Where is my order?</span><svg class="w-5 h-5 text-forest flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Integrate -->
-    <section class="py-20 sm:py-32">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-2xl lg:mx-0">
-                <h2 class="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">Integrate in 10 mins</h2>
-                <p class="mt-4 text-lg tracking-tight text-slate-700">Use our SDK or connect your existing observability platform — no code changes required.</p>
-            </div>
-            <div class="mt-16 rounded-2xl bg-slate-900 overflow-hidden shadow-xl">
-                <!-- Tabs -->
-                <div class="flex overflow-x-auto border-b border-white/10 bg-white/5">
-                    <button onclick="switchTab('python')" data-tab="python" class="code-tab whitespace-nowrap px-5 py-3 text-sm font-medium text-white border-b-2 border-blue-400">Python</button>
-                    <button onclick="switchTab('typescript')" data-tab="typescript" class="code-tab whitespace-nowrap px-5 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent">TypeScript</button>
-                    <button onclick="switchTab('langfuse')" data-tab="langfuse" class="code-tab whitespace-nowrap px-5 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent">Langfuse</button>
-                    <button onclick="switchTab('langsmith')" data-tab="langsmith" class="code-tab whitespace-nowrap px-5 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent">Langsmith</button>
-                    <button onclick="switchTab('helicone')" data-tab="helicone" class="code-tab whitespace-nowrap px-5 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent">Helicone</button>
-                </div>
-                <!-- Panels -->
-                <div class="p-6 sm:p-8 overflow-x-auto">
-                    <pre id="panel-python" class="text-sm leading-relaxed"><code><span class="text-slate-500"># pip install artanis-ai</span>
-<span class="text-blue-400">from</span> <span class="text-green-300">artanis</span> <span class="text-blue-400">import</span> <span class="text-slate-200">Artanis</span>
-
-<span class="text-slate-200">artanis</span> <span class="text-slate-400">=</span> <span class="text-slate-200">Artanis</span><span class="text-slate-400">(</span><span class="text-slate-200">api_key</span><span class="text-slate-400">=</span><span class="text-green-300">"sk_..."</span><span class="text-slate-400">)</span>
-
-<span class="text-slate-200">trace</span> <span class="text-slate-400">=</span> <span class="text-slate-200">artanis</span><span class="text-slate-400">.</span><span class="text-sky-300">trace</span><span class="text-slate-400">(</span><span class="text-green-300">"rag-answer"</span><span class="text-slate-400">)</span>
-<span class="text-slate-200">trace</span><span class="text-slate-400">.</span><span class="text-sky-300">input</span><span class="text-slate-400">(</span><span class="text-slate-200">question</span><span class="text-slate-400">=</span><span class="text-green-300">"What is AI?"</span><span class="text-slate-400">,</span> <span class="text-slate-200">model</span><span class="text-slate-400">=</span><span class="text-green-300">"gpt-4"</span><span class="text-slate-400">)</span>
-
-<span class="text-slate-200">response</span> <span class="text-slate-400">=</span> <span class="text-slate-200">llm</span><span class="text-slate-400">.</span><span class="text-sky-300">generate</span><span class="text-slate-400">(</span><span class="text-slate-200">prompt</span><span class="text-slate-400">)</span>
-<span class="text-slate-200">trace</span><span class="text-slate-400">.</span><span class="text-sky-300">output</span><span class="text-slate-400">(</span><span class="text-slate-200">response</span><span class="text-slate-400">)</span></code></pre>
-
-                    <pre id="panel-typescript" class="hidden text-sm leading-relaxed"><code><span class="text-slate-500">// npm install @artanis-ai/sdk</span>
-<span class="text-blue-400">import</span> <span class="text-slate-400">{</span> <span class="text-slate-200">Artanis</span> <span class="text-slate-400">}</span> <span class="text-blue-400">from</span> <span class="text-green-300">"@artanis-ai/sdk"</span><span class="text-slate-400">;</span>
-
-<span class="text-blue-400">const</span> <span class="text-slate-200">artanis</span> <span class="text-slate-400">=</span> <span class="text-blue-400">new</span> <span class="text-slate-200">Artanis</span><span class="text-slate-400">({</span> <span class="text-slate-200">apiKey</span><span class="text-slate-400">:</span> <span class="text-green-300">"sk_..."</span> <span class="text-slate-400">});</span>
-
-<span class="text-blue-400">const</span> <span class="text-slate-200">trace</span> <span class="text-slate-400">=</span> <span class="text-slate-200">artanis</span><span class="text-slate-400">.</span><span class="text-sky-300">trace</span><span class="text-slate-400">(</span><span class="text-green-300">"rag-answer"</span><span class="text-slate-400">);</span>
-<span class="text-slate-200">trace</span><span class="text-slate-400">.</span><span class="text-sky-300">input</span><span class="text-slate-400">({</span> <span class="text-slate-200">question</span><span class="text-slate-400">:</span> <span class="text-green-300">"What is AI?"</span><span class="text-slate-400">,</span> <span class="text-slate-200">model</span><span class="text-slate-400">:</span> <span class="text-green-300">"gpt-4"</span> <span class="text-slate-400">});</span>
-
-<span class="text-blue-400">const</span> <span class="text-slate-200">response</span> <span class="text-slate-400">=</span> <span class="text-blue-400">await</span> <span class="text-slate-200">llm</span><span class="text-slate-400">.</span><span class="text-sky-300">generate</span><span class="text-slate-400">(</span><span class="text-slate-200">prompt</span><span class="text-slate-400">);</span>
-<span class="text-slate-200">trace</span><span class="text-slate-400">.</span><span class="text-sky-300">output</span><span class="text-slate-400">(</span><span class="text-slate-200">response</span><span class="text-slate-400">);</span></code></pre>
-
-                    <pre id="panel-langfuse" class="hidden text-sm leading-relaxed"><code><span class="text-slate-500"># No code changes needed</span>
-<span class="text-slate-500">#</span>
-<span class="text-slate-500"># 1. In Artanis, go to Settings → Integrations</span>
-<span class="text-slate-500"># 2. Click Configure next to Langfuse</span>
-<span class="text-slate-500"># 3. Select your region (EU or US)</span>
-<span class="text-slate-500"># 4. Enter your Langfuse API keys:</span>
-<span class="text-slate-500">#    - Public Key  (pk-lf-...)</span>
-<span class="text-slate-500">#    - Secret Key  (sk-lf-...)</span>
-<span class="text-slate-500">#</span>
-<span class="text-slate-500"># Traces sync automatically every 10 minutes.</span></code></pre>
-
-                    <pre id="panel-langsmith" class="hidden text-sm leading-relaxed"><code><span class="text-slate-500"># No code changes needed</span>
-<span class="text-slate-500">#</span>
-<span class="text-slate-500"># 1. In Artanis, go to Settings → Integrations</span>
-<span class="text-slate-500"># 2. Click Configure next to LangSmith</span>
-<span class="text-slate-500"># 3. Enter your API key (lsv2_pt_...)</span>
-<span class="text-slate-500"># 4. Copy the generated webhook URL</span>
-<span class="text-slate-500"># 5. In LangSmith, open your project</span>
-<span class="text-slate-500">#    → Automations → Create rule → Webhook action</span>
-<span class="text-slate-500">#    → Paste the URL</span>
-<span class="text-slate-500">#</span>
-<span class="text-slate-500"># Traces flow in real-time.</span></code></pre>
-
-                    <pre id="panel-helicone" class="hidden text-sm leading-relaxed"><code><span class="text-slate-500"># No code changes needed</span>
-<span class="text-slate-500">#</span>
-<span class="text-slate-500"># 1. In Artanis, go to Settings → Integrations</span>
-<span class="text-slate-500"># 2. Click Configure next to Helicone</span>
-<span class="text-slate-500"># 3. Copy your webhook URL and paste it at</span>
-<span class="text-slate-500">#    us.helicone.ai/webhooks</span>
-<span class="text-slate-500"># 4. Set sample rate to 100%</span>
-<span class="text-slate-500"># 5. Turn on "Include Enhanced Data"</span>
-<span class="text-slate-500"># 6. Copy the HMAC key back to Artanis</span>
-<span class="text-slate-500">#</span>
-<span class="text-slate-500"># Traces flow automatically.</span></code></pre>
-                </div>
-            </div>
+    <!-- Steamroller paving transition -->
+    <div class="relative" style="z-index: 10; margin-top: -120px;">
+        <!-- Steamroller - positioned to overlap above the pavement -->
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 relative" style="z-index: 3;">
+            <img src="img/steamroller.png" alt="Artanis steamroller" class="relative" style="height: 110px; width: auto; margin-bottom: -55px; margin-left: 100px;">
         </div>
-    </section>
+        <!-- Pavement surface -->
+        <div class="relative" style="height: 200px; background: url('img/pavement-field.png') repeat-x center / auto 100%;"></div>
+    </div>
 
     <!-- CTA -->
-    <section id="contact" class="relative overflow-hidden bg-blue-600 py-20 sm:py-32">
+    <section class="relative overflow-hidden py-16 sm:py-24" style="background: linear-gradient(180deg, #321e0c 0%, #1a0f06 100%);">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
             <div class="mx-auto max-w-lg text-center">
-                <h2 class="font-display text-3xl tracking-tight text-white sm:text-4xl">Get Started</h2>
-                <p class="mt-4 text-lg tracking-tight text-white">
-                    Start identifying and fixing failures in your AI pipeline today.
-                </p>
+                <img src="img/mole-sleeping.png" alt="Mole sleeping peacefully in his underground burrow" class="mx-auto mb-8" style="height: 180px; width: auto; max-width: 90vw; object-fit: contain;">
+                <h2 class="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">Keep those moles down for good</h2>
                 <a href="https://accounts.artanis.ai/waitlist"
-                   class="mt-10 inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-blue-50 active:bg-blue-200 active:text-slate-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                    Sign Up
+                   class="mt-10 inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-base font-semibold text-white hover:bg-primary-dark transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary shadow-lg shadow-primary/20">
+                    Sign up
                 </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-slate-50">
+    <footer style="background: #0f0a05;">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col items-center py-10 sm:flex-row sm:justify-between">
-                <p class="text-sm text-slate-500">
-                    &copy; 2025 Artanis Ltd. All rights reserved.
+                <p class="text-sm text-warm/50">
+                    &copy; 2026 Artanis Ltd. All rights reserved.
                 </p>
                 <div class="mt-6 flex gap-x-6 text-sm sm:mt-0">
-                    <a href="https://app.artanis.ai/terms.html" class="text-slate-500 hover:text-slate-900">Terms</a>
-                    <a href="https://app.artanis.ai/privacy.html" class="text-slate-500 hover:text-slate-900">Privacy</a>
+                    <a href="https://app.artanis.ai/terms.html" class="text-warm/50 hover:text-warm transition-colors">Terms</a>
+                    <a href="https://app.artanis.ai/privacy.html" class="text-warm/50 hover:text-warm transition-colors">Privacy</a>
                 </div>
             </div>
         </div>
@@ -422,91 +713,373 @@
             document.getElementById('mobile-menu').classList.add('hidden');
         }
 
-        // Code tab switching
-        function switchTab(tab) {
-            document.querySelectorAll('[id^="panel-"]').forEach(p => p.classList.add('hidden'));
-            document.getElementById('panel-' + tab).classList.remove('hidden');
-            document.querySelectorAll('.code-tab').forEach(btn => {
-                btn.classList.remove('text-white', 'border-blue-400');
-                btn.classList.add('text-slate-400', 'border-transparent');
-            });
-            const active = document.querySelector('[data-tab="' + tab + '"]');
-            active.classList.remove('text-slate-400', 'border-transparent');
-            active.classList.add('text-white', 'border-blue-400');
-        }
-
-        // How It Works scroll-driven animation + mouse parallax
+        // Mole animation state machine
         (function() {
-            const container = document.getElementById('how-it-works');
-            if (!container) return;
+            var moleHoles = document.querySelectorAll('.mole-hole');
+            var moleField = document.getElementById('mole-field');
 
-            const screenshot = container.querySelector('.how-it-works-screenshot');
-            const slack = container.querySelector('.how-it-works-slack');
-            const arrow1 = container.querySelector('.how-it-works-arrow-1');
-            const arrow2 = container.querySelector('.how-it-works-arrow-2');
-            const doc = container.querySelector('.how-it-works-doc');
-
-            function lerp(a, b, t) { return a + (b - a) * t; }
-            function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-
-            // Mouse parallax: mx/my range from -1 to 1 (center of container = 0)
-            let mx = 0, my = 0, targetMx = 0, targetMy = 0;
-            container.addEventListener('mousemove', function(e) {
-                const rect = container.getBoundingClientRect();
-                targetMx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-                targetMy = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-            });
-            container.addEventListener('mouseleave', function() {
-                targetMx = 0;
-                targetMy = 0;
+            // State for each mole
+            var moleStates = [];
+            moleHoles.forEach(function(hole, i) {
+                moleStates.push({
+                    el: hole,
+                    sprite: hole.querySelector('.mole-sprite'),
+                    state: 'hidden',
+                    timer: null
+                });
             });
 
-            function update() {
-                // Smooth mouse tracking
-                mx += (targetMx - mx) * 0.08;
-                my += (targetMy - my) * 0.08;
-
-                const rect = container.getBoundingClientRect();
-                const vh = window.innerHeight;
-                const raw = (vh - rect.top) / (vh + rect.height * 0.5);
-                const p = clamp(raw, 0, 1);
-
-                // Screenshot: always visible, mouse tilts perspective
-                screenshot.querySelector('img').style.transform = `rotateY(${-3 + mx * 3}deg) rotateX(${2 - my * 3}deg)`;
-
-                // 1) Slack comment: appears first — foreground parallax
-                const slackP = clamp((p - 0) / 0.25, 0, 1);
-                const slackEased = 1 - Math.pow(1 - slackP, 3);
-                slack.style.opacity = slackEased;
-                slack.style.transform = `rotate(-3deg) translateX(${lerp(-200, 0, slackEased) + mx * 8}px) translateY(${lerp(-80, 0, slackEased) + my * 5}px) scale(${lerp(0.8, 1, slackEased)})`;
-
-                // 2) Arrow 1: appears after slack
-                const a1P = clamp((p - 0.12) / 0.2, 0, 1);
-                const a1Eased = 1 - Math.pow(1 - a1P, 3);
-                if (arrow1) {
-                    arrow1.style.opacity = a1Eased;
-                    arrow1.style.transform = `rotate(13deg) scale(${lerp(0.3, 1, a1Eased)}) translate(${mx * 6}px, ${my * 4}px)`;
-                }
-
-                // 3) Arrow 2: appears after arrow 1
-                const a2P = clamp((p - 0.22) / 0.2, 0, 1);
-                const a2Eased = 1 - Math.pow(1 - a2P, 3);
-                if (arrow2) {
-                    arrow2.style.opacity = a2Eased;
-                    arrow2.style.transform = `rotate(70deg) scale(${lerp(0.3, 1, a2Eased)}) translate(${mx * 5}px, ${my * 3}px)`;
-                }
-
-                // 4) Doc: appears last — foreground parallax
-                const docP = clamp((p - 0.3) / 0.2, 0, 1);
-                const docEased = 1 - Math.pow(1 - docP, 3);
-                if (doc) {
-                    doc.style.opacity = docEased;
-                    doc.style.transform = `rotate(2deg) translateX(${lerp(100, 0, docEased) + mx * 8}px) translateY(${my * 5}px) scale(${lerp(0.85, 1, docEased)})`;
-                }
-
-                requestAnimationFrame(update);
+            function setAnim(mole, className) {
+                var sprite = mole.sprite;
+                sprite.classList.remove('emerge', 'idle', 'hit', 'retreat-normal', 'retreat-hit');
+                void sprite.offsetWidth;
+                if (className) sprite.classList.add(className);
             }
-            requestAnimationFrame(update);
+
+            // Random position for each mole emergence, avoiding overlap
+            function getMinDist() {
+                return window.innerWidth < 640 ? 120 : 130;
+            }
+            var MIN_DIST = getMinDist();
+
+            function getVisiblePositions(excludeMole) {
+                var positions = [];
+                moleStates.forEach(function(m) {
+                    if (m === excludeMole || m.state === 'hidden') return;
+                    var left = parseFloat(m.el.style.left) || 0;
+                    var bottom = parseFloat(m.el.style.bottom) || 0;
+                    positions.push({ x: left + 60, y: bottom + 60 });
+                });
+                return positions;
+            }
+
+            function getSpawnBounds() {
+                var fieldH = moleField.offsetHeight;
+                var fieldW = moleField.offsetWidth;
+                // Desktop (320px): minBottom=110. Scale proportionally for smaller fields.
+                var minBottom = fieldW < 640 ? Math.round(fieldH * 0.27) : (fieldW < 1024 ? Math.round(fieldH * 0.32) : Math.round(fieldH * 0.34));
+                var range = fieldW < 640 ? 10 : 20;
+                return {
+                    minLeft: 10,
+                    maxLeft: fieldW - 140 - 20,
+                    minBottom: minBottom,
+                    range: range
+                };
+            }
+
+            function randomizePosition(mole) {
+                var bounds = getSpawnBounds();
+                var others = getVisiblePositions(mole);
+                var left, bottom, cx, cy, ok, attempts = 0;
+
+                do {
+                    left = bounds.minLeft + Math.random() * Math.max(0, bounds.maxLeft - bounds.minLeft);
+                    bottom = bounds.minBottom + Math.random() * bounds.range;
+                    cx = left + 60;
+                    cy = bottom + 60;
+                    ok = true;
+                    for (var i = 0; i < others.length; i++) {
+                        var dx = cx - others[i].x;
+                        var dy = cy - others[i].y;
+                        if (Math.sqrt(dx * dx + dy * dy) < MIN_DIST) {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    attempts++;
+                } while (!ok && attempts < 30);
+
+                mole.el.style.left = left + 'px';
+                mole.el.style.bottom = bottom + 'px';
+                if (Math.random() > 0.5) {
+                    mole.el.classList.add('mirrored');
+                } else {
+                    mole.el.classList.remove('mirrored');
+                }
+            }
+
+            function startMole(mole) {
+                randomizePosition(mole);
+                mole.state = 'emerging';
+                mole.el.classList.add('hittable');
+                // Fade in during emerge
+                mole.sprite.style.opacity = '1';
+                setAnim(mole, 'emerge');
+
+                mole.timer = setTimeout(function() {
+                    mole.state = 'idle';
+                    setAnim(mole, 'idle');
+
+                    mole.timer = setTimeout(function() {
+                        if (mole.state === 'idle') {
+                            retreatMole(mole, false);
+                        }
+                    }, 2000 + Math.random() * 3000);
+                }, 1000);
+            }
+
+            function retreatMole(mole, wasHit) {
+                mole.state = 'retreating';
+                if (!wasHit) {
+                    mole.el.classList.remove('hittable');
+                }
+                setAnim(mole, wasHit ? 'retreat-hit' : 'retreat-normal');
+                var retreatDuration = wasHit ? 700 : 600;
+
+                // After animation finishes, fade out, then go hidden
+                mole.timer = setTimeout(function() {
+                    mole.sprite.style.opacity = '0';
+                    setTimeout(function() {
+                        mole.state = 'hidden';
+                        setAnim(mole, null);
+                        mole.sprite.style.backgroundPosition = '0 0';
+
+                        mole.timer = setTimeout(function() {
+                            startMole(mole);
+                        }, 1500 + Math.random() * 3000);
+                    }, 200);
+                }, retreatDuration);
+            }
+
+            var bonkSound = new Audio('sfx/bonk.wav');
+
+            function playBonk() {
+                bonkSound.currentTime = 0;
+                bonkSound.playbackRate = 0.9 + Math.random() * 0.2;
+                bonkSound.play();
+            }
+
+            function hitMole(mole, tapX, tapY) {
+                if (mole.state !== 'idle' && mole.state !== 'emerging') return;
+                clearTimeout(mole.timer);
+
+                mole.state = 'hit';
+                setAnim(mole, 'hit');
+                playBonk();
+
+                // Show mallet at tap point on touch — offset so the head hits at tap location
+                if (tapX !== undefined) {
+                    malletEl.style.left = (tapX + 20) + 'px';
+                    malletEl.style.top = (tapY - 55) + 'px';
+                    malletEl.style.display = 'block';
+                }
+
+                // Swing the mallet
+                malletEl.classList.add('swinging');
+                setTimeout(function() {
+                    malletEl.classList.remove('swinging');
+                    if (tapX !== undefined) {
+                        setTimeout(function() { malletEl.style.display = 'none'; }, 150);
+                    }
+                    setTimeout(function() {
+                        mole.el.classList.remove('hittable');
+                    }, 300);
+                }, 200);
+
+                mole.timer = setTimeout(function() {
+                    retreatMole(mole, true);
+                }, 200);
+            }
+
+            function getMoleCount() {
+                var w = window.innerWidth;
+                return w < 400 ? 1 : (w < 640 ? 2 : (w < 1024 ? 4 : 6));
+            }
+
+            var activeMoleCount = getMoleCount();
+
+            // Initialize: fewer moles on small screens
+            moleStates.slice(0, activeMoleCount).forEach(function(mole, i) {
+                var initialDelay = 500 + Math.random() * 4000;
+                mole.timer = setTimeout(function() {
+                    startMole(mole);
+                }, initialDelay);
+            });
+
+            // Update on resize
+            window.addEventListener('resize', function() {
+                MIN_DIST = getMinDist();
+                var newCount = getMoleCount();
+                if (newCount > activeMoleCount) {
+                    // Start additional moles
+                    moleStates.slice(activeMoleCount, newCount).forEach(function(mole) {
+                        if (mole.state === 'hidden' && !mole.timer) {
+                            mole.timer = setTimeout(function() { startMole(mole); }, 500 + Math.random() * 2000);
+                        }
+                    });
+                } else if (newCount < activeMoleCount) {
+                    // Stop excess moles
+                    moleStates.slice(newCount).forEach(function(mole) {
+                        clearTimeout(mole.timer);
+                        mole.timer = null;
+                        if (mole.state !== 'hidden') {
+                            mole.sprite.style.opacity = '0';
+                            mole.state = 'hidden';
+                            mole.el.classList.remove('hittable');
+                            mole.sprite.classList.remove('emerge', 'idle', 'hit', 'retreat-normal', 'retreat-hit');
+                            mole.sprite.style.backgroundPosition = '0 0';
+                        }
+                    });
+                }
+                activeMoleCount = newCount;
+            });
+
+            // Global click handler
+            window.whackMole = function(holeEl, e) {
+                var mole = moleStates.find(function(m) { return m.el === holeEl; });
+                if (!mole) return;
+                if (isTouch && e) {
+                    var touch = e.touches ? e.touches[0] : e;
+                    hitMole(mole, touch.clientX, touch.clientY);
+                } else {
+                    hitMole(mole);
+                }
+            };
+
+            // Mallet cursor: visible when mouse is in spawn zone (desktop only)
+            var malletEl = document.getElementById('mallet-cursor');
+            var malletVisible = false;
+            var isTouch = 'ontouchstart' in window;
+
+            if (!isTouch) {
+                document.addEventListener('mousemove', function(e) {
+                    var bounds = getSpawnBounds();
+                    var fieldRect = moleField.getBoundingClientRect();
+                    var fieldBottom = fieldRect.bottom;
+                    var spawnTopY = fieldBottom - bounds.minBottom - bounds.range - 140;
+                    var spawnBottomY = fieldBottom - bounds.minBottom;
+                    var inZone = e.clientX >= fieldRect.left + bounds.minLeft &&
+                                 e.clientX <= fieldRect.left + bounds.maxLeft + 140 &&
+                                 e.clientY >= spawnTopY &&
+                                 e.clientY <= spawnBottomY;
+
+                    if (inZone) {
+                        malletEl.style.left = (e.clientX - 20) + 'px';
+                        malletEl.style.top = (e.clientY - 50) + 'px';
+                        if (!malletVisible) {
+                            malletVisible = true;
+                            malletEl.style.display = 'block';
+                            document.body.classList.add('mallet-active');
+                        }
+                    } else if (malletVisible) {
+                        malletVisible = false;
+                        malletEl.style.display = 'none';
+                        document.body.classList.remove('mallet-active');
+                    }
+                });
+            }
+        })();
+
+        // Label demo (Step 2)
+        (function() {
+            var userIcon = '<svg class="w-4 h-4 text-text-muted flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+            var aiIcon = '<svg class="w-4 h-4 text-accent flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>';
+            function chatBubble(who, text) {
+                if (who === 'user') return '<div class="flex items-start gap-2 justify-end mb-2"><div class="bg-cream rounded-lg rounded-tr-sm px-3 py-1.5 text-xs">' + text + '</div>' + userIcon + '</div>';
+                return '<div class="flex items-start gap-2 mb-2">' + aiIcon + '<div class="bg-earth-light/10 rounded-lg rounded-tl-sm px-3 py-1.5 text-xs">' + text + '</div></div>';
+            }
+            var del = function(t) { return '<span class="line-through text-primary/70 bg-primary/5">' + t + '</span>'; };
+            var ins = function(t) { return '<span class="text-forest font-medium bg-forest/5">' + t + '</span>'; };
+            var examples = [
+                { type: 'Text Q&A', input: 'What is your refund policy?', output: 'You can return any item within 30 days of purchase for a full refund to your original payment method.', corrected: 'You can return any item within ' + del('30') + ' ' + ins('14') + ' days of purchase for a full refund to your original payment method.' },
+                { type: 'Chat', input: chatBubble('user', 'Hi') + chatBubble('ai', 'Hey! How can I help you today?') + chatBubble('user', 'My order hasn\'t arrived yet, it\'s been 2 weeks'), output: chatBubble('ai', 'I apologize for the delay. Your order #4829 shipped on Feb 3rd via FedEx. Tracking shows it\'s in transit. Expected delivery is tomorrow.'), corrected: chatBubble('ai', 'I ' + del('apologize for the delay') + ins('\'m sorry about that') + '. Your order #4829 shipped on Feb 3rd via FedEx. Tracking shows it\'s in transit. Expected delivery is tomorrow.') },
+                { type: 'Email', input: '<div class="text-xs text-text-muted mb-1">From: jane@corp.com</div><div class="text-xs text-text-muted mb-2">Subject: Billing issue</div>I was charged $99 but my plan is $49/mo. Please fix this.', output: 'Hi Jane, I can see the duplicate charge on your account. I\'ve issued a refund of $49 which should appear in 3-5 business days.', corrected: 'Hi Jane, I can see the duplicate charge on your account. I\'ve issued a refund of ' + del('$49') + ' ' + ins('$50') + ' which should appear in ' + del('3-5') + ' ' + ins('5-10') + ' business days.' },
+                { type: 'Support ticket', input: '<div class="text-xs text-text-muted mb-1">#TKT-2847 · High priority</div>App crashes on login. Android 14, Pixel 8. Started after last update.', output: 'This is a known issue with v3.2.1 on Android 14. Please update to v3.2.2 from the Play Store, which includes the fix.', corrected: 'This is a known issue with ' + del('v3.2.1') + ' ' + ins('v3.2.0') + ' on Android 14. Please ' + del('update to v3.2.2 from the Play Store') + ' ' + ins('clear your app cache and update to v3.2.2') + ', which includes the fix.' },
+                { type: 'Chat', input: chatBubble('user', 'Hello') + chatBubble('ai', 'Hi there! What can I do for you?') + chatBubble('user', 'I want to cancel my subscription'), output: chatBubble('ai', 'To cancel your subscription, go to Settings and click Delete Account. This will remove all your data permanently.'), corrected: chatBubble('ai', 'To cancel your subscription, go to Settings and click ' + del('Delete Account') + ' ' + ins('Cancel Plan') + '. ' + del('This will remove all your data permanently.') + ' ' + ins('Your data will be kept for 30 days.')) },
+                { type: 'Text Q&A', input: 'How do I export my data?', output: 'Go to Settings > Data > Export. Choose CSV or JSON format. The export will be emailed to you within 24 hours.', corrected: 'Go to Settings > Data > Export. Choose CSV or JSON format. The export will be emailed to you within ' + del('24 hours') + ' ' + ins('1 hour') + '.' },
+                { type: 'Email', input: '<div class="text-xs text-text-muted mb-1">From: partner@bigco.com</div><div class="text-xs text-text-muted mb-2">Subject: Partnership inquiry</div>We\'d like to explore an integration between our platforms.', output: 'Thank you for reaching out. I\'d be happy to connect you with our partnerships team. Could you share more about your use case?', corrected: 'Thank you for reaching out. I\'d be happy to connect you with our ' + del('partnerships team') + ' ' + ins('integrations team') + '. Could you share more about your use case?' },
+                { type: 'Chat', input: chatBubble('user', 'Hey') + chatBubble('ai', 'Hello! How can I help?') + chatBubble('user', 'How much does the Pro plan cost?'), output: chatBubble('ai', 'Our Pro plan is $29/month billed annually, or $39/month billed monthly. Includes unlimited projects and priority support.'), corrected: chatBubble('ai', 'Our Pro plan is ' + del('$29') + ' ' + ins('$24') + '/month billed annually, or ' + del('$39') + ' ' + ins('$34') + '/month billed monthly. Includes unlimited projects and priority support.') },
+                { type: 'Text Q&A', input: 'What integrations do you support?', output: 'We support Slack, Jira, GitHub, Linear, Notion, and Zapier. You can also use our REST API for custom integrations.', corrected: 'We support Slack, Jira, GitHub, Linear, Notion, ' + del('and Zapier') + ' ' + ins('Zapier, and Salesforce') + '. You can also use our REST API for custom integrations.' },
+                { type: 'Support ticket', input: '<div class="text-xs text-text-muted mb-1">#TKT-3102 · Medium priority</div>Can\'t reset my password. The email never arrives. Checked spam.', output: 'I\'ve sent a password reset link to your registered email. If it doesn\'t arrive in 5 minutes, try using a different email.', corrected: 'I\'ve sent a password reset link to your registered email. If it doesn\'t arrive in 5 minutes, try ' + del('using a different email') + ' ' + ins('checking your spam folder again or contact support') + '.' }
+            ];
+            var currentIdx = 0;
+            var inputEl = document.getElementById('label-input');
+            var outputEl = document.getElementById('label-output');
+            var typeBadge = document.getElementById('label-type-badge');
+            var buttonsEl = document.getElementById('label-buttons');
+            var feedbackEl = document.getElementById('label-feedback');
+            var reasonEl = document.getElementById('label-reason');
+
+            function showExample(idx) {
+                var ex = examples[idx];
+                inputEl.innerHTML = ex.input;
+                outputEl.innerHTML = ex.output;
+                typeBadge.textContent = ex.type;
+            }
+            showExample(0);
+
+            window.labelVote = function(dir) {
+                if (dir === 'up') {
+                    currentIdx = (currentIdx + 1) % examples.length;
+                    showExample(currentIdx);
+                } else {
+                    buttonsEl.classList.add('hidden');
+                    feedbackEl.classList.remove('hidden');
+                    reasonEl.value = '';
+                    reasonEl.focus();
+                }
+            };
+            window.labelSubmitFeedback = function() {
+                // Show corrected output with inline diff
+                var ex = examples[currentIdx];
+                if (ex.corrected) {
+                    outputEl.innerHTML = ex.corrected;
+                }
+                feedbackEl.classList.add('hidden');
+                buttonsEl.classList.remove('hidden');
+            };
+        })();
+
+        // Eval mole whack on click or scroll past (Step 4)
+        (function() {
+            var moleWhacked = false;
+            var evalCard = document.getElementById('eval-card');
+
+            function doWhack() {
+                if (moleWhacked) return;
+                moleWhacked = true;
+                var mole = document.getElementById('eval-mole');
+                var tick = document.getElementById('eval-tick');
+                var row = document.getElementById('mole-row');
+                var counter = document.getElementById('eval-counter');
+                mole.style.transition = 'transform 0.3s cubic-bezier(0.6, 0, 0.4, 1), opacity 0.2s 0.15s';
+                mole.style.transformOrigin = 'center bottom';
+                mole.style.transform = 'scaleY(0.1) translateY(4px)';
+                mole.style.opacity = '0';
+                setTimeout(function() {
+                    mole.classList.add('hidden');
+                    tick.classList.remove('hidden');
+                    tick.style.transform = 'scale(0)';
+                    tick.style.transition = 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    setTimeout(function() { tick.style.transform = 'scale(1)'; }, 20);
+                    row.classList.remove('bg-primary/5');
+                    row.style.cursor = 'default';
+                    if (counter) counter.textContent = '5/5 passing';
+                }, 350);
+            }
+
+            // Click to whack
+            window.whackEvalMole = doWhack;
+        })();
+
+        // Scroll-triggered fade-in (IntersectionObserver)
+        (function() {
+            var sections = document.querySelectorAll('.section-fade');
+            if (!('IntersectionObserver' in window)) {
+                // Fallback: just show everything
+                sections.forEach(function(s) { s.classList.add('visible'); });
+                return;
+            }
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+            sections.forEach(function(s) { observer.observe(s); });
         })();
     </script>
 </body>
