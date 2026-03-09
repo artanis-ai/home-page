@@ -369,6 +369,10 @@
                 <p class="mx-auto mt-6 max-w-2xl text-lg tracking-tight text-text-mid">
 								Fix one thing, break another. Sound familiar?<br>Artanis keeps your AI aligned, for good.
                 </p>
+                <button onclick="openDemoModal()" class="mt-4 sm:mt-6 inline-flex items-center gap-1.5 rounded-full border border-text-dark/20 px-4 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm font-medium text-text-mid hover:border-text-dark/40 hover:text-text-dark transition-colors">
+                    <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="currentColor" viewBox="0 0 20 20"><polygon points="5,3 19,10 5,17"/></svg>
+                    Watch demo
+                </button>
             </div>
         </div>
 
@@ -1111,6 +1115,35 @@
 
             sections.forEach(function(s) { observer.observe(s); });
         })();
+    </script>
+
+    <!-- Demo Video Modal -->
+    <div id="demo-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6" onclick="if(event.target===this)closeDemoModal()">
+        <div class="relative w-full max-w-4xl">
+            <button onclick="closeDemoModal()" class="absolute -top-8 sm:-top-10 right-0 text-white/70 hover:text-white transition-colors text-sm font-medium flex items-center gap-1 z-10">
+                Close <span class="text-lg leading-none">&times;</span>
+            </button>
+            <div class="relative w-full rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl" style="padding-bottom:56.25%">
+                <iframe id="demo-iframe" class="absolute inset-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openDemoModal() {
+            var modal = document.getElementById('demo-modal');
+            document.getElementById('demo-iframe').src = 'https://www.youtube-nocookie.com/embed/5GmMnFhWu5E?autoplay=1&rel=0';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeDemoModal() {
+            var modal = document.getElementById('demo-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('demo-iframe').src = '';
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDemoModal(); });
     </script>
 </body>
 </html>
