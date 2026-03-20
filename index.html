@@ -255,17 +255,6 @@
             opacity: 0.7;
         }
 
-        /* Section fade-in */
-        .section-fade {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.7s ease-out, transform 0.7s ease-out;
-        }
-        .section-fade.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
         /* Smooth scrolling */
         html {
             scroll-behavior: smooth;
@@ -492,7 +481,7 @@
 
     <!-- How It Works -->
     <section id="how-it-works" class="bg-warm py-24 pb-40 lg:pb-32">
-        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 section-fade">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto">
                 <h2 class="font-display text-3xl font-semibold tracking-tight text-text-dark sm:text-4xl">How it works</h2>
                 <p class="mt-4 text-lg text-text-mid">
@@ -731,8 +720,9 @@
                     &copy; 2026 Artanis Ltd. All rights reserved.
                 </p>
                 <div class="mt-6 flex gap-x-6 text-sm sm:mt-0">
-                    <a href="https://app.artanis.ai/terms.html" class="text-warm/50 hover:text-warm transition-colors">Terms</a>
-                    <a href="https://app.artanis.ai/privacy.html" class="text-warm/50 hover:text-warm transition-colors">Privacy</a>
+                    <a href="/terms" class="text-warm/50 hover:text-warm transition-colors">Terms</a>
+                    <a href="/privacy" class="text-warm/50 hover:text-warm transition-colors">Privacy</a>
+                    <a href="/dpa" class="text-warm/50 hover:text-warm transition-colors">DPA</a>
                 </div>
             </div>
         </div>
@@ -1096,25 +1086,6 @@
             window.whackEvalMole = doWhack;
         })();
 
-        // Scroll-triggered fade-in (IntersectionObserver)
-        (function() {
-            var sections = document.querySelectorAll('.section-fade');
-            if (!('IntersectionObserver' in window)) {
-                // Fallback: just show everything
-                sections.forEach(function(s) { s.classList.add('visible'); });
-                return;
-            }
-            var observer = new IntersectionObserver(function(entries) {
-                entries.forEach(function(entry) {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-            sections.forEach(function(s) { observer.observe(s); });
-        })();
     </script>
 
     <!-- Demo Video Modal -->
