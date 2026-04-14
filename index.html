@@ -966,13 +966,16 @@
             var isTouch = 'ontouchstart' in window;
 
             if (!isTouch) {
+                var demoBtn = document.querySelector('button[onclick="openDemoModal()"]');
                 document.addEventListener('mousemove', function(e) {
                     var bounds = getSpawnBounds();
                     var fieldRect = moleField.getBoundingClientRect();
                     var fieldBottom = fieldRect.bottom;
                     var spawnTopY = fieldBottom - bounds.minBottom - bounds.range - 140;
                     var spawnBottomY = fieldBottom - bounds.minBottom;
-                    var inZone = e.clientX >= fieldRect.left + bounds.minLeft &&
+                    var overBtn = demoBtn && demoBtn.contains(e.target);
+                    var inZone = !overBtn &&
+                                 e.clientX >= fieldRect.left + bounds.minLeft &&
                                  e.clientX <= fieldRect.left + bounds.maxLeft + 140 &&
                                  e.clientY >= spawnTopY &&
                                  e.clientY <= spawnBottomY;
