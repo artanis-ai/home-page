@@ -1,21 +1,17 @@
-import { useClerk } from '@clerk/clerk-react'
 import type { ReactNode } from 'react'
+import { useGitHubSignIn } from '../../hooks/useGitHubSignIn'
 
 interface GitHubSignInButtonProps {
   children: ReactNode
 }
 
 export function GitHubSignInButton({ children }: GitHubSignInButtonProps) {
-  const clerk = useClerk()
+  const signInWithGitHub = useGitHubSignIn()
 
   function handleClick(e: React.MouseEvent) {
     e.preventDefault()
     e.stopPropagation()
-
-    clerk.redirectToSignIn({
-      signInForceRedirectUrl: window.location.origin + '/mallet/#/app',
-      signUpForceRedirectUrl: window.location.origin + '/mallet/#/app',
-    })
+    signInWithGitHub()
   }
 
   return <span onClick={handleClick} onClickCapture={handleClick} style={{ cursor: 'pointer' }}>{children}</span>
