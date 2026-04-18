@@ -83,7 +83,6 @@ export function AnalysisPanel({
     }
   }
 
-  const activeIssue = issues.find((i) => i.id === activeIssueId)
   const prevActiveRef = useRef<string | null>(null)
 
   // Auto-fetch suggestion when active issue changes (from cursor movement)
@@ -119,84 +118,85 @@ export function AnalysisPanel({
           const isActive = issue.id === activeIssueId
 
           return (
-            <button
-              key={issue.id}
-              data-issue-id={issue.id}
-              onClick={() => {
-                onIssueClick(isActive ? null : issue.id)
-                if (!isActive) fetchSuggestion(issue)
-              }}
-              className={`flex w-full items-start gap-3 border-b border-warm p-4 text-left transition ${
-                isActive ? 'bg-warm' : 'hover:bg-cream'
-              }`}
-            >
-              <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${color}`} />
-              <div className="min-w-0 flex-1">
-                <div className={`text-xs font-medium uppercase tracking-wide ${color}`}>
-                  {label}
+            <div key={issue.id} className="border-b border-warm">
+              <button
+                data-issue-id={issue.id}
+                onClick={() => {
+                  onIssueClick(isActive ? null : issue.id)
+                  if (!isActive) fetchSuggestion(issue)
+                }}
+                className={`flex w-full cursor-pointer items-start gap-3 p-4 text-left transition ${
+                  isActive ? 'bg-warm' : 'hover:bg-cream'
+                }`}
+              >
+                <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${color}`} />
+                <div className="min-w-0 flex-1">
+                  <div className={`text-xs font-medium uppercase tracking-wide ${color}`}>
+                    {label}
+                  </div>
+                  <p className="mt-1 text-sm text-text-dark">{issue.message}</p>
+                  <p className="mt-1 font-mono text-xs text-text-muted">
+                    {content.slice(issue.range[0], Math.min(issue.range[1], issue.range[0] + 50))}
+                    {issue.range[1] - issue.range[0] > 50 ? '...' : ''}
+                  </p>
                 </div>
-                <p className="mt-1 text-sm text-text-dark">{issue.message}</p>
-                <p className="mt-1 font-mono text-xs text-text-muted">
-                  {content.slice(issue.range[0], Math.min(issue.range[1], issue.range[0] + 50))}
-                  {issue.range[1] - issue.range[0] > 50 ? '...' : ''}
-                </p>
-              </div>
-              <ChevronRight className={`mt-0.5 h-4 w-4 shrink-0 text-text-muted transition ${isActive ? 'rotate-90' : ''}`} />
-            </button>
+                <ChevronRight className={`mt-0.5 h-4 w-4 shrink-0 text-text-muted transition ${isActive ? 'rotate-90' : ''}`} />
+              </button>
+
+              {isActive && (
+                <div className="bg-cream px-4 pb-4">
+                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-earth-dark">Suggestion</h3>
+
+                  {loadingSuggestion && (
+                    <div className="flex items-center gap-2 text-sm text-text-muted">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Generating suggestion...
+                    </div>
+                  )}
+
+                  {suggestion && !loadingSuggestion && (
+                    <div>
+                      <div className="mb-2 rounded-lg border border-warm bg-white p-3">
+                        <div className="mb-1 font-mono text-xs">
+                          <span className="bg-primary/10 text-primary line-through">{suggestion.original}</span>
+                        </div>
+                        <div className="font-mono text-xs">
+                          <span className="bg-forest/10 text-forest">{suggestion.suggested}</span>
+                        </div>
+                      </div>
+                      {suggestion.explanation && (
+                        <p className="mb-3 text-xs text-text-muted">{suggestion.explanation}</p>
+                      )}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            if (suggestion) {
+                              onAcceptSuggestion(issue.range, suggestion.suggested)
+                            }
+                            onIssueClick(null)
+                            setSuggestion(null)
+                          }}
+                          className="flex cursor-pointer items-center gap-1 rounded-lg bg-forest px-3 py-1.5 text-xs font-medium text-white transition hover:bg-forest-light"
+                        >
+                          <Check className="h-3 w-3" />
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => { onIssueClick(null); setSuggestion(null) }}
+                          className="flex cursor-pointer items-center gap-1 rounded-lg border border-warm px-3 py-1.5 text-xs text-text-mid transition hover:bg-warm"
+                        >
+                          <X className="h-3 w-3" />
+                          Dismiss
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           )
         })}
       </div>
-
-      {activeIssue && (
-        <div className="border-t border-warm bg-cream p-4">
-          <h3 className="mb-2 text-sm font-semibold text-earth-dark">Suggestion</h3>
-
-          {loadingSuggestion && (
-            <div className="flex items-center gap-2 text-sm text-text-muted">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Generating suggestion...
-            </div>
-          )}
-
-          {suggestion && !loadingSuggestion && (
-            <div>
-              <div className="mb-2 rounded-lg border border-warm bg-white p-3">
-                <div className="mb-1 font-mono text-xs">
-                  <span className="bg-primary/10 text-primary line-through">{suggestion.original}</span>
-                </div>
-                <div className="font-mono text-xs">
-                  <span className="bg-forest/10 text-forest">{suggestion.suggested}</span>
-                </div>
-              </div>
-              {suggestion.explanation && (
-                <p className="mb-3 text-xs text-text-muted">{suggestion.explanation}</p>
-              )}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    if (activeIssue && suggestion) {
-                      onAcceptSuggestion(activeIssue.range, suggestion.suggested)
-                    }
-                    onIssueClick(null)
-                    setSuggestion(null)
-                  }}
-                  className="flex items-center gap-1 rounded-lg bg-forest px-3 py-1.5 text-xs font-medium text-white transition hover:bg-forest-light"
-                >
-                  <Check className="h-3 w-3" />
-                  Accept
-                </button>
-                <button
-                  onClick={() => { onIssueClick(null); setSuggestion(null) }}
-                  className="flex items-center gap-1 rounded-lg border border-warm px-3 py-1.5 text-xs text-text-mid transition hover:bg-warm"
-                >
-                  <X className="h-3 w-3" />
-                  Dismiss
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   )
 }

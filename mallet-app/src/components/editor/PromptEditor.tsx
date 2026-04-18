@@ -329,7 +329,23 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
     async function runIncrementalAnalysis() {
       if (analyzing) return
       const docText = ytext.toString()
-      if (!docText.trim()) return
+
+      // Empty doc → wipe any stale issues/decorations/cache. Otherwise the
+      // side panel and underlines linger after the user deletes everything.
+      if (!docText.trim()) {
+        if (currentIssues.length > 0 || prevSegmentHashes.size > 0) {
+          currentIssues = []
+          applyIssueDecorations(currentIssues)
+          prevSegmentHashes = new Set()
+          cachedIssuesByHash = {}
+          if (roomId) saveRoom(roomId, {
+            hashes: [],
+            issuesByHash: {},
+            updatedAt: Date.now(),
+          })
+        }
+        return
+      }
 
       // Only leader runs analysis
       if (provider?.awareness && !isLeader(provider.awareness, ydoc.clientID)) return
