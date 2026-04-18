@@ -7,13 +7,35 @@
  * `?token=` query parameter (custom headers can't be set during the
  * browser WebSocket handshake). The token is verified against Clerk's
  * JWKS before accepting the connection.
+ *
+ * Hibernation: we use `state.acceptWebSocket()` so the DO can evict
+ * from memory between messages without closing live WebSockets.
+ * Per-connection topic subscriptions MUST therefore live on the
+ * WebSocket attachment (durable across hibernation), NOT in an
+ * in-memory Map — a prior implementation stored them in a Map which
+ * was reset to `new Map()` on every wake, silently dropping all
+ * subsequent subscribe/publish messages and breaking cross-tab /
+ * cross-browser collaboration.
  */
 import { verifyClerkJWT } from './lib/auth'
 import type { Env } from './types'
 
-export class SignalingRoom implements DurableObject {
-  private connections: Map<WebSocket, Set<string>> = new Map()
+interface Attachment {
+  topics: string[]
+}
 
+function readTopics(ws: WebSocket): Set<string> {
+  const a = (ws as unknown as { deserializeAttachment: () => Attachment | null }).deserializeAttachment()
+  return new Set(a?.topics ?? [])
+}
+
+function writeTopics(ws: WebSocket, topics: Set<string>): void {
+  ;(ws as unknown as { serializeAttachment: (v: Attachment) => void }).serializeAttachment({
+    topics: Array.from(topics),
+  })
+}
+
+export class SignalingRoom implements DurableObject {
   constructor(
     private state: DurableObjectState,
     private env: Env
@@ -41,7 +63,7 @@ export class SignalingRoom implements DurableObject {
     const [client, server] = [pair[0], pair[1]]
 
     this.state.acceptWebSocket(server)
-    this.connections.set(server, new Set())
+    writeTopics(server as unknown as WebSocket, new Set())
 
     return new Response(null, { status: 101, webSocket: client })
   }
@@ -56,29 +78,28 @@ export class SignalingRoom implements DurableObject {
       return
     }
 
-    const subscribedTopics = this.connections.get(ws)
-    if (!subscribedTopics) return
-
     if (msg.type === 'subscribe') {
-      const topics = msg.topics || []
-      for (const topic of topics) {
-        subscribedTopics.add(topic)
-      }
+      const current = readTopics(ws)
+      for (const t of msg.topics || []) current.add(t)
+      writeTopics(ws, current)
     } else if (msg.type === 'unsubscribe') {
-      const topics = msg.topics || []
-      for (const topic of topics) {
-        subscribedTopics.delete(topic)
-      }
+      const current = readTopics(ws)
+      for (const t of msg.topics || []) current.delete(t)
+      writeTopics(ws, current)
     } else if (msg.type === 'publish') {
       const topic = msg.topic
       if (!topic) return
-
-      for (const [conn, topics] of this.connections) {
-        if (conn !== ws && topics.has(topic)) {
+      // Relay to every other socket subscribed to this topic. Using
+      // state.getWebSockets() rather than an in-memory registry is the
+      // point of the hibernation-safe design.
+      for (const conn of this.state.getWebSockets()) {
+        if (conn === ws) continue
+        if (readTopics(conn).has(topic)) {
           try {
             conn.send(message)
           } catch {
-            this.connections.delete(conn)
+            // Socket in a bad state — drop silently; getWebSockets()
+            // will stop returning it once it's closed.
           }
         }
       }
@@ -92,10 +113,11 @@ export class SignalingRoom implements DurableObject {
   }
 
   async webSocketClose(ws: WebSocket) {
-    this.connections.delete(ws)
+    // No in-memory registry to clean; attachment is discarded with the socket.
+    void ws
   }
 
   async webSocketError(ws: WebSocket) {
-    this.connections.delete(ws)
+    void ws
   }
 }

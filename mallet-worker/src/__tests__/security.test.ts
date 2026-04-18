@@ -193,6 +193,83 @@ describe('WebSocket signaling auth', () => {
   }, 5000)
 })
 
+// Regression: hibernation used to wipe in-memory topic subscriptions,
+// silently dropping publish relays. This test opens two clients, has
+// them subscribe to the same topic, and confirms a publish from A is
+// relayed to B. If signaling is broken, no WebRTC signaling flows —
+// and cross-browser (e.g. incognito) collaboration is dead.
+describe('WebSocket signaling relay', () => {
+  function openSubscribed(room: string, topic: string, userSuffix: string) {
+    return new Promise<{ ws: WebSocket; messages: string[] }>((resolve, reject) => {
+      const ws = new WebSocket(
+        `${WS_WORKER_URL}/signaling/${room}?token=test_relay_${userSuffix}`
+      )
+      const messages: string[] = []
+      const timer = setTimeout(() => reject(new Error('ws open timed out')), 3000)
+      ws.on('open', () => {
+        clearTimeout(timer)
+        ws.send(JSON.stringify({ type: 'subscribe', topics: [topic] }))
+        resolve({ ws, messages })
+      })
+      ws.on('message', (data) => {
+        messages.push(data.toString())
+      })
+      ws.on('error', (e) => {
+        clearTimeout(timer)
+        reject(e)
+      })
+    })
+  }
+
+  it('relays a publish from one subscriber to another on the same topic', async () => {
+    const room = `relay-test-${Date.now()}`
+    const topic = 'peer-discovery'
+
+    const a = await openSubscribed(room, topic, 'a')
+    const b = await openSubscribed(room, topic, 'b')
+
+    // Give subscribe messages a moment to be processed.
+    await new Promise((r) => setTimeout(r, 200))
+
+    const payload = { type: 'publish', topic, data: { hello: 'from-a' } }
+    a.ws.send(JSON.stringify(payload))
+
+    // Wait for relay delivery to b.
+    const deadline = Date.now() + 3000
+    while (b.messages.length === 0 && Date.now() < deadline) {
+      await new Promise((r) => setTimeout(r, 50))
+    }
+
+    expect(b.messages.length).toBeGreaterThanOrEqual(1)
+    const received = JSON.parse(b.messages[0])
+    expect(received.type).toBe('publish')
+    expect(received.topic).toBe(topic)
+    // Publisher should NOT get an echo of its own message.
+    expect(a.messages.length).toBe(0)
+
+    a.ws.close()
+    b.ws.close()
+  }, 10000)
+
+  it('does not relay to unsubscribed peers', async () => {
+    const room = `relay-test-${Date.now()}`
+    const a = await openSubscribed(room, 'topic-a', 'a')
+    const b = await openSubscribed(room, 'topic-b', 'b')
+
+    await new Promise((r) => setTimeout(r, 200))
+
+    a.ws.send(JSON.stringify({ type: 'publish', topic: 'topic-a', data: 1 }))
+
+    // Give time for (incorrect) relay to happen if it were going to.
+    await new Promise((r) => setTimeout(r, 500))
+
+    expect(b.messages.length).toBe(0)
+
+    a.ws.close()
+    b.ws.close()
+  }, 10000)
+})
+
 describe('public endpoints stay public', () => {
   it('GET / health-check requires no auth', async () => {
     const res = await fetch(`${WORKER_URL}/`)
