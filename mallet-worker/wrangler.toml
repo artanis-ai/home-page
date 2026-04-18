@@ -1,0 +1,44 @@
+name = "mallet-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+# Default (development) environment.
+# Secrets must be set via `wrangler secret put`:
+#   - OPENAI_API_KEY
+#   - CLERK_SECRET_KEY
+[vars]
+ENVIRONMENT = "development"
+# Update this to your dev Clerk Frontend API URL (no trailing slash).
+# Find it at https://dashboard.clerk.com → API Keys → "Frontend API URL".
+CLERK_ISSUER_URL = "https://distinct-gannet-86.clerk.accounts.dev"
+
+[[kv_namespaces]]
+binding = "LOGS"
+id = "b392b1982cfb4a779ab30e16bef4a25a"
+
+[[durable_objects.bindings]]
+name = "SIGNALING_ROOM"
+class_name = "SignalingRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["SignalingRoom"]
+
+# Production environment.
+# Set secrets with:
+#   wrangler secret put OPENAI_API_KEY --env production
+#   wrangler secret put CLERK_SECRET_KEY --env production
+[env.production]
+name = "mallet-api"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+CLERK_ISSUER_URL = "https://clerk.artanis.ai"
+
+[[env.production.kv_namespaces]]
+binding = "LOGS"
+id = "b392b1982cfb4a779ab30e16bef4a25a"
+
+[[env.production.durable_objects.bindings]]
+name = "SIGNALING_ROOM"
+class_name = "SignalingRoom"

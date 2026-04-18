@@ -1,0 +1,26 @@
+{
+  "name": "mallet-worker",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "eval": "vitest run --config vitest.config.eval.ts"
+  },
+  "dependencies": {
+    "hono": "^4.7.0",
+    "jose": "^6.2.2",
+    "openai": "^4.80.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250410.0",
+    "@types/ws": "^8.18.1",
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.4",
+    "wrangler": "^4.14.0",
+    "ws": "^8.20.0"
+  }
+}
