@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { FileText, Search, Loader2, Bot, PenLine, Check } from 'lucide-react'
 import { useGitHubToken } from '../../hooks/useGitHubToken'
 import { WORKER_URL, authedFetch } from '../../lib/api'
+import { formatLineRangeHash } from '../../lib/line-range'
+import type { DetectedPrompt } from '../../types'
 
 interface TreeFile {
   path: string
@@ -22,7 +24,7 @@ export function PromptDiscovery() {
   const [step, setStep] = useState<DiscoveryStep>('scanning')
   const [candidates, setCandidates] = useState<TreeFile[]>([])
   const [selected, setSelected] = useState<Set<string>>(new Set())
-  const [agentResults, setAgentResults] = useState<{ path: string; confidence: number; snippet: string }[]>([])
+  const [agentResults, setAgentResults] = useState<DetectedPrompt[]>([])
   const [manualPrompt, setManualPrompt] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -210,22 +212,32 @@ export function PromptDiscovery() {
             <div className="w-full">
               <p className="mb-4 text-text-mid">Our agent found these potential prompt locations:</p>
               <div className="space-y-2">
-                {agentResults.map((r) => (
-                  <button
-                    key={r.path}
-                    onClick={() => {
-                      setSelected(new Set([r.path]))
-                      handleContinue()
-                    }}
-                    className="flex w-full items-center gap-3 rounded-xl border border-warm bg-white p-4 text-left transition hover:border-primary/30"
-                  >
-                    <Search className="h-5 w-5 shrink-0 text-forest" />
-                    <div>
-                      <div className="font-mono text-sm text-earth-dark">{r.path}</div>
-                      <div className="mt-1 text-sm text-text-muted">{r.snippet}</div>
-                    </div>
-                  </button>
-                ))}
+                {agentResults.map((r, i) => {
+                  // Two prompts in one file share r.path, so key must include
+                  // the line range (or index as fallback). Building the URL
+                  // fragment matches GitHub's own scheme: …/foo.py#L1-L8.
+                  const hasRange = typeof r.lineStart === 'number' && typeof r.lineEnd === 'number'
+                  const hash = hasRange
+                    ? formatLineRangeHash({ start: r.lineStart!, end: r.lineEnd! })
+                    : ''
+                  const key = `${r.path}${hash}#${i}`
+                  const label = hasRange ? `${r.path}${hash}` : r.path
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        navigate(`/gh/${owner}/${repo}/blob/main/${r.path}${hash}`)
+                      }}
+                      className="flex w-full items-center gap-3 rounded-xl border border-warm bg-white p-4 text-left transition hover:border-primary/30"
+                    >
+                      <Search className="h-5 w-5 shrink-0 text-forest" />
+                      <div>
+                        <div className="font-mono text-sm text-earth-dark">{label}</div>
+                        <div className="mt-1 text-sm text-text-muted">{r.snippet}</div>
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
               <button
                 onClick={() => setStep('manual')}

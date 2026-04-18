@@ -353,6 +353,201 @@ test.describe('GitHub public repos', () => {
   })
 })
 
+test.describe('GitHub line ranges', () => {
+  // Deterministic fixture so we aren't depending on a live repo's line
+  // numbering. The `page.route()` interception below intercepts the
+  // GitHub Contents API and serves this content to the editor.
+  const fixtureLines = [
+    'header line 1',                // L1
+    'header line 2',                // L2
+    'SYSTEM_PROMPT_A = """',        // L3
+    'You are agent A.',             // L4
+    'Be helpful.',                  // L5
+    '"""',                          // L6
+    '',                             // L7
+    'SYSTEM_PROMPT_B = """',        // L8
+    'You are agent B.',             // L9
+    'Be concise.',                  // L10
+    '"""',                          // L11
+    'footer line 12',               // L12
+  ]
+  const fixtureFile = fixtureLines.join('\n')
+
+  async function mockContentsApi(page: Page) {
+    await page.route(/api\.github\.com\/repos\/.+\/contents\/.+/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/plain; charset=utf-8',
+        body: fixtureFile,
+      })
+    })
+  }
+
+  test('no range → editor shows whole file', async ({ page }) => {
+    test.setTimeout(30000)
+    await mockContentsApi(page)
+    await page.goto('#/gh/example/repo/blob/main/prompts.py')
+    await page.waitForSelector('.cm-content', { timeout: 15000 })
+    // Poll for content (editor hydration is not instant).
+    await expect.poll(async () => (await page.locator('.cm-content').innerText()).trim(), {
+      timeout: 10000,
+    }).toContain('header line 1')
+    const text = (await page.locator('.cm-content').innerText()).trim()
+    expect(text).toContain('SYSTEM_PROMPT_A')
+    expect(text).toContain('SYSTEM_PROMPT_B')
+    expect(text).toContain('footer line 12')
+  })
+
+  test('#L3-L6 → editor shows only the first prompt', async ({ page }) => {
+    test.setTimeout(30000)
+    await mockContentsApi(page)
+    await page.goto('#/gh/example/repo/blob/main/prompts.py#L3-L6')
+    await page.waitForSelector('.cm-content', { timeout: 15000 })
+    await expect.poll(async () => (await page.locator('.cm-content').innerText()).trim(), {
+      timeout: 10000,
+    }).toContain('SYSTEM_PROMPT_A')
+    const text = (await page.locator('.cm-content').innerText()).trim()
+    expect(text).toContain('SYSTEM_PROMPT_A')
+    expect(text).toContain('You are agent A.')
+    // Out-of-range prompts must NOT appear in the editor.
+    expect(text).not.toContain('header line 1')
+    expect(text).not.toContain('SYSTEM_PROMPT_B')
+    expect(text).not.toContain('footer line 12')
+  })
+
+  test('#L8-L11 → editor shows only the second prompt', async ({ page }) => {
+    test.setTimeout(30000)
+    await mockContentsApi(page)
+    await page.goto('#/gh/example/repo/blob/main/prompts.py#L8-L11')
+    await page.waitForSelector('.cm-content', { timeout: 15000 })
+    await expect.poll(async () => (await page.locator('.cm-content').innerText()).trim(), {
+      timeout: 10000,
+    }).toContain('SYSTEM_PROMPT_B')
+    const text = (await page.locator('.cm-content').innerText()).trim()
+    expect(text).toContain('SYSTEM_PROMPT_B')
+    expect(text).toContain('You are agent B.')
+    expect(text).not.toContain('SYSTEM_PROMPT_A')
+    expect(text).not.toContain('footer line 12')
+  })
+
+  test('#L9 → single-line range shows only that line', async ({ page }) => {
+    test.setTimeout(30000)
+    await mockContentsApi(page)
+    await page.goto('#/gh/example/repo/blob/main/prompts.py#L9')
+    await page.waitForSelector('.cm-content', { timeout: 15000 })
+    // `.cm-content` innerText can return the line twice in some CM6 render
+    // paths (gutter + visible line), so check line count via .cm-line
+    // children and substring containment rather than exact equality.
+    await expect.poll(async () => (await page.locator('.cm-content').innerText()).trim(), {
+      timeout: 10000,
+    }).toContain('You are agent B.')
+    const text = (await page.locator('.cm-content').innerText()).trim()
+    // Nothing from outside the single-line range
+    expect(text).not.toContain('agent A')
+    expect(text).not.toContain('SYSTEM_PROMPT')
+    expect(text).not.toContain('header line')
+    expect(text).not.toContain('footer line')
+    // Editor should have exactly one line
+    const lineCount = await page.locator('.cm-content .cm-line').count()
+    expect(lineCount).toBe(1)
+  })
+
+  test('range header hint is visible', async ({ page }) => {
+    test.setTimeout(30000)
+    await mockContentsApi(page)
+    await page.goto('#/gh/example/repo/blob/main/prompts.py#L3-L6')
+    // The header should show the range so the user knows they're in a slice.
+    await expect(page.locator('text=#L3-L6').first()).toBeVisible({ timeout: 10000 })
+  })
+
+  test('invalid range (backwards) → falls back to whole file', async ({ page }) => {
+    test.setTimeout(30000)
+    await mockContentsApi(page)
+    await page.goto('#/gh/example/repo/blob/main/prompts.py#L10-L5')
+    await page.waitForSelector('.cm-content', { timeout: 15000 })
+    await expect.poll(async () => (await page.locator('.cm-content').innerText()).trim(), {
+      timeout: 10000,
+    }).toContain('header line 1')
+    // Full file should be present since the invalid hash is ignored.
+    const text = (await page.locator('.cm-content').innerText()).trim()
+    expect(text).toContain('SYSTEM_PROMPT_A')
+    expect(text).toContain('SYSTEM_PROMPT_B')
+  })
+
+  test('editing within a range enables Create PR (dirty vs pristine)', async ({ page }) => {
+    test.setTimeout(30000)
+    await mockContentsApi(page)
+    await page.goto('#/gh/example/repo/blob/main/prompts.py#L3-L6')
+    await page.waitForSelector('.cm-content', { timeout: 15000 })
+    await expect.poll(async () => (await page.locator('.cm-content').innerText()).trim(), {
+      timeout: 10000,
+    }).toContain('SYSTEM_PROMPT_A')
+
+    const prButton = page.locator('button:has-text("Create PR")')
+    await expect(prButton).toBeDisabled()
+
+    // Type into the slice
+    await page.locator('.cm-content').click()
+    await page.locator('.cm-content').pressSequentially(' // edited', { delay: 20 })
+
+    await expect(prButton).toBeEnabled({ timeout: 3000 })
+  })
+
+  test('adding lines inside the slice keeps out-of-range content hidden', async ({ page }) => {
+    test.setTimeout(30000)
+    await mockContentsApi(page)
+    await page.goto('#/gh/example/repo/blob/main/prompts.py#L3-L6')
+    await page.waitForSelector('.cm-content', { timeout: 15000 })
+    await expect.poll(async () => (await page.locator('.cm-content').innerText()).trim(), {
+      timeout: 10000,
+    }).toContain('SYSTEM_PROMPT_A')
+
+    // Position at end and add new lines
+    await page.locator('.cm-content').click()
+    await page.keyboard.press('Control+End')
+    await page.keyboard.press('End')
+    await page.keyboard.press('Enter')
+    await page.locator('.cm-content').pressSequentially('NEW LINE A', { delay: 20 })
+    await page.keyboard.press('Enter')
+    await page.locator('.cm-content').pressSequentially('NEW LINE B', { delay: 20 })
+
+    await page.waitForTimeout(300)
+    const text = (await page.locator('.cm-content').innerText()).trim()
+    // New lines present
+    expect(text).toContain('NEW LINE A')
+    expect(text).toContain('NEW LINE B')
+    // Out-of-range content still invisible — this is the key invariant
+    // the split/reassemble layer guarantees even under mutation.
+    expect(text).not.toContain('SYSTEM_PROMPT_B')
+    expect(text).not.toContain('footer line 12')
+    expect(text).not.toContain('header line 1')
+  })
+
+  test('deleting lines inside the slice keeps out-of-range content hidden', async ({ page }) => {
+    test.setTimeout(30000)
+    await mockContentsApi(page)
+    await page.goto('#/gh/example/repo/blob/main/prompts.py#L3-L6')
+    await page.waitForSelector('.cm-content', { timeout: 15000 })
+    await expect.poll(async () => (await page.locator('.cm-content').innerText()).trim(), {
+      timeout: 10000,
+    }).toContain('SYSTEM_PROMPT_A')
+
+    // Select all and delete
+    await page.locator('.cm-content').click()
+    await page.keyboard.press('Control+a')
+    await page.keyboard.press('Delete')
+
+    await page.waitForTimeout(300)
+    const text = (await page.locator('.cm-content').innerText()).trim()
+    expect(text).toBe('')
+    // Deletion only removes the slice; the stashed before/after are still
+    // in memory, waiting to be reassembled on PR creation.
+    // Nothing out-of-range should ever leak into the editor view.
+    expect(text).not.toContain('SYSTEM_PROMPT_B')
+    expect(text).not.toContain('footer line 12')
+  })
+})
+
 test.describe('PR creation', () => {
   test('Create PR button appears for GitHub files and opens modal', async ({ page }) => {
     test.setTimeout(30000)

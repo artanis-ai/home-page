@@ -9,6 +9,13 @@ import { AnalysisPanel } from './AnalysisPanel'
 import { PRCreator } from '../repo/PRCreator'
 import { Share2, GitPullRequest, Check, PanelRightOpen, PanelRightClose } from 'lucide-react'
 import type { AnalysisIssue } from '../../types'
+import {
+  parseLineRangeHash,
+  splitByLineRange,
+  reassemble,
+  formatLineRangeHash,
+  type SplitContent,
+} from '../../lib/line-range'
 
 export function EditorPage() {
   const { owner, repo, branch, '*': filePath, docId } = useParams()
@@ -30,8 +37,14 @@ export function EditorPage() {
     return () => { cancelled = true }
   }, [isSignedIn, getToken])
 
+  // `content` is always what the editor sees.
+  // When the URL fragment has #L1-L8, `content` holds ONLY that slice and
+  // `split` holds the frozen before/after chunks. Line additions/deletions
+  // inside the slice don't shift the anchors — we never re-derive them.
+  // When there's no fragment, `split` is null and `content` is the full file.
   const [content, setContent] = useState('')
   const [originalContent, setOriginalContent] = useState('')
+  const [split, setSplit] = useState<SplitContent | null>(null)
   const [issues, setIssues] = useState<AnalysisIssue[]>([])
   const [loading, setLoading] = useState(true)
   const [showPR, setShowPR] = useState(false)
@@ -59,22 +72,35 @@ export function EditorPage() {
   const isGitHub = Boolean(owner && repo && branch)
   const decodedPath = filePath ? decodeURIComponent(filePath) : ''
 
+  // GitHub-style line range from the URL fragment (e.g. #L3-L7).
+  // Parsed once per location change — re-parsing on every render is cheap
+  // but this keeps dependencies in useMemo readable.
+  const range = useMemo(() => parseLineRangeHash(location.hash), [location.hash])
+
+  // Room ID scopes the collaborative session. When two users open the
+  // same file at the same range, they collaborate on the slice together.
+  // Different ranges of the same file are deliberately separate rooms —
+  // merging would let a user editing L3-L6 stomp on someone editing L8-L12.
   const roomId = useMemo(() => {
     if (docId) return docId
-    if (isGitHub) return `${owner}/${repo}/${branch}/${decodedPath}`
-    return null
-  }, [docId, owner, repo, branch, decodedPath, isGitHub])
+    if (!isGitHub) return null
+    const base = `${owner}/${repo}/${branch}/${decodedPath}`
+    return range ? `${base}${formatLineRangeHash(range)}` : base
+  }, [docId, owner, repo, branch, decodedPath, isGitHub, range])
 
   useEffect(() => {
     if (!isGitHub) {
       const prompt = location.state?.manualPrompt || ''
       setContent(prompt)
       setOriginalContent(prompt)
+      setSplit(null)
       setLoading(false)
       return
     }
     fetchFileContent()
-  }, [owner, repo, branch, filePath])
+    // range is in deps because changing #L1-L8 → #L10-L15 must re-split
+    // the content (we freeze before/after at the moment the file loads).
+  }, [owner, repo, branch, filePath, range?.start, range?.end])
 
   async function fetchFileContent() {
     try {
@@ -87,14 +113,34 @@ export function EditorPage() {
       )
       if (!res.ok) throw new Error('Failed to fetch file')
       const text = await res.text()
-      setContent(text)
       setOriginalContent(text)
+      if (range) {
+        const s = splitByLineRange(text, range)
+        setSplit(s)
+        setContent(s.slice)
+      } else {
+        setSplit(null)
+        setContent(text)
+      }
     } catch (err) {
       console.error('Failed to fetch file:', err)
     } finally {
       setLoading(false)
     }
   }
+
+  // When sending to the PR, reconstitute the full file from the frozen
+  // anchors + the (possibly edited) slice. Without a range, `content`
+  // already IS the full file.
+  const outgoingContent = useMemo(
+    () => (split ? reassemble(split, content) : content),
+    [split, content]
+  )
+
+  // Dirty check for the Create PR button — compare the OUTGOING (full) file
+  // against the originally-fetched content. This way pure whitespace in
+  // before/after (which we never touched) won't false-positive as dirty.
+  const isDirty = outgoingContent !== originalContent
 
   function handleShareSession() {
     const textarea = document.createElement('textarea')
@@ -124,6 +170,11 @@ export function EditorPage() {
           {isGitHub ? (
             <span className="font-mono text-sm text-text-mid">
               {owner}/{repo}/{decodedPath}
+              {range && (
+                <span className="ml-1 text-text-muted">
+                  {formatLineRangeHash(range)}
+                </span>
+              )}
             </span>
           ) : (
             <span className="text-sm text-text-mid">Scratch prompt</span>
@@ -176,7 +227,7 @@ export function EditorPage() {
           {isGitHub && (
             <button
               onClick={() => setShowPR(true)}
-              disabled={content === originalContent}
+              disabled={!isDirty}
               className="flex items-center gap-1.5 rounded-lg bg-forest px-3 py-1.5 text-sm font-medium text-white transition hover:bg-forest-light disabled:opacity-50"
             >
               <GitPullRequest className="h-4 w-4" />
@@ -237,7 +288,10 @@ export function EditorPage() {
           owner={owner}
           repo={repo}
           filePath={decodedPath}
-          content={content}
+          // PRCreator always gets the reconstituted full file — the worker
+          // commits exactly these bytes, so the before/after chunks outside
+          // the edited range must be byte-identical to what we fetched.
+          content={outgoingContent}
           onClose={() => setShowPR(false)}
         />
       )}

@@ -33,6 +33,10 @@ export interface SyncedIssue {
 
 export interface DetectedPrompt {
   path: string
+  /** 1-indexed, inclusive — first line of the prompt string literal. */
+  lineStart?: number
+  /** 1-indexed, inclusive — last line of the prompt string literal. */
+  lineEnd?: number
   confidence: number
   snippet: string
 }

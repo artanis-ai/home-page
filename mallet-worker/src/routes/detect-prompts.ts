@@ -8,7 +8,7 @@ const app = new Hono<{ Bindings: Env; Variables: AuthVars }>()
 
 app.use('*', requireGitHubToken())
 
-const DETECT_SYSTEM_PROMPT = `You are an expert at finding AI prompts in codebases. Given a list of files from a GitHub repository, identify which files or code locations likely contain AI/LLM prompts.
+const DETECT_SYSTEM_PROMPT = `You are an expert at finding AI prompts in codebases. Given a list of files from a GitHub repository, identify which code locations likely contain AI/LLM prompts.
 
 Look for:
 - Files with "prompt", "system", "instruction", "template" in the name
@@ -17,7 +17,14 @@ Look for:
 - Constants or variables named "SYSTEM_PROMPT", "prompt", "instructions", etc.
 - Files that import OpenAI, Anthropic, or other LLM SDKs and contain prompt strings
 
-Return JSON: { "prompts": [{ "path": "file/path", "confidence": 0.0-1.0, "snippet": "brief excerpt" }] }
+IMPORTANT — report per-prompt, not per-file:
+- Each distinct prompt in a file is its OWN entry in the output, even if two prompts live in the same file.
+- "lineStart" is the 1-indexed line where the prompt string BEGINS (not the assignment keyword — the line of the opening quote).
+- "lineEnd" is the 1-indexed line where the prompt string ENDS (the closing quote). Inclusive on both ends.
+- The file contents you receive have line numbers prefixed as "  42│ …" — use those numbers verbatim.
+- Omit any prompt where you can't determine both lineStart and lineEnd; do not guess.
+
+Return JSON: { "prompts": [{ "path": "file/path", "lineStart": 1, "lineEnd": 8, "confidence": 0.0-1.0, "snippet": "brief excerpt" }] }
 Only return results with confidence >= 0.5. Sort by confidence descending.`
 
 app.post('/', async (c) => {
@@ -85,7 +92,15 @@ app.post('/', async (c) => {
         )
         if (contentRes.ok) {
           const text = await contentRes.text()
-          fileContents.push({ path: file.path, content: text.slice(0, 2000) })
+          // Prefix each line with its 1-indexed line number so the model
+          // can report precise lineStart/lineEnd ranges rather than guessing.
+          // The prompt above tells the model to use these verbatim.
+          const numbered = text
+            .split('\n')
+            .map((line, i) => `${String(i + 1).padStart(4, ' ')}│ ${line}`)
+            .join('\n')
+            .slice(0, 4000) // keep a bit more room now that we're adding prefix overhead
+          fileContents.push({ path: file.path, content: numbered })
         }
       } catch {
         // skip files we can't read
