@@ -1,0 +1,93 @@
+name: Mallet AI Evals
+
+# Runs the LLM eval suite on demand and on a nightly cadence. NOT wired
+# to PRs — these tests cost real OpenAI dollars (~$0.10/run) and run
+# slowly (~2min). Use the manual trigger before merging anything that
+# touches analyze.ts / suggest.ts / the contradiction or judge prompts.
+
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Which eval suite to run'
+        type: choice
+        default: 'all'
+        options: ['all', 'analyze', 'suggest']
+  schedule:
+    # 04:00 UTC nightly — catches model drift from upstream OpenAI changes.
+    - cron: '0 4 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: mallet-worker/package-lock.json
+
+      - name: Install worker deps
+        working-directory: mallet-worker
+        run: npm ci
+
+      - name: Write .dev.vars from secrets
+        # The eval bootstraps OPENAI_API_KEY from .dev.vars if not in env;
+        # we set both so wrangler dev (background) and the test runner agree.
+        working-directory: mallet-worker
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::OPENAI_API_KEY secret missing — eval cannot run"
+            exit 1
+          fi
+          {
+            echo "OPENAI_API_KEY=\"$OPENAI_API_KEY\""
+            echo "CLERK_SECRET_KEY=\"$CLERK_SECRET_KEY\""
+          } > .dev.vars
+
+      - name: Start wrangler dev
+        working-directory: mallet-worker
+        run: |
+          npx wrangler dev --port 8787 > /tmp/wrangler.log 2>&1 &
+          # Wait for /health to come up. Fail fast if it never does.
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8787/ > /dev/null; then
+              echo "wrangler ready after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::wrangler dev did not become healthy within 30s"
+          tail -50 /tmp/wrangler.log
+          exit 1
+
+      - name: Run eval suite
+        working-directory: mallet-worker
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          WORKER_URL: http://localhost:8787
+          SUITE: ${{ github.event.inputs.suite || 'all' }}
+        run: |
+          set -e
+          if [ "$SUITE" = "analyze" ]; then
+            npx vitest run --config vitest.config.eval.ts src/__tests__/evals/analyze.eval.ts
+          elif [ "$SUITE" = "suggest" ]; then
+            npx vitest run --config vitest.config.eval.ts src/__tests__/evals/suggest.eval.ts
+          else
+            npm run eval
+          fi
+
+      - name: Dump wrangler log on failure
+        if: failure()
+        run: tail -200 /tmp/wrangler.log || true

@@ -1,0 +1,82 @@
+name: Build Mallet App
+
+# Builds mallet-app/ → mallet/ on every push to main that touches the
+# frontend, then commits the built bundle back to main. GitHub Pages
+# serves /mallet/ directly from the repo, so this is what actually ships.
+#
+# Why a commit instead of an artifact upload + Pages deploy?
+# The rest of the site (index.html, blog.html) is checked in directly
+# and served from the repo root, so we keep mallet/ in-repo for parity
+# and to avoid splitting the deploy story. The commit is gated on the
+# build actually changing files (idempotent dist → no commit).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'mallet-app/**'
+      - '.github/workflows/build-mallet.yml'
+  workflow_dispatch:
+
+# Avoid two pushes racing: only one build commit at a time.
+concurrency:
+  group: build-mallet
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Use a token that can push back to main. Defaults to GITHUB_TOKEN
+          # which respects branch protection (will fail the push if main
+          # requires PRs — in that case wire up a deploy key or PAT).
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Need full history so the commit references resolve cleanly.
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: mallet-app/package-lock.json
+
+      - name: Install deps
+        working-directory: mallet-app
+        run: npm ci
+
+      - name: Typecheck + lint
+        working-directory: mallet-app
+        run: |
+          npm run lint
+        # `npm run build` already runs `tsc -b` first, so typecheck is implicit.
+
+      - name: Build
+        working-directory: mallet-app
+        env:
+          # Production env vars used at build time. Add these as repo secrets.
+          # If a secret is missing, the build still succeeds (the SPA reads
+          # them at runtime and falls back), but features tied to it break.
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          VITE_WORKER_URL: ${{ secrets.VITE_WORKER_URL }}
+        run: npm run build
+
+      - name: Commit built bundle if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mallet/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "build: rebuild mallet-app bundle
+
+          Auto-generated from ${{ github.sha }} via build-mallet workflow."
+          git push origin HEAD:main
