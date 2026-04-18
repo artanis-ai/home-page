@@ -93,8 +93,8 @@ export function LandingPage() {
       {/* Agent skill — public analysis API */}
       <SkillSection />
 
-      {/* CTA */}
-      <section className="border-t border-warm bg-white px-4 py-24 sm:px-6">
+      {/* CTA + Upsell — merged; cream keeps the alternating bg (skill above is white) */}
+      <section className="border-t border-warm bg-cream px-4 py-24 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-display text-3xl font-bold text-earth-dark">
             Ready to improve your prompts?
@@ -105,26 +105,23 @@ export function LandingPage() {
           <div className="mt-8">
             <button
               onClick={() => navigate('/start')}
-              className="rounded-full bg-primary px-8 py-3.5 text-lg font-semibold text-white shadow-lg shadow-primary/25 transition hover:bg-primary-dark"
+              className="cursor-pointer rounded-full bg-primary px-8 py-3.5 text-lg font-semibold text-white shadow-lg shadow-primary/25 transition hover:bg-primary-dark"
             >
               Get Started
             </button>
           </div>
-        </div>
-      </section>
 
-      {/* Upsell */}
-      <section className="border-t border-warm bg-cream px-4 py-12 sm:px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-text-muted">
-            Want to measure if your prompt changes actually work in production?
-          </p>
-          <a
-            href="https://artanis.ai"
-            className="mt-2 inline-flex items-center gap-1 font-medium text-primary transition hover:text-primary-dark"
-          >
-            Try Artanis AI
-          </a>
+          <div className="mt-12 border-t border-warm pt-8">
+            <p className="text-text-muted">
+              Want to measure if your prompt changes actually work in production?
+            </p>
+            <a
+              href="https://artanis.ai"
+              className="mt-2 inline-flex items-center gap-1 font-medium text-primary transition hover:text-primary-dark"
+            >
+              Try Artanis AI
+            </a>
+          </div>
         </div>
       </section>
 
