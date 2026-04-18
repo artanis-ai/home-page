@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
-import { useUser, useAuth, UserButton, SignedIn, SignedOut } from '@clerk/clerk-react'
-import { useGitHubSignIn } from '../../hooks/useGitHubSignIn'
+import { useUser, useAuth, UserButton, SignedIn } from '@clerk/clerk-react'
 import { useGitHubToken } from '../../hooks/useGitHubToken'
 import { TEST_TOKEN } from '../../lib/api'
 import { PromptEditor, type Peer } from './PromptEditor'
@@ -22,7 +21,6 @@ export function EditorPage() {
   const location = useLocation()
   const { user } = useUser()
   const { getToken, isSignedIn } = useAuth()
-  const signInWithGitHub = useGitHubSignIn()
   const getGitHubToken = useGitHubToken()
 
   // Clerk session JWT for the WebSocket signaling handshake (must be a string,
@@ -238,14 +236,6 @@ export function EditorPage() {
           <SignedIn>
             <UserButton />
           </SignedIn>
-          <SignedOut>
-            <button
-              onClick={signInWithGitHub}
-              className="rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-white transition hover:bg-primary-dark"
-            >
-              Sign in
-            </button>
-          </SignedOut>
         </div>
       </div>
 
