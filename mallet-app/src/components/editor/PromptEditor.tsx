@@ -36,7 +36,7 @@ const editorTheme = EditorView.theme({
   '.cm-issue-ambiguity': { textDecoration: 'dashed underline #D4A76A', textDecorationSkipInk: 'none', backgroundColor: 'rgba(212, 167, 106, 0.06)' },
   '.cm-issue-best-practice': { textDecoration: 'dotted underline #6B4226', textDecorationSkipInk: 'none', backgroundColor: 'rgba(107, 66, 38, 0.06)' },
   '.cm-ySelectionInfo': { fontFamily: "'DM Sans', sans-serif", fontSize: '11px', padding: '1px 4px', borderRadius: '3px 3px 3px 0', fontWeight: '600' },
-  '.cm-template-var': { backgroundColor: 'rgba(74, 124, 89, 0.12)', borderRadius: '2px', padding: '0 1px' },
+  '.cm-template-var': { opacity: '0.55' },
 })
 
 // Dynamic template variable highlighting — runs client-side, no LLM
@@ -180,18 +180,26 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
       provider.awareness.on('change', updatePeers)
     }
 
-    // Insert initial content
-    if (initialContent && ytext.length === 0) {
-      ytext.insert(0, initialContent)
-    }
-
     // --- Create CodeMirror ---
-    // IMPORTANT: initialize with ytext.toString() so CM starts in sync with the
-    // CRDT. yCollab's observer only forwards FUTURE ytext changes; if we instead
-    // dispatched a manual insert after view creation, yCollab would echo it back
-    // into ytext (no ySyncAnnotation on our dispatch) and double the content.
-    // For peer-sync content that arrives later, yCollab's observer applies it
-    // automatically via webrtc updates — no polling needed.
+    // Initialize with ytext.toString() (empty at this point — seed is deferred
+    // below). When the seed (or any peer sync) inserts into ytext, yCollab's
+    // observer forwards the change to CM. We do NOT seed synchronously because:
+    //
+    //   - React 18 StrictMode double-invokes effects, creating provider1 →
+    //     destroying it → creating provider2. The y-webrtc BroadcastChannel
+    //     publishes sync step 1 / state messages synchronously to local subs,
+    //     and `_bcSubscriber` decrypts asynchronously (via Promise chains),
+    //     so in-flight messages from mount1 can land back after mount2 has
+    //     subscribed — with two distinct ydocs both seeded with `initialContent`,
+    //     CRDT merge preserves BOTH inserts → visible content doubles.
+    //   - The same hazard exists across browser tabs: if another tab on the
+    //     same URL already seeded the room, our sync would pull their state;
+    //     seeding concurrently before sync completes doubles the content.
+    //
+    // Deferring the seed to a macrotask (setTimeout 0) lets pending BC/WebRTC
+    // sync messages deliver first. We re-check `ytext.length === 0` inside the
+    // callback: if a peer (or ourselves from a previous mount) already supplied
+    // state, we skip the seed.
     const extensions: Extension[] = [
       keymap.of(defaultKeymap),
       markdown(),
@@ -215,6 +223,8 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
     ]
 
     const view = new EditorView({
+      // ytext is empty here — seed is deferred. When the seed (or a peer sync)
+      // inserts into ytext, yCollab will forward the change to CM.
       state: EditorState.create({ doc: ytext.toString(), extensions }),
       parent: containerRef.current,
     })
@@ -225,11 +235,18 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
       view.dispatch({ changes: { from, to, insert: text } })
     }
 
-    if (ytext.length > 0) {
-      // Notify parent of the initial content (no CM update fires for the doc
-      // we passed at creation time).
-      onChangeRef.current(ytext.toString())
-    }
+    // Deferred seed — see the big comment above the `extensions` declaration.
+    // setTimeout(…, 0) schedules a macrotask, which runs after all pending
+    // microtasks (including y-webrtc's async room-init / destroy-room chains
+    // triggered by `this.key.then(…)`) have settled. Re-checking
+    // `ytext.length === 0` at seed time is what actually prevents doubling:
+    // if any peer (or our own previous StrictMode mount leaking through BC)
+    // already supplied state, ytext is non-empty and we skip our insert.
+    const seedTimer = setTimeout(() => {
+      if (initialContent && ytext.length === 0) {
+        ytext.insert(0, initialContent)
+      }
+    }, 0)
 
     // --- Issue decorations: apply directly from AnalysisIssue[] ---
     function applyIssueDecorations(issues: AnalysisIssue[]) {
@@ -280,15 +297,33 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
     let analyzing = false
 
     // Restore decorations from cache as soon as ytext has content. Avoids
-    // a brief "no issues" flash before analysis re-runs.
-    if (cached && ytext.toString().trim()) {
-      const segs = segmentPrompt(ytext.toString()).map((s) => ({
+    // a brief "no issues" flash before analysis re-runs. Because the seed is
+    // deferred (see above), ytext is empty at this point — wrap the rehydration
+    // in a function and run it either immediately (if peer sync somehow
+    // beat us here) or once the first content arrives via observer.
+    const runCacheRehydration = () => {
+      if (!cached) return
+      const text = ytext.toString()
+      if (!text.trim()) return
+      const segs = segmentPrompt(text).map((s) => ({
         hash: hashSegment(s.text),
         startIndex: s.startOffset,
         endIndex: s.endOffset,
       }))
       currentIssues = rehydrateIssues(cachedIssuesByHash, segs)
       if (currentIssues.length > 0) applyIssueDecorations(currentIssues)
+    }
+    if (ytext.toString().trim()) {
+      runCacheRehydration()
+    } else {
+      // One-shot: the first time ytext has content, rehydrate and detach.
+      const onFirstContent = () => {
+        if (ytext.toString().trim()) {
+          ytext.unobserve(onFirstContent)
+          runCacheRehydration()
+        }
+      }
+      ytext.observe(onFirstContent)
     }
 
     async function runIncrementalAnalysis() {
@@ -392,18 +427,17 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
       }
     }
 
-    // Debounced trigger on ytext changes
+    // Debounced trigger on ytext changes. Fires for BOTH our deferred seed
+    // and any peer-sync updates, so an explicit initial-analysis kickoff is
+    // unnecessary — whichever delivers content first will schedule analysis.
     ytext.observe(() => {
       if (analyzeTimer) clearTimeout(analyzeTimer)
       analyzeTimer = setTimeout(runIncrementalAnalysis, 800)
     })
 
-    if (ytext.length > 0) {
-      setTimeout(runIncrementalAnalysis, 1000)
-    }
-
     // --- Cleanup ---
     return () => {
+      clearTimeout(seedTimer)
       if (analyzeTimer) clearTimeout(analyzeTimer)
       view.destroy()
       viewRef.current = null

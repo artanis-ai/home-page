@@ -415,6 +415,38 @@ test.describe('GitHub line ranges', () => {
     expect(text).not.toContain('footer line 12')
   })
 
+  test('slice appears exactly once (no CRDT-merge doubling)', async ({ page }) => {
+    // Regression: an earlier version of PromptEditor seeded ytext synchronously
+    // BEFORE y-webrtc's async BC/room-init chain had settled. Under React 18
+    // StrictMode (and across peer tabs), two providers could each seed an
+    // identical slice into their ydoc; the CRDT merge would then preserve
+    // BOTH inserts and the user would see the slice end-to-end twice in the
+    // editor. The deferred-seed fix moves the insert to a macrotask and only
+    // runs it if `ytext.length === 0` at fire time, so a peer/sync that already
+    // supplied state pre-empts the seed.
+    test.setTimeout(30000)
+    await mockContentsApi(page)
+    await page.goto('#/gh/example/repo/blob/main/prompts.py#L3-L6')
+    await page.waitForSelector('.cm-content', { timeout: 15000 })
+    await expect.poll(async () => (await page.locator('.cm-content').innerText()).trim(), {
+      timeout: 10000,
+    }).toContain('SYSTEM_PROMPT_A')
+    // Allow any delayed BC / StrictMode remount work to complete before asserting.
+    await page.waitForTimeout(500)
+
+    // Count line occurrences in the editor. Each slice line must appear once.
+    const text = (await page.locator('.cm-content').innerText())
+    const countOccurrences = (needle: string) =>
+      (text.match(new RegExp(needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length
+    expect(countOccurrences('SYSTEM_PROMPT_A = """')).toBe(1)
+    expect(countOccurrences('You are agent A.')).toBe(1)
+    expect(countOccurrences('Be helpful.')).toBe(1)
+
+    // Editor line count must match the slice (L3..L6 = 4 lines).
+    const lineCount = await page.locator('.cm-content .cm-line').count()
+    expect(lineCount).toBe(4)
+  })
+
   test('#L8-L11 → editor shows only the second prompt', async ({ page }) => {
     test.setTimeout(30000)
     await mockContentsApi(page)
