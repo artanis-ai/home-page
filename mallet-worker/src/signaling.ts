@@ -3,10 +3,19 @@
  * Each room gets its own DO instance. Clients connect via WebSocket,
  * subscribe to topics, and the DO relays messages between peers.
  *
- * Auth: WebSocket connections require a Clerk session token in the
- * `?token=` query parameter (custom headers can't be set during the
- * browser WebSocket handshake). The token is verified against Clerk's
- * JWKS before accepting the connection.
+ * Auth: signaling is INTENTIONALLY UNAUTHENTICATED so that anyone
+ * with a room URL — including anonymous (signed-out, incognito)
+ * users — can join the collaborative session. Rooms are scoped by
+ * the URL the user pasted: /d/<uuid> uses a random UUID (link-auth
+ * by obscurity), /gh/<owner>/<repo>/<branch>/<path> uses public-repo
+ * metadata that's already public. The expensive authenticated work
+ * (/api/analyze, /api/suggest, /api/create-pr) stays gated behind
+ * Clerk — signaling only shuffles small WebRTC offer/answer blobs.
+ *
+ * Previously we required a Clerk JWT in ?token=, but that locked
+ * signed-out users out of their own scratch pads and made incognito
+ * collaboration impossible (no shared Clerk session across browser
+ * profiles).
  *
  * Hibernation: we use `state.acceptWebSocket()` so the DO can evict
  * from memory between messages without closing live WebSockets.
@@ -17,7 +26,6 @@
  * subsequent subscribe/publish messages and breaking cross-tab /
  * cross-browser collaboration.
  */
-import { verifyClerkJWT } from './lib/auth'
 import type { Env } from './types'
 
 interface Attachment {
@@ -36,29 +44,14 @@ function writeTopics(ws: WebSocket, topics: Set<string>): void {
 }
 
 export class SignalingRoom implements DurableObject {
-  constructor(
-    private state: DurableObjectState,
-    private env: Env
-  ) {}
+  constructor(private state: DurableObjectState, _env: Env) {}
 
   async fetch(request: Request): Promise<Response> {
     if (request.headers.get('Upgrade') !== 'websocket') {
       return new Response('Expected WebSocket', { status: 426 })
     }
 
-    // Verify Clerk session token from query string.
-    const url = new URL(request.url)
-    const token = url.searchParams.get('token')
-    if (!token) {
-      return new Response('Unauthorized: missing token', { status: 401 })
-    }
-
-    try {
-      await verifyClerkJWT(this.env, token)
-    } catch {
-      return new Response('Unauthorized: invalid token', { status: 401 })
-    }
-
+    // No auth check — see module comment. Anyone with the room URL joins.
     const pair = new WebSocketPair()
     const [client, server] = [pair[0], pair[1]]
 

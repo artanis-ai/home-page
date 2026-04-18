@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
 import { useUser, useAuth, UserButton, SignedIn } from '@clerk/clerk-react'
 import { useGitHubToken } from '../../hooks/useGitHubToken'
-import { TEST_TOKEN } from '../../lib/api'
 import { PromptEditor, type Peer } from './PromptEditor'
 import { AnalysisPanel } from './AnalysisPanel'
 import { PRCreator } from '../repo/PRCreator'
@@ -20,20 +19,8 @@ export function EditorPage() {
   const { owner, repo, branch, '*': filePath, docId } = useParams()
   const location = useLocation()
   const { user } = useUser()
-  const { getToken, isSignedIn } = useAuth()
+  const { getToken } = useAuth()
   const getGitHubToken = useGitHubToken()
-
-  // Clerk session JWT for the WebSocket signaling handshake (must be a string,
-  // not a promise — the signaling URL is built synchronously when the editor
-  // effect mounts). In Playwright/E2E, VITE_TEST_TOKEN supplies a static token.
-  const [sessionToken, setSessionToken] = useState<string | null>(TEST_TOKEN)
-  useEffect(() => {
-    if (TEST_TOKEN) return // E2E bypass — use the static token
-    let cancelled = false
-    if (!isSignedIn) { setSessionToken(null); return }
-    getToken().then(t => { if (!cancelled) setSessionToken(t) })
-    return () => { cancelled = true }
-  }, [isSignedIn, getToken])
 
   // `content` is always what the editor sees.
   // When the URL fragment has #L1-L8, `content` holds ONLY that slice and
@@ -255,7 +242,6 @@ export function EditorPage() {
             activeIssueId={activeIssueId}
             onActiveIssueChange={setActiveIssueId}
             onReplaceText={replaceTextRef}
-            sessionToken={sessionToken}
             getToken={getToken}
           />
         </div>

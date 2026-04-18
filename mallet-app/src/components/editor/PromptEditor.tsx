@@ -109,13 +109,11 @@ interface PromptEditorProps {
   activeIssueId: string | null
   onActiveIssueChange: (id: string | null) => void
   onReplaceText: React.MutableRefObject<((from: number, to: number, text: string) => void) | null>
-  /** Clerk session JWT, used for the WebSocket signaling handshake. */
-  sessionToken: string | null
-  /** Returns a fresh Clerk session JWT for HTTP API calls. */
+  /** Returns a fresh Clerk session JWT for HTTP API calls (analyze/suggest only). */
   getToken: () => Promise<string | null>
 }
 
-export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeersChange, onAnalyzingChange, roomId, userName, userImageUrl, onActiveIssueChange, onReplaceText, sessionToken, getToken }: PromptEditorProps) {
+export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeersChange, onAnalyzingChange, roomId, userName, userImageUrl, onActiveIssueChange, onReplaceText, getToken }: PromptEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const onChangeRef = useRef(onChange)
@@ -142,17 +140,15 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
     // --- Set up WebRTC provider ---
     let provider: WebrtcProvider | null = null
 
-    if (roomId && sessionToken) {
-      // Build the signaling URL with the Clerk JWT in the query string.
-      // Browser WebSocket API can't set custom headers during the handshake,
-      // so the token rides as ?token=. The Durable Object verifies it before
-      // accepting the upgrade.
+    if (roomId) {
+      // Signaling is unauthenticated (see mallet-worker/src/signaling.ts for
+      // rationale). Anonymous / incognito users collaborate on the same
+      // /d/<uuid> or /gh/... URL as signed-in users — no token needed.
       const workerUrl = import.meta.env.VITE_WORKER_URL || 'https://mallet-api.artanis-ai.workers.dev'
       const signalingUrl =
         workerUrl.replace(/^http/, 'ws') +
         '/signaling/' +
-        encodeURIComponent(`mallet-${roomId}`) +
-        `?token=${encodeURIComponent(sessionToken)}`
+        encodeURIComponent(`mallet-${roomId}`)
 
       provider = new WebrtcProvider(`mallet-${roomId}`, ydoc, {
         signaling: [signalingUrl],
@@ -460,7 +456,7 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
       provider?.destroy()
       ydoc.destroy()
     }
-  }, [roomId, sessionToken])
+  }, [roomId])
 
 
   return (

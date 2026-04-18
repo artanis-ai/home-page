@@ -169,26 +169,22 @@ describe('input validation', () => {
   }, 5000)
 })
 
-describe('WebSocket signaling auth', () => {
-  it('rejects WebSocket upgrade without ?token=', async () => {
+describe('WebSocket signaling is intentionally unauthenticated', () => {
+  // Signaling is public so that signed-out / incognito users can still
+  // collaborate on a shared room URL. The expensive authenticated work
+  // (analyze/suggest/create-pr) is gated separately in its own tests.
+  it('accepts WebSocket upgrade with no token (anonymous allowed)', async () => {
     const probe = await probeWebSocket(`${WS_WORKER_URL}/signaling/test-room`)
-    expect(probe.opened).toBe(false)
-    expect(probe.statusCode).toBe(401)
+    expect(probe.opened).toBe(true)
   }, 5000)
 
-  it('rejects WebSocket upgrade with garbage token', async () => {
+  it('accepts WebSocket upgrade even with a bogus token (no verification)', async () => {
     const probe = await probeWebSocket(`${WS_WORKER_URL}/signaling/test-room?token=not.a.jwt`)
-    expect(probe.opened).toBe(false)
-    expect(probe.statusCode).toBe(401)
-  }, 5000)
-
-  it('accepts WebSocket upgrade with valid dev test_ token', async () => {
-    const probe = await probeWebSocket(`${WS_WORKER_URL}/signaling/test-room?token=test_signaling_user`)
     expect(probe.opened).toBe(true)
   }, 5000)
 
   it('rejects non-WebSocket request to /signaling (426)', async () => {
-    const res = await fetch(`${WORKER_URL}/signaling/test-room?token=test_anyone`)
+    const res = await fetch(`${WORKER_URL}/signaling/test-room`)
     expect(res.status).toBe(426) // Expected WebSocket
   }, 5000)
 })
