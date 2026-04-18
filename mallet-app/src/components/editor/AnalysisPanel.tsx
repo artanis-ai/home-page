@@ -144,19 +144,25 @@ export function AnalysisPanel({
               </button>
 
               {isActive && (
-                <div className="bg-cream px-4 pb-4">
-                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-earth-dark">Suggestion</h3>
+                <div className="bg-cream px-4 pb-4 pt-3">
+                  <h3 className="mb-3 text-center text-xs font-semibold uppercase tracking-wide text-earth-dark">
+                    Suggestion
+                  </h3>
 
                   {loadingSuggestion && (
-                    <div className="flex items-center gap-2 text-sm text-text-muted">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Generating suggestion...
+                    <div className="rounded-lg border border-warm bg-white p-3">
+                      <div className="mb-2 h-3 w-3/4 animate-pulse rounded bg-warm" />
+                      <div className="space-y-1.5">
+                        <div className="h-3 w-full animate-pulse rounded bg-warm" />
+                        <div className="h-3 w-11/12 animate-pulse rounded bg-warm" />
+                        <div className="h-3 w-4/5 animate-pulse rounded bg-warm" />
+                      </div>
                     </div>
                   )}
 
                   {suggestion && !loadingSuggestion && (
                     <div>
-                      <div className="mb-2 rounded-lg border border-warm bg-white p-3">
+                      <div className="mb-3 rounded-lg border border-warm bg-white p-3">
                         <div className="mb-1 font-mono text-xs">
                           <span className="bg-primary/10 text-primary line-through">{suggestion.original}</span>
                         </div>
@@ -167,7 +173,7 @@ export function AnalysisPanel({
                       {suggestion.explanation && (
                         <p className="mb-3 text-xs text-text-muted">{suggestion.explanation}</p>
                       )}
-                      <div className="flex gap-2">
+                      <div className="flex justify-center gap-2">
                         <button
                           onClick={() => {
                             if (suggestion) {
