@@ -249,6 +249,51 @@ describe('code / JSON / variable declarations are skipped', () => {
   }, 20000)
 })
 
+describe('ambiguity and best-practice do not double up on vague segments', () => {
+  // The user shouldn't see TWO near-identical cards — one "Ambiguity" and one
+  // "Best Practice" — for the same vague sentence. Ambiguity owns vagueness;
+  // best-practice must stay on structural defects only (missing format, no
+  // examples, tone conflict, etc.).
+  it('a plainly vague sentence produces at most one ambiguity, no BP', async () => {
+    const t0 = Date.now()
+    const { issues } = await analyze(
+      [{ text: 'Be helpful.', startIndex: 0, endIndex: 11, hash: 'vague1' }],
+      ['vague1']
+    )
+    const elapsed = Date.now() - t0
+    const ambig = issues.filter(i => i.type === 'ambiguity')
+    const bp = issues.filter(i => i.type === 'best-practice')
+    console.log(`[analyze-dedup] vague sentence: ${elapsed}ms, ${ambig.length} ambig, ${bp.length} bp`)
+    // Best-practice must NOT fire just on vagueness (that's the ambiguity check's job).
+    expect(bp.length).toBe(0)
+  }, 20000)
+
+  it('a vague sentence with no output format: BP may flag the format, but not vagueness', async () => {
+    // "Give me a list" is vague AND has no format spec. BP may legitimately
+    // fire on the format gap, but its message should speak to FORMAT, not vagueness.
+    const { issues } = await analyze(
+      [{ text: 'Give me a list.', startIndex: 0, endIndex: 15, hash: 'vague2' }],
+      ['vague2']
+    )
+    const bp = issues.filter(i => i.type === 'best-practice')
+    for (const i of bp) {
+      expect(i.message.toLowerCase()).not.toMatch(/\b(vague|unclear|ambiguous)\b/)
+    }
+  }, 20000)
+
+  it('a structurally well-formed but empty-ish instruction: neither fires', async () => {
+    const { issues } = await analyze(
+      [{ text: 'Respond in English.', startIndex: 0, endIndex: 19, hash: 'clear1' }],
+      ['clear1']
+    )
+    const ambig = issues.filter(i => i.type === 'ambiguity')
+    const bp = issues.filter(i => i.type === 'best-practice')
+    console.log(`[analyze-dedup] clear sentence: ${ambig.length} ambig, ${bp.length} bp`)
+    expect(ambig.length).toBe(0)
+    expect(bp.length).toBe(0)
+  }, 20000)
+})
+
 describe('suggest API', () => {
   it('returns a suggestion for a contradiction', async () => {
     const res = await fetch(`${WORKER_URL}/api/suggest`, {

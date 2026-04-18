@@ -94,11 +94,30 @@ If the segment IS prose, decide: is it vague or ambiguous?
 
 JSON: {"ambiguous": true/false, "message": "brief why"}`
 
-const BEST_PRACTICE_PROMPT = `You flag best-practice issues in an AI prompt instruction — too vague, missing examples, unclear output format, conflicting tone.
+const BEST_PRACTICE_PROMPT = `You flag STRUCTURAL best-practice issues in an AI prompt instruction.
 
 ${NON_PROSE_GUARD}
 
-If the segment IS prose, decide: does it have a best-practice issue?
+A structural issue is a concrete defect the author can fix by adding
+or changing a specific piece of the instruction:
+- Missing output-format spec where one is clearly expected (e.g. a rule
+  asking for "a list" or "a summary" without a format, schema, or length)
+- Missing examples where the task is pattern-dependent (classification,
+  extraction, transformation, style imitation)
+- Missing role/persona framing for a task that needs it (expertise level,
+  domain, audience)
+- Tone/style hint directly conflicting with another in the same segment
+  (e.g. "formal and casual")
+
+DO NOT flag (these are handled elsewhere or are not defects):
+- Vagueness or ambiguity in general — a separate ambiguity check owns this.
+  If the ONLY issue is "too vague", "unclear", "could be clearer", skip it.
+- Scope that could be narrower — not a structural defect
+- Shortness / brevity — not a defect on its own
+- Stylistic preference ("could be friendlier") — not structural
+
+If the segment IS prose, decide: does it have a STRUCTURAL defect per the
+bullets above (not general vagueness)?
 
 JSON: {"issue": true/false, "message": "brief what to fix"}`
 
