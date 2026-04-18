@@ -70,7 +70,7 @@ export function StepConnect() {
         </p>
       </div>
 
-      <div className="w-full max-w-md flex-1">
+      <div className="w-full max-w-md flex-1 self-center lg:self-auto">
         <div className="rounded-xl border border-warm bg-white p-5 shadow-lg">
           <div className="grid grid-cols-5 gap-3">
             {INTEGRATIONS.map((item) => (

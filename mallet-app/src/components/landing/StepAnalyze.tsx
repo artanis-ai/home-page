@@ -12,7 +12,7 @@ export function StepAnalyze() {
       </div>
 
       {/* Mock analysis illustration */}
-      <div className="w-full max-w-md flex-1">
+      <div className="w-full max-w-md flex-1 self-center lg:self-auto">
         <div className="rounded-xl border border-warm bg-white shadow-lg">
           {/* Mock editor with highlights */}
           <div className="border-b border-warm p-5">
@@ -35,7 +35,7 @@ export function StepAnalyze() {
                 <span className="mr-3 w-3 text-right text-text-muted">3</span>
                 <span className="text-earth-dark">
                   Include{' '}
-                  <span className="rounded bg-forest/10 px-0.5">
+                  <span className="text-text-muted">
                     {'{{user_name}}'}
                   </span>
                   {' '}in your greeting.
@@ -67,7 +67,7 @@ export function StepAnalyze() {
                 <div className="mt-1 text-forest">Always answer questions helpfully.</div>
               </div>
             </div>
-            <div className="mt-3 flex gap-2">
+            <div className="mt-3 flex justify-center gap-2">
               <button className="rounded-lg bg-forest px-3 py-1 text-xs font-medium text-white">
                 Accept
               </button>

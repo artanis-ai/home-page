@@ -23,7 +23,7 @@ export function LandingPage() {
       {/* Hero with desaturated sky gradient */}
       <section
         className="relative flex min-h-[80vh] flex-col items-center justify-center px-4 py-16 sm:px-6"
-        style={{ background: 'linear-gradient(180deg, #dce8ef 0%, #e2eaf0 55%, #e4e8de 90%, #dde4d5 100%)' }}
+        style={{ background: 'linear-gradient(180deg in oklab, #e7f1f6 0%, #c5dce8 20%, #c5dce8 98%, #d8c8b4 100%)' }}
       >
         <div className="text-center">
           <div className="flex items-center justify-center gap-4 mb-3">
@@ -51,7 +51,7 @@ export function LandingPage() {
         </div>
 
         {/* Trust badges at bottom of hero */}
-        <div className="absolute bottom-8 left-0 right-0 flex flex-wrap items-center justify-center gap-6 text-sm text-text-muted">
+        <div className="absolute bottom-32 left-0 right-0 flex flex-wrap items-center justify-center gap-6 text-sm text-text-muted">
           <div className="flex items-center gap-1.5">
             <Shield className="h-4 w-4 text-forest" />
             Prompts never stored
@@ -111,7 +111,7 @@ export function LandingPage() {
             </button>
           </div>
 
-          <div className="mt-12 border-t border-warm pt-8">
+          <div className="mt-12">
             <p className="text-text-muted">
               Want to measure if your prompt changes actually work in production?
             </p>

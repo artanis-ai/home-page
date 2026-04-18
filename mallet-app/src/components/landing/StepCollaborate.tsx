@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
 const LINES = [
-  '',
   'You are a support agent for Acme.',
   'Always be professional and helpful.',
   'Refer pricing questions to /pricing.',
@@ -12,19 +11,19 @@ const USERS = [
   { name: 'Bob', color: '#4A7C59' },
 ]
 
-// Alice always stays on line 2, Bob always stays on line 1
-// They edit words on their own line only — no jumping between lines
+// Alice edits line index 1 ("Always be professional..."); Bob edits line index 0
+// ("You are a support..."). Each user stays on their own line throughout.
 const EDIT_SEQUENCE = [
-  { line: 2, from: 'helpful', to: 'empathetic', user: 0 },
-  { line: 1, from: 'support', to: 'customer success', user: 1 },
-  { line: 2, from: 'empathetic', to: 'helpful', user: 0 },
-  { line: 1, from: 'customer success', to: 'support', user: 1 },
+  { line: 1, from: 'helpful', to: 'empathetic', user: 0 },
+  { line: 0, from: 'support', to: 'customer success', user: 1 },
+  { line: 1, from: 'empathetic', to: 'helpful', user: 0 },
+  { line: 0, from: 'customer success', to: 'support', user: 1 },
 ]
 
 // Initial cursor positions — each user on their line, at the word they'll edit
 const INITIAL_CURSORS = [
-  { line: 2, col: LINES[2].indexOf('helpful') + 'helpful'.length },  // Alice
-  { line: 1, col: LINES[1].indexOf('support') + 'support'.length },  // Bob
+  { line: 1, col: LINES[1].indexOf('helpful') + 'helpful'.length },  // Alice
+  { line: 0, col: LINES[0].indexOf('support') + 'support'.length },  // Bob
 ]
 
 export function StepCollaborate() {
@@ -126,12 +125,12 @@ export function StepCollaborate() {
         </p>
       </div>
 
-      <div className="w-full max-w-md flex-1">
-        <div className="overflow-hidden rounded-xl border border-warm bg-white shadow-lg" style={{ height: '190px' }}>
-          <div className="px-5 font-mono text-xs text-earth-dark" style={{ whiteSpace: 'pre', overflowX: 'hidden' }}>
+      <div className="w-full max-w-md flex-1 self-center lg:self-auto">
+        <div className="overflow-hidden rounded-xl border border-warm bg-white shadow-lg">
+          <div className="px-5 py-4 font-mono text-xs text-earth-dark" style={{ whiteSpace: 'pre', overflowX: 'hidden' }}>
             {lines.map((line, lineIdx) => (
               <div key={lineIdx} className="flex h-7 items-center">
-                <span className="mr-3 w-3 text-right text-text-muted select-none">{lineIdx === 0 ? '' : lineIdx}</span>
+                <span className="mr-3 w-3 text-right text-text-muted select-none">{lineIdx + 1}</span>
                 <span className="relative">
                   {line.split('').map((char, charIdx) => (
                     <span key={charIdx} className="relative">
