@@ -1,31 +1,31 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FileText, Brain, ExternalLink, ArrowLeft } from 'lucide-react'
-import { SignedIn, SignedOut } from '@clerk/clerk-react'
+import { ArrowLeft, MoreHorizontal, FileText, Brain, ExternalLink } from 'lucide-react'
+import { useUser } from '@clerk/clerk-react'
 import { useGitHubSignIn } from '../../hooks/useGitHubSignIn'
-
-function GitHubIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-    </svg>
-  )
-}
+import {
+  GitHubIcon,
+  LangfuseIcon,
+  LangSmithIcon,
+  HumanloopIcon,
+  PromptLayerIcon,
+} from '../shared/BrandIcons'
 
 type Step = 'source' | 'github-visibility' | 'github-public' | 'github-private' | 'elsewhere-pick' | 'elsewhere-instructions'
 type ElsewhereTool = 'langfuse' | 'langsmith' | 'promptlayer' | 'humanloop' | 'other'
 
-const ELSEWHERE_TOOLS: { id: ElsewhereTool; name: string; instructions: string }[] = [
-  { id: 'langfuse', name: 'Langfuse', instructions: 'In Langfuse, go to Prompts in the left sidebar. Select your prompt, then click the prompt version you want to edit. Select the template text and copy it (Ctrl/Cmd+C).' },
-  { id: 'langsmith', name: 'LangSmith', instructions: 'In LangSmith, go to Prompts in the left sidebar. Click on your prompt, then select the template tab. Copy the prompt template text (Ctrl/Cmd+C).' },
-  { id: 'promptlayer', name: 'PromptLayer', instructions: 'In PromptLayer, go to the Registry. Click on your prompt template to open it. Select the template body text and copy it (Ctrl/Cmd+C).' },
-  { id: 'humanloop', name: 'Humanloop', instructions: 'In Humanloop, open your project and go to the Editor. Select the prompt template text in the editor pane and copy it (Ctrl/Cmd+C).' },
-  { id: 'other', name: 'Other', instructions: 'Open your prompt management tool, find the prompt you want to improve, and copy the full template text. Then paste it into the Mallet editor.' },
+const ELSEWHERE_TOOLS: { id: ElsewhereTool; name: string; icon: React.ReactNode; instructions: string }[] = [
+  { id: 'langfuse', name: 'Langfuse', icon: <LangfuseIcon className="h-5 w-5" />, instructions: 'In Langfuse, go to Prompts in the left sidebar. Select your prompt, then click the prompt version you want to edit. Select the template text and copy it (Ctrl/Cmd+C).' },
+  { id: 'langsmith', name: 'LangSmith', icon: <LangSmithIcon className="h-5 w-5" />, instructions: 'In LangSmith, go to Prompts in the left sidebar. Click on your prompt, then select the template tab. Copy the prompt template text (Ctrl/Cmd+C).' },
+  { id: 'promptlayer', name: 'PromptLayer', icon: <PromptLayerIcon className="h-5 w-5" />, instructions: 'In PromptLayer, go to the Registry. Click on your prompt template to open it. Select the template body text and copy it (Ctrl/Cmd+C).' },
+  { id: 'humanloop', name: 'Humanloop', icon: <HumanloopIcon className="h-5 w-5" />, instructions: 'In Humanloop, open your project and go to the Editor. Select the prompt template text in the editor pane and copy it (Ctrl/Cmd+C).' },
+  { id: 'other', name: 'Other', icon: <MoreHorizontal className="h-5 w-5" />, instructions: 'Open your prompt management tool, find the prompt you want to improve, and copy the full template text. Then paste it into the Mallet editor.' },
 ]
 
 export function OnboardingWizard() {
   const navigate = useNavigate()
   const signInWithGitHub = useGitHubSignIn()
+  const { isSignedIn } = useUser()
 
   const [step, setStep] = useState<Step>('source')
   const [elsewhereTool, setElsewhereTool] = useState<ElsewhereTool | null>(null)
@@ -84,7 +84,10 @@ export function OnboardingWizard() {
               icon={<GitHubIcon className="h-6 w-6" />}
               title="GitHub"
               description="In a repo, as files or in code"
-              onClick={() => setStep('github-visibility')}
+              onClick={() => {
+                if (isSignedIn) navigate('/app')
+                else setStep('github-visibility')
+              }}
             />
             <SourceCard
               icon={<FileText className="h-6 w-6" />}
@@ -179,24 +182,13 @@ export function OnboardingWizard() {
           </p>
 
           <div className="mt-8">
-            <SignedIn>
-              <button
-                onClick={() => navigate('/app')}
-                className="flex items-center gap-2 rounded-full bg-earth-dark px-6 py-3 font-medium text-white transition hover:bg-earth"
-              >
-                <GitHubIcon className="h-5 w-5" />
-                Browse Your Repos
-              </button>
-            </SignedIn>
-            <SignedOut>
-              <button
-                onClick={signInWithGitHub}
-                className="flex items-center gap-2 rounded-full bg-earth-dark px-6 py-3 font-medium text-white transition hover:bg-earth"
-              >
-                <GitHubIcon className="h-5 w-5" />
-                Connect with GitHub
-              </button>
-            </SignedOut>
+            <button
+              onClick={isSignedIn ? () => navigate('/app') : signInWithGitHub}
+              className="flex items-center gap-2 rounded-full bg-earth-dark px-6 py-3 font-medium text-white transition hover:bg-earth"
+            >
+              <GitHubIcon className="h-5 w-5" />
+              {isSignedIn ? 'Browse Your Repos' : 'Connect with GitHub'}
+            </button>
           </div>
         </div>
       )}
@@ -215,7 +207,7 @@ export function OnboardingWizard() {
             {ELSEWHERE_TOOLS.map((tool) => (
               <SourceCard
                 key={tool.id}
-                icon={<ExternalLink className="h-5 w-5" />}
+                icon={tool.icon}
                 title={tool.name}
                 description=""
                 onClick={() => {
