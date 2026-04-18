@@ -18,10 +18,49 @@ import type { AnalysisIssue } from '../types'
 
 const MODEL = 'gpt-5.4-nano-2026-03-17'
 
+// Shared guard prepended to every analysis prompt. Mallet runs over raw file
+// slices that routinely include scaffolding lines — variable declarations,
+// triple-quote openers/closers, imports, JSON/YAML object literals, HTML
+// tags — and the segmenter cannot tell these apart from instructions. The
+// model must: NOT flag scaffolding-only segments as ambiguity / bad practice,
+// and NOT pair scaffolding against prose when checking contradictions. The
+// existing prose checks (refinements, exceptions, etc.) stay unchanged
+// below — this guard fires first, independently of the original rubric.
+const NON_PROSE_GUARD = `FIRST RULE — skip non-prose scaffolding:
+If the WHOLE instruction is code, a JSON/YAML structural literal, a variable
+declaration, or a lone delimiter — not natural-language prose directed at a
+model — reply with the "no issue" variant (contradiction:false / ambiguous:false
+/ issue:false) with an empty message. These lines are around the prompt, not
+part of it.
+
+Treat as non-prose (DO NOT flag):
+- Variable declarations/assignments as the whole segment — e.g. \`FOO = ...\`,
+  \`const x = ...\`, \`let y = ...\`, \`SYSTEM_PROMPT = """\`, \`prompt: str\`
+- Lone string-literal delimiters — \`"""\`, \`'''\`, backticks on their own
+- Function/class/import declarations — \`def foo(...):\`, \`class Bar:\`,
+  \`function baz(...)\`, \`import X\`, \`from Y import Z\`, \`require(...)\`
+- JSON/YAML structural syntax as the segment — \`{\`, \`}\`, \`[\`, \`]\`,
+  \`{"x": "y"}\`, array literals
+- HTML / XML tags — \`<tag>\`, \`</tag>\`, \`<tag attr="…"/>\`
+- Control-flow keywords / statements — \`if (…)\`, \`for (…)\`, \`return x\`,
+  \`break\`, \`continue\`
+- Lone punctuation/operators — \`)\`, \`}\`, \`]\`, \`=>\`, \`->\`, \`:\`
+- Code comments as the whole segment when they contain no full instruction
+
+DO analyze natural-language prose that MENTIONS code or schema — the segment
+is prose FOR A MODEL even if it refers to JSON, function names, variable
+names, etc. ("Reply with JSON.", "Output format: {status, data}").`
+
 // See routes/analyze.ts prior art for why each bullet exists. Kept here
 // because both the authenticated and public paths need identical analysis
 // behavior — diverging the prompts would make the eval + skill differ.
 const CONTRADICTION_PROMPT = `You detect DIRECT, UNRESOLVABLE contradictions between two instructions in the same prompt.
+
+${NON_PROSE_GUARD}
+
+For contradictions specifically: if EITHER A or B is non-prose scaffolding per
+the rule above, reply {"contradiction": false} — scaffolding cannot contradict
+anything.
 
 A contradiction means: NO single response could satisfy BOTH instructions at once.
 
@@ -47,9 +86,21 @@ Only flag if the instructions truly pull in opposite directions with no reasonab
 
 Reply strict JSON only: {"contradiction": true|false, "message": "one short sentence"}`
 
-const AMBIGUITY_PROMPT = `Is this instruction vague or ambiguous? JSON: {"ambiguous": true/false, "message": "brief why"}`
+const AMBIGUITY_PROMPT = `You flag vague or ambiguous instructions in an AI prompt.
 
-const BEST_PRACTICE_PROMPT = `Does this AI prompt instruction have issues? Check: too vague, missing examples, unclear output format, conflicting tone. JSON: {"issue": true/false, "message": "brief what to fix"}`
+${NON_PROSE_GUARD}
+
+If the segment IS prose, decide: is it vague or ambiguous?
+
+JSON: {"ambiguous": true/false, "message": "brief why"}`
+
+const BEST_PRACTICE_PROMPT = `You flag best-practice issues in an AI prompt instruction — too vague, missing examples, unclear output format, conflicting tone.
+
+${NON_PROSE_GUARD}
+
+If the segment IS prose, decide: does it have a best-practice issue?
+
+JSON: {"issue": true/false, "message": "brief what to fix"}`
 
 export interface AnalyzerUsage {
   inputTokens: number

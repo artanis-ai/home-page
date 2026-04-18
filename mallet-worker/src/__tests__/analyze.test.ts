@@ -111,6 +111,144 @@ describe('segment-level analysis API', () => {
   }, 20000)
 })
 
+describe('code / JSON / variable declarations are skipped', () => {
+  // Mallet slices raw file ranges — the segmenter can't tell a prose
+  // instruction from a Python `FOO = """` opener or a function signature.
+  // These tests guard the analyzer's NON_PROSE_GUARD rule: scaffolding
+  // segments must never be flagged as ambiguous / bad-practice, and must
+  // never pair against prose to produce a contradiction. Real prose
+  // contradictions elsewhere in the slice must still surface.
+
+  // Paid LLM calls: log elapsed time per-case so regressions in latency
+  // or fan-out are visible. See the user-memory note about API timing.
+  async function analyzeLogged(label: string, segments: Segment[], changedHashes: string[]) {
+    const start = Date.now()
+    const result = await analyze(segments, changedHashes)
+    const elapsed = Date.now() - start
+    console.log(`[analyze-skip] ${label}: ${elapsed}ms, ${result.issues.length} issues`)
+    return { ...result, elapsed }
+  }
+
+  it('does not flag a Python triple-quote declaration as ambiguous or bad practice', async () => {
+    const { issues, elapsed } = await analyzeLogged(
+      'python triple-quote declaration',
+      [{ text: 'SYSTEM_PROMPT = """', startIndex: 0, endIndex: 19, hash: 'decl1' }],
+      ['decl1']
+    )
+    expect(issues.filter(i => i.type === 'ambiguity')).toHaveLength(0)
+    expect(issues.filter(i => i.type === 'best-practice')).toHaveLength(0)
+    // Whole check is a single segment → two per-segment tasks; stay under 15s.
+    expect(elapsed).toBeLessThan(15000)
+  }, 20000)
+
+  it('does not flag a lone triple-quote delimiter', async () => {
+    const { issues } = await analyzeLogged(
+      'lone triple-quote',
+      [{ text: '"""', startIndex: 0, endIndex: 3, hash: 'delim1' }],
+      ['delim1']
+    )
+    expect(issues).toHaveLength(0)
+  }, 20000)
+
+  it('does not flag a JSON object literal', async () => {
+    const { issues } = await analyzeLogged(
+      'json object literal',
+      [{ text: '{"role": "system", "content": "..."}', startIndex: 0, endIndex: 36, hash: 'json1' }],
+      ['json1']
+    )
+    expect(issues.filter(i => i.type === 'ambiguity')).toHaveLength(0)
+    expect(issues.filter(i => i.type === 'best-practice')).toHaveLength(0)
+  }, 20000)
+
+  it('does not flag a Python function declaration', async () => {
+    const { issues } = await analyzeLogged(
+      'python function declaration',
+      [{ text: 'def generate_response(prompt: str) -> str:', startIndex: 0, endIndex: 42, hash: 'fn1' }],
+      ['fn1']
+    )
+    expect(issues).toHaveLength(0)
+  }, 20000)
+
+  it('does not flag an import statement', async () => {
+    const { issues } = await analyzeLogged(
+      'import statement',
+      [{ text: 'from openai import OpenAI', startIndex: 0, endIndex: 25, hash: 'imp1' }],
+      ['imp1']
+    )
+    expect(issues).toHaveLength(0)
+  }, 20000)
+
+  it('does not flag a JavaScript const declaration', async () => {
+    const { issues } = await analyzeLogged(
+      'js const declaration',
+      [{ text: 'const systemPrompt = `', startIndex: 0, endIndex: 22, hash: 'js1' }],
+      ['js1']
+    )
+    expect(issues).toHaveLength(0)
+  }, 20000)
+
+  it('does not pair scaffolding against prose as a contradiction', async () => {
+    // A code declaration and a prose instruction live in the same slice;
+    // the declaration is not an instruction, so pairwise comparison must
+    // short-circuit without flagging a contradiction.
+    const { issues } = await analyzeLogged(
+      'code paired with prose',
+      [
+        { text: 'SYSTEM_PROMPT = """', startIndex: 0, endIndex: 19, hash: 'code_a' },
+        { text: 'Be brief.', startIndex: 20, endIndex: 29, hash: 'prose_a' },
+      ],
+      ['code_a', 'prose_a']
+    )
+    expect(issues.filter(i => i.type === 'contradiction')).toHaveLength(0)
+  }, 20000)
+
+  it('still flags a real prose contradiction alongside code scaffolding', async () => {
+    // Mirrors the `.py` slice shape Mallet actually sees: opener, two prose
+    // lines that contradict, closer. The scaffolding is ignored; the prose
+    // contradiction MUST still surface.
+    const { issues } = await analyzeLogged(
+      'prose contradiction among code',
+      [
+        { text: 'SYSTEM_PROMPT = """', startIndex: 0, endIndex: 19, hash: 'code_open' },
+        { text: 'Be brief.', startIndex: 20, endIndex: 29, hash: 'p_brief' },
+        { text: 'Give long detailed answers.', startIndex: 30, endIndex: 57, hash: 'p_long' },
+        { text: '"""', startIndex: 58, endIndex: 61, hash: 'code_close' },
+      ],
+      ['code_open', 'p_brief', 'p_long', 'code_close']
+    )
+    const contradictions = issues.filter(i => i.type === 'contradiction')
+    expect(contradictions.length).toBeGreaterThanOrEqual(1)
+    // None of the surfaced contradictions should reference the scaffolding text
+    for (const c of contradictions) {
+      expect(c.message).not.toContain('SYSTEM_PROMPT')
+      expect(c.message).not.toMatch(/^"""/)
+    }
+  }, 30000)
+
+  it('still analyzes prose that MENTIONS code/JSON', async () => {
+    // "Reply with JSON" is prose ABOUT code — the guard must not trip on
+    // mere mention of code. We don't require a specific verdict (the LLM
+    // may or may not find an issue); we just require the call to succeed
+    // and not treat this as scaffolding (i.e. the analyzer runs normally).
+    const { issues } = await analyzeLogged(
+      'prose mentioning JSON',
+      [{ text: 'Reply with JSON: {"status": "ok"}.', startIndex: 0, endIndex: 34, hash: 'mention' }],
+      ['mention']
+    )
+    // Structural assertion only — behavior depends on the LLM's judgement.
+    expect(Array.isArray(issues)).toBe(true)
+  }, 20000)
+
+  it('does not flag an HTML/XML tag alone', async () => {
+    const { issues } = await analyzeLogged(
+      'html tag',
+      [{ text: '<system_prompt>', startIndex: 0, endIndex: 15, hash: 'html1' }],
+      ['html1']
+    )
+    expect(issues).toHaveLength(0)
+  }, 20000)
+})
+
 describe('suggest API', () => {
   it('returns a suggestion for a contradiction', async () => {
     const res = await fetch(`${WORKER_URL}/api/suggest`, {
