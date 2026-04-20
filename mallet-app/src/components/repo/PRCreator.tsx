@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, ExternalLink, Loader2, GitPullRequest, Check } from 'lucide-react'
 import { useSession } from '../../hooks/useSession'
 import { WORKER_URL, authedFetch } from '../../lib/api'
+import { track } from '../../lib/track'
 
 interface PRCreatorProps {
   owner: string
@@ -42,9 +43,12 @@ export function PRCreator({ owner, repo, filePath, content, onClose }: PRCreator
       }
 
       const data = await res.json()
+      track('pr.created', { owner, repo, filePath, prNumber: data.prNumber, contentLength: content.length })
       setPrUrl(data.prUrl)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create PR')
+      const msg = err instanceof Error ? err.message : 'Failed to create PR'
+      track('pr.failed', { owner, repo, filePath, error: msg.slice(0, 200) })
+      setError(msg)
     } finally {
       setCreating(false)
     }

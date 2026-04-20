@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { LogOut } from 'lucide-react'
 import { useSession } from '../../hooks/useSession'
+import { track } from '../../lib/track'
 
 export function UserMenu() {
   const { user, signOut } = useSession()
@@ -42,6 +43,7 @@ export function UserMenu() {
           </div>
           <button
             onClick={() => {
+              track('signout.clicked')
               setOpen(false)
               signOut()
             }}

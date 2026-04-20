@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { AlertTriangle, HelpCircle, Lightbulb, ChevronRight, Check, X, Loader2 } from 'lucide-react'
 import { WORKER_URL, publicFetch } from '../../lib/api'
+import { track } from '../../lib/track'
 import type { AnalysisIssue, Suggestion } from '../../types'
 
 const issueIcons: Record<string, typeof AlertTriangle> = {
@@ -30,6 +31,8 @@ interface AnalysisPanelProps {
   analyzing?: boolean
   /** Returns the session JWT for the /api/suggest call. */
   getToken: () => Promise<string | null>
+  /** File context stamped into server logs for attribution. Optional — scratch editor has none. */
+  fileContext?: { repoOwner?: string; repoName?: string; branch?: string; filePath?: string }
 }
 
 export function AnalysisPanel({
@@ -40,6 +43,7 @@ export function AnalysisPanel({
   onAcceptSuggestion,
   analyzing,
   getToken,
+  fileContext,
 }: AnalysisPanelProps) {
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null)
   const [loadingSuggestion, setLoadingSuggestion] = useState(false)
@@ -66,6 +70,7 @@ export function AnalysisPanel({
           issueType: issue.type,
           fullPrompt: currentContent,
           message: issue.message,
+          ...fileContext,
         }),
       })
 
@@ -177,6 +182,7 @@ export function AnalysisPanel({
                         <button
                           onClick={() => {
                             if (suggestion) {
+                              track('editor.suggestion.accepted', { issueType: issue.type })
                               onAcceptSuggestion(issue.range, suggestion.suggested)
                             }
                             onIssueClick(null)
@@ -188,7 +194,11 @@ export function AnalysisPanel({
                           Accept
                         </button>
                         <button
-                          onClick={() => { onIssueClick(null); setSuggestion(null) }}
+                          onClick={() => {
+                            track('editor.suggestion.dismissed', { issueType: issue.type })
+                            onIssueClick(null)
+                            setSuggestion(null)
+                          }}
                           className="flex cursor-pointer items-center gap-1 rounded-lg border border-warm px-3 py-1.5 text-xs text-text-mid transition hover:bg-warm"
                         >
                           <X className="h-3 w-3" />

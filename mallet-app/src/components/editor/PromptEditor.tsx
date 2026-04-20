@@ -111,9 +111,11 @@ interface PromptEditorProps {
   onReplaceText: React.MutableRefObject<((from: number, to: number, text: string) => void) | null>
   /** Returns the session JWT for HTTP API calls (analyze/suggest only). */
   getToken: () => Promise<string | null>
+  /** File context stamped into server logs for attribution. Optional — scratch editor has none. */
+  fileContext?: { repoOwner?: string; repoName?: string; branch?: string; filePath?: string }
 }
 
-export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeersChange, onAnalyzingChange, roomId, userName, userImageUrl, onActiveIssueChange, onReplaceText, getToken }: PromptEditorProps) {
+export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeersChange, onAnalyzingChange, roomId, userName, userImageUrl, onActiveIssueChange, onReplaceText, getToken, fileContext }: PromptEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const onChangeRef = useRef(onChange)
@@ -121,12 +123,14 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
   const onPeersChangeRef = useRef(onPeersChange)
   const onAnalyzingChangeRef = useRef(onAnalyzingChange)
   const onActiveIssueChangeRef = useRef(onActiveIssueChange)
+  const fileContextRef = useRef(fileContext)
   const currentIssuesRef = useRef<AnalysisIssue[]>([])
   onChangeRef.current = onChange
   onIssuesChangeRef.current = onIssuesChange
   onPeersChangeRef.current = onPeersChange
   onAnalyzingChangeRef.current = onAnalyzingChange
   onActiveIssueChangeRef.current = onActiveIssueChange
+  fileContextRef.current = fileContext
 
 
   useEffect(() => {
@@ -383,7 +387,12 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
         const res = await publicFetch(getToken, `${WORKER_URL}/api/analyze`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ segments: apiSegments, changedHashes }),
+          body: JSON.stringify({
+            segments: apiSegments,
+            changedHashes,
+            roomId,
+            ...fileContextRef.current,
+          }),
         })
 
         if (!res.ok) { analyzing = false; return }

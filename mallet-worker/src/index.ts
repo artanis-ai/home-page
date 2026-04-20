@@ -11,6 +11,7 @@ import createPRRoute from './routes/create-pr'
 import githubTokenRoute from './routes/github-token'
 import oauthRoute from './routes/oauth'
 import trackRoute from './routes/track'
+import eventRoute from './routes/event'
 
 export { SignalingRoom } from './signaling'
 
@@ -49,6 +50,12 @@ app.route('/auth/github', oauthRoute)
 // Campaign-link first-touch attribution. Unauthenticated — recipients
 // haven't signed in yet when they click an email link.
 app.route('/t', trackRoute)
+
+// SPA telemetry sink. Unauthenticated; rate-limited per IP. The client
+// sends UI events (onboarding clicks, share/copy, suggestion accept,
+// PR open, etc.) — never prompt text or file content.
+app.use('/event', rateLimitMiddlewareByIP(120))
+app.route('/event', eventRoute)
 
 // WebSocket signaling endpoint for y-webrtc.
 // Auth is enforced inside the Durable Object (it needs the session token in

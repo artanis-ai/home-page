@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Shield, Users, Zap, Heart } from 'lucide-react'
+import { track } from '../../lib/track'
 import { StepConnect } from './StepConnect'
 import { StepCollaborate } from './StepCollaborate'
 import { StepAnalyze } from './StepAnalyze'
@@ -43,7 +44,7 @@ export function LandingPage() {
           </p>
 
           <button
-            onClick={() => navigate('/start')}
+            onClick={() => { track('landing.cta.clicked'); navigate('/start') }}
             className="rounded-full bg-primary px-8 py-3.5 text-lg font-semibold text-white shadow-lg shadow-primary/25 transition hover:bg-primary-dark hover:shadow-xl"
           >
             Get Started
@@ -104,7 +105,7 @@ export function LandingPage() {
           </p>
           <div className="mt-8">
             <button
-              onClick={() => navigate('/start')}
+              onClick={() => { track('landing.cta.clicked'); navigate('/start') }}
               className="cursor-pointer rounded-full bg-primary px-8 py-3.5 text-lg font-semibold text-white shadow-lg shadow-primary/25 transition hover:bg-primary-dark"
             >
               Get Started

@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, MoreHorizontal, FileText, Brain, ExternalLink } from 'lucide-react'
 import { useSession } from '../../hooks/useSession'
+import { track } from '../../lib/track'
 import {
   GitHubIcon,
   LangfuseIcon,
@@ -33,8 +34,17 @@ export function OnboardingWizard() {
   const [repoUrl, setRepoUrl] = useState('')
   const [repoError, setRepoError] = useState('')
 
+  useEffect(() => {
+    track('onboarding.opened', { signedIn: isSignedIn })
+  }, [])
+
+  useEffect(() => {
+    track('onboarding.step', { step })
+  }, [step])
+
   function goToEditor(prompt?: string) {
     const uuid = crypto.randomUUID().slice(0, 8)
+    track('onboarding.editor.opened', { source: prompt ? 'manual' : 'blank' })
     navigate(`/d/${uuid}`, {
       state: { manualPrompt: prompt || '' },
     })
@@ -50,9 +60,11 @@ export function OnboardingWizard() {
     setRepoError('')
     const match = repoUrl.trim().match(/(?:github\.com\/)?([^/\s]+)\/([^/\s]+?)(?:\.git)?$/)
     if (!match) {
+      track('onboarding.public-repo.invalid')
       setRepoError('Enter a valid repo, e.g. owner/repo or github.com/owner/repo')
       return
     }
+    track('onboarding.public-repo.submitted', { owner: match[1], repo: match[2] })
     navigate(`/app/prompts/${match[1]}/${match[2]}`)
   }
 
@@ -86,6 +98,7 @@ export function OnboardingWizard() {
               title="GitHub"
               description="In a repo, as files or in code"
               onClick={() => {
+                track('onboarding.source.selected', { source: 'github' })
                 if (isSignedIn) navigate('/app')
                 else setStep('github-visibility')
               }}
@@ -94,19 +107,28 @@ export function OnboardingWizard() {
               icon={<FileText className="h-6 w-6" />}
               title="Locally"
               description="On my machine, I can paste it"
-              onClick={() => goToEditor()}
+              onClick={() => {
+                track('onboarding.source.selected', { source: 'local' })
+                goToEditor()
+              }}
             />
             <SourceCard
               icon={<Brain className="h-6 w-6" />}
               title="In my head"
               description="I want to write one from scratch"
-              onClick={() => goToEditor()}
+              onClick={() => {
+                track('onboarding.source.selected', { source: 'in-head' })
+                goToEditor()
+              }}
             />
             <SourceCard
               icon={<ExternalLink className="h-6 w-6" />}
               title="Elsewhere"
               description="In a prompt management tool"
-              onClick={() => setStep('elsewhere-pick')}
+              onClick={() => {
+                track('onboarding.source.selected', { source: 'elsewhere' })
+                setStep('elsewhere-pick')
+              }}
             />
           </div>
         </div>
@@ -127,13 +149,19 @@ export function OnboardingWizard() {
               icon={<GitHubIcon className="h-6 w-6" />}
               title="Public"
               description="Anyone can see it"
-              onClick={() => setStep('github-public')}
+              onClick={() => {
+                track('onboarding.github.visibility', { visibility: 'public' })
+                setStep('github-public')
+              }}
             />
             <SourceCard
               icon={<GitHubIcon className="h-6 w-6" />}
               title="Private"
               description="Only collaborators can access"
-              onClick={() => setStep('github-private')}
+              onClick={() => {
+                track('onboarding.github.visibility', { visibility: 'private' })
+                setStep('github-private')
+              }}
             />
           </div>
         </div>
@@ -184,7 +212,11 @@ export function OnboardingWizard() {
 
           <div className="mt-8">
             <button
-              onClick={isSignedIn ? () => navigate('/app') : signInWithGitHub}
+              onClick={() => {
+                track('onboarding.signin.clicked', { from: 'github-private', signedIn: isSignedIn })
+                if (isSignedIn) navigate('/app')
+                else signInWithGitHub()
+              }}
               className="flex items-center gap-2 rounded-full bg-earth-dark px-6 py-3 font-medium text-white transition hover:bg-earth"
             >
               <GitHubIcon className="h-5 w-5" />
@@ -212,6 +244,7 @@ export function OnboardingWizard() {
                 title={tool.name}
                 description=""
                 onClick={() => {
+                  track('onboarding.elsewhere.tool', { tool: tool.id })
                   setElsewhereTool(tool.id)
                   setStep('elsewhere-instructions')
                 }}

@@ -20,12 +20,20 @@ const app = new Hono<{ Bindings: Env }>()
 interface AnalyzeRequest {
   segments: Segment[]
   changedHashes: string[]
+  // Optional file context — passed by the editor for telemetry only.
+  // The analyzer doesn't use these; they're logged so we can attribute
+  // analysis activity to a specific repo/file.
+  repoOwner?: string
+  repoName?: string
+  branch?: string
+  filePath?: string
+  roomId?: string
 }
 
 app.post('/', async (c) => {
   const start = Date.now()
   const body = await c.req.json<AnalyzeRequest>()
-  const { segments, changedHashes } = body
+  const { segments, changedHashes, repoOwner, repoName, branch, filePath, roomId } = body
 
   if (!segments || segments.length === 0) {
     return c.json({ issues: [] })
@@ -44,6 +52,10 @@ app.post('/', async (c) => {
     `[analyze] Done: ${issues.length} issues in ${elapsed}ms (${usage.tasks} tasks, ${usage.inputTokens}in/${usage.outputTokens}out tok)`
   )
 
+  // Issue-type breakdown — counts only, no messages (those can echo prompt text).
+  const byType: Record<string, number> = {}
+  for (const issue of issues) byType[issue.type] = (byType[issue.type] ?? 0) + 1
+
   await logAction(c, 'analyze', {
     segmentCount: segments.length,
     changedCount: changedHashes?.length ?? 0,
@@ -51,7 +63,13 @@ app.post('/', async (c) => {
     outputTokens: usage.outputTokens,
     tasks: usage.tasks,
     issueCount: issues.length,
+    issueTypes: byType,
     elapsedMs: elapsed,
+    repoOwner: repoOwner ?? null,
+    repoName: repoName ?? null,
+    branch: branch ?? null,
+    filePath: filePath ?? null,
+    roomId: roomId ?? null,
   })
 
   // Echo usage so eval can price runs without scraping wrangler logs.

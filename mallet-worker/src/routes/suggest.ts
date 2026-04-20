@@ -14,9 +14,17 @@ Return JSON with:
 
 Keep the suggested text as close to the original as possible — only change what is necessary to fix the issue. Preserve the author's intent, style, and voice.`
 
+interface SuggestRequestWithContext extends SuggestRequest {
+  repoOwner?: string
+  repoName?: string
+  branch?: string
+  filePath?: string
+  roomId?: string
+}
+
 app.post('/', async (c) => {
-  const body = await c.req.json<SuggestRequest>()
-  const { segmentText, issueType, fullPrompt, message } = body
+  const body = await c.req.json<SuggestRequestWithContext>()
+  const { segmentText, issueType, fullPrompt, message, repoOwner, repoName, branch, filePath, roomId } = body
 
   if (!segmentText?.trim()) {
     return c.json({ error: 'No segment text provided' }, 400)
@@ -48,6 +56,12 @@ app.post('/', async (c) => {
     await logAction(c, 'suggest', {
       issueType,
       segmentLength: segmentText.length,
+      promptLength: fullPrompt?.length ?? 0,
+      repoOwner: repoOwner ?? null,
+      repoName: repoName ?? null,
+      branch: branch ?? null,
+      filePath: filePath ?? null,
+      roomId: roomId ?? null,
     })
 
     return c.json(suggestion)

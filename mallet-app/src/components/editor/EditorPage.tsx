@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
 import { useSession } from '../../hooks/useSession'
+import { track } from '../../lib/track'
 import { UserMenu } from '../shared/UserMenu'
 import { useGitHubToken } from '../../hooks/useGitHubToken'
 import { PromptEditor, type Peer } from './PromptEditor'
@@ -57,6 +58,11 @@ export function EditorPage() {
   const isGitHub = Boolean(owner && repo && branch)
   const decodedPath = filePath ? decodeURIComponent(filePath) : ''
 
+  const fileContext = useMemo(
+    () => (isGitHub ? { repoOwner: owner, repoName: repo, branch, filePath: decodedPath } : undefined),
+    [isGitHub, owner, repo, branch, decodedPath]
+  )
+
   // GitHub-style line range from the URL fragment (e.g. #L3-L7).
   // Parsed once per location change — re-parsing on every render is cheap
   // but this keeps dependencies in useMemo readable.
@@ -80,8 +86,10 @@ export function EditorPage() {
       setOriginalContent(prompt)
       setSplit(null)
       setLoading(false)
+      track('editor.opened', { kind: 'scratch', docId, hasManualPrompt: Boolean(prompt) })
       return
     }
+    track('editor.opened', { kind: 'github', owner, repo, branch, filePath: decodedPath, hasRange: Boolean(range) })
     fetchFileContent()
     // range is in deps because changing #L1-L8 → #L10-L15 must re-split
     // the content (we freeze before/after at the moment the file loads).
@@ -137,6 +145,7 @@ export function EditorPage() {
     document.execCommand('copy')
     document.body.removeChild(textarea)
     setCopied(true)
+    track('editor.share.copied', { kind: isGitHub ? 'github' : 'scratch', signedIn: isSignedIn, peerCount: peers.length })
     setTimeout(() => setCopied(false), 2000)
   }
 
@@ -211,7 +220,10 @@ export function EditorPage() {
 
           {isGitHub && (
             <button
-              onClick={() => setShowPR(true)}
+              onClick={() => {
+                track('editor.pr.button.clicked', { owner, repo, branch, filePath: decodedPath, signedIn: isSignedIn })
+                setShowPR(true)
+              }}
               disabled={!isDirty}
               className="flex items-center gap-1.5 rounded-lg bg-forest px-3 py-1.5 text-sm font-medium text-white transition hover:bg-forest-light disabled:opacity-50"
             >
@@ -241,6 +253,7 @@ export function EditorPage() {
             onActiveIssueChange={setActiveIssueId}
             onReplaceText={replaceTextRef}
             getToken={getToken}
+            fileContext={fileContext}
           />
         </div>
 
@@ -253,6 +266,7 @@ export function EditorPage() {
             onAcceptSuggestion={handleAcceptSuggestion}
             analyzing={analyzing}
             getToken={getToken}
+            fileContext={fileContext}
           />
         </div>
       </div>
