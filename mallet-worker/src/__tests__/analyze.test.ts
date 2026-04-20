@@ -480,7 +480,10 @@ describe('suggest API', () => {
     expect(text).not.toMatch(/sk-[A-Za-z0-9_-]{20,}/)
   }, 20000)
 
-  it('rejects suggest with no auth (P0 regression)', async () => {
+  it('suggest is anonymous-allowed (no Authorization required)', async () => {
+    // suggest is intentionally public — campaign-link recipients and any
+    // anonymous editor user can request inline fixes without signing in.
+    // Sign-in is only forced on the GitHub-touching routes.
     const res = await fetch(`${WORKER_URL}/api/suggest`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -491,6 +494,6 @@ describe('suggest API', () => {
         message: 'x',
       }),
     })
-    expect(res.status).toBe(401)
+    expect(res.status).not.toBe(401)
   }, 5000)
 })

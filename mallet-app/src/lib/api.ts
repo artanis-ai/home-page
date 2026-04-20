@@ -16,7 +16,8 @@ export const TEST_TOKEN: string | null =
 
 /**
  * fetch() with the session JWT attached as Authorization: Bearer <token>.
- * Pass `getToken` from `useSession()`.
+ * Pass `getToken` from `useSession()`. Throws if no token — use this for
+ * endpoints that require auth (PR creation, GitHub-token-needing ops).
  */
 export async function authedFetch(
   getToken: () => Promise<string | null>,
@@ -27,6 +28,27 @@ export async function authedFetch(
   if (!token) throw new Error('Not authenticated')
   const headers = new Headers(init.headers)
   headers.set('Authorization', `Bearer ${token}`)
+  const mid = getMid()
+  if (mid) headers.set('X-Mid', mid)
+  return fetch(input, { ...init, headers })
+}
+
+/**
+ * fetch() for endpoints that don't require auth (analyze, suggest).
+ * Sign-in is only forced for private-repo / PR-creation flows. If the
+ * user happens to be signed in we still attach the Bearer so the worker
+ * can rate-limit by user; otherwise it falls back to per-IP limits.
+ * X-Mid is always attached when present, so anonymous campaign clicks
+ * still attribute back to the recipient.
+ */
+export async function publicFetch(
+  getToken: () => Promise<string | null>,
+  input: string,
+  init: RequestInit = {}
+): Promise<Response> {
+  const token = TEST_TOKEN ?? (await getToken())
+  const headers = new Headers(init.headers)
+  if (token) headers.set('Authorization', `Bearer ${token}`)
   const mid = getMid()
   if (mid) headers.set('X-Mid', mid)
   return fetch(input, { ...init, headers })

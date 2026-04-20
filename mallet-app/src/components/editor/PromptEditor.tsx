@@ -7,7 +7,7 @@ import * as Y from 'yjs'
 import { WebrtcProvider } from 'y-webrtc'
 import { yCollab } from 'y-codemirror.next'
 import { segmentPrompt, hashSegment } from '../../lib/segmenter'
-import { WORKER_URL, authedFetch } from '../../lib/api'
+import { WORKER_URL, publicFetch } from '../../lib/api'
 import { loadRoom, saveRoom, groupIssuesBySegment, rehydrateIssues } from '../../lib/segment-cache'
 import type { AnalysisIssue } from '../../types'
 
@@ -380,7 +380,7 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
       analyzing = true
       onAnalyzingChangeRef.current(true)
       try {
-        const res = await authedFetch(getToken, `${WORKER_URL}/api/analyze`, {
+        const res = await publicFetch(getToken, `${WORKER_URL}/api/analyze`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ segments: apiSegments, changedHashes }),

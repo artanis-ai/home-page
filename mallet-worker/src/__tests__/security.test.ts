@@ -39,9 +39,11 @@ function probeWebSocket(url: string): Promise<{ opened: boolean; closeCode: numb
   })
 }
 
+// analyze + suggest are intentionally anonymous-allowed (they don't touch
+// GitHub, so signed-out / campaign-link users can use the editor end-to-end).
+// The remaining /api/* routes need a GitHub token via the session, so they
+// must reject unauthenticated calls.
 const ENDPOINTS = [
-  '/api/analyze',
-  '/api/suggest',
   '/api/detect-prompts',
   '/api/create-pr',
   '/api/github-token',
@@ -272,6 +274,28 @@ describe('public endpoints stay public', () => {
     expect(res.status).toBe(200)
     const data = await res.json() as { status: string }
     expect(data.status).toBe('ok')
+  }, 5000)
+
+  // analyze + suggest are deliberately unauthenticated so anonymous users
+  // (and unsigned campaign-link recipients) can use the editor. They must
+  // NOT 401 on a missing Authorization header — anything else (200 with
+  // empty issues, 400 on bad input, 429 rate limited) is acceptable here.
+  it('POST /api/analyze with no auth does NOT 401', async () => {
+    const res = await fetch(`${WORKER_URL}/api/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ segments: [], changedHashes: [] }),
+    })
+    expect(res.status).not.toBe(401)
+  }, 5000)
+
+  it('POST /api/suggest with no auth does NOT 401', async () => {
+    const res = await fetch(`${WORKER_URL}/api/suggest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    })
+    expect(res.status).not.toBe(401)
   }, 5000)
 })
 

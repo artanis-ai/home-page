@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { AlertTriangle, HelpCircle, Lightbulb, ChevronRight, Check, X, Loader2 } from 'lucide-react'
-import { WORKER_URL, authedFetch } from '../../lib/api'
+import { WORKER_URL, publicFetch } from '../../lib/api'
 import type { AnalysisIssue, Suggestion } from '../../types'
 
 const issueIcons: Record<string, typeof AlertTriangle> = {
@@ -58,7 +58,7 @@ export function AnalysisPanel({
     setLoadingSuggestion(true)
     setSuggestion(null)
     try {
-      const res = await authedFetch(getToken, `${WORKER_URL}/api/suggest`, {
+      const res = await publicFetch(getToken, `${WORKER_URL}/api/suggest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -6,11 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <script>
-      // GitHub Pages serves this file with HTTP 404 for any unmatched path.
-      // We use it for one specific redirect: cold-email campaign links shaped
-      // `/mallet/v<n>` get rewritten to `/mallet/?v=<n>` so the SPA's static
-      // index.html serves and its attribution bootstrap can pick up the `v`
-      // param. Other 404s fall through to the simple message below.
+      // SPA fallback for versioned subpaths.
       (function () {
         var path = window.location.pathname || ''
         var m = path.match(/^\/mallet\/v([\d.]+)\/?$/)

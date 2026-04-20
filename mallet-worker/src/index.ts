@@ -67,20 +67,26 @@ app.get('/signaling/:room', async (c) => {
 app.use('/api/public/analyze', rateLimitMiddlewareByIP(10))
 app.route('/api/public/analyze', publicAnalyzeRoute)
 
-// All other /api/* routes require auth. `/api/public/*` is explicitly
-// skipped — Hono runs all path-matching middleware regardless of
-// registration order, so we can't rely on "declared earlier" to exempt
-// the public route; the skip has to be explicit.
+// `/api/analyze` and `/api/suggest` are intentionally unauthenticated —
+// they don't touch GitHub, so anonymous users (and campaign-link clickers
+// who haven't signed in yet) can use the editor end-to-end. Sign-in is
+// only forced on routes that need a GitHub token (PR creation, repo
+// discovery). IP-based rate limits apply since there's no userId.
+app.use('/api/analyze', rateLimitMiddlewareByIP(60))   // ~1/sec, debounce-friendly
+app.use('/api/suggest', rateLimitMiddlewareByIP(30))   // user-initiated clicks
+
+// All other /api/* routes require auth. `/api/public/*`, `/api/analyze`,
+// and `/api/suggest` are explicitly skipped — Hono runs all path-matching
+// middleware regardless of registration order, so we can't rely on
+// "declared earlier" to exempt them; the skip has to be explicit.
 app.use('/api/*', async (c, next) => {
   const path = new URL(c.req.url).pathname
   if (path.startsWith('/api/public/')) return next()
+  if (path === '/api/analyze' || path === '/api/suggest') return next()
   return requireAuth()(c, next)
 })
 
-// Per-route rate limits, applied after auth so the bucket key is per userId.
-// Limits sized for normal interactive use; tightened on the hot, expensive paths.
-app.use('/api/analyze', rateLimitMiddleware(60))      // ~1/sec, debounce-friendly
-app.use('/api/suggest', rateLimitMiddleware(30))      // user-initiated clicks
+// Per-route rate limits for authed routes (bucket key is per userId).
 app.use('/api/detect-prompts', rateLimitMiddleware(20))
 app.use('/api/create-pr', rateLimitMiddleware(10))    // GitHub-side cost too
 app.use('/api/github-token', rateLimitMiddleware(60))
