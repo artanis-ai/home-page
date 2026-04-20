@@ -13,8 +13,11 @@
       // param. Other 404s fall through to the simple message below.
       (function () {
         var path = window.location.pathname || ''
-        var m = path.match(/^\/mallet\/v(\d+)\/?$/)
-        if (m) window.location.replace('/mallet/?v=' + m[1])
+        var m = path.match(/^\/mallet\/v([\d.]+)\/?$/)
+        if (m) {
+          var n = m[1].replace(/\./g, '')
+          if (n) window.location.replace('/mallet/?v=' + n)
+        }
       })()
     </script>
     <style>

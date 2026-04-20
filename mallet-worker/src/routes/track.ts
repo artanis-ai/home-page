@@ -8,7 +8,9 @@ const app = new Hono<{ Bindings: Env }>()
 // `?v=<n>` param is present. Records the first-touch hit; silently
 // reports miss for unknown slugs so probes can't enumerate the list.
 app.post('/:n', async (c) => {
-  const n = c.req.param('n')
+  // Dots are cosmetic — the SPA already strips them, but accept and
+  // normalize here too so direct worker hits (or future variants) work.
+  const n = c.req.param('n').replace(/\./g, '')
   if (!/^\d+$/.test(n)) return c.json({ ok: false }, 200)
 
   const entry = await c.env.INVITES.get<InviteEntry>(`v:${n}`, 'json')

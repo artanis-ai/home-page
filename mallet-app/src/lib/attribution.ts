@@ -30,8 +30,12 @@ export async function captureAttribution(): Promise<void> {
   if (typeof window === 'undefined') return
 
   const params = new URLSearchParams(window.location.search)
-  const n = params.get('v')
-  if (!n || !/^\d+$/.test(n)) return
+  const raw = params.get('v')
+  if (!raw) return
+  // Dots are cosmetic (e.g. `v1.2.3` disguises the digit count) — strip
+  // them before validating. The slug space is just positive integers.
+  const n = raw.replace(/\./g, '')
+  if (!/^\d+$/.test(n)) return
 
   // Clean URL immediately so the `?v=` is only visible for the split
   // second between the 404 redirect and this line.
