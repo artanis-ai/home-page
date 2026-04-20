@@ -33,7 +33,7 @@ app.use(
       return 'https://artanis.ai'
     },
     allowMethods: ['GET', 'POST', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization', 'Upgrade', 'Connection'],
+    allowHeaders: ['Content-Type', 'Authorization', 'Upgrade', 'Connection', 'X-Mid'],
   })
 )
 
