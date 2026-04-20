@@ -1,26 +1,21 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
-import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-react'
 import { router } from './router'
+import { ingestSessionFromHash } from './hooks/useSession'
+import { captureAttribution } from './lib/attribution'
 import './index.css'
 
-const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+// Pull the session JWT out of the OAuth callback URL fragment BEFORE
+// React mounts so the first render already reflects the signed-in state.
+ingestSessionFromHash()
 
-if (!CLERK_PUBLISHABLE_KEY) {
-  throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY environment variable')
-}
+// Fire-and-forget: if this pageload came from a campaign link (?v=<n>),
+// persist the mid in localStorage and log the click server-side.
+void captureAttribution()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ClerkProvider
-      publishableKey={CLERK_PUBLISHABLE_KEY}
-      signInFallbackRedirectUrl="/mallet/#/app"
-      signUpFallbackRedirectUrl="/mallet/#/app"
-    >
-      <ClerkLoaded>
-        <RouterProvider router={router} />
-      </ClerkLoaded>
-    </ClerkProvider>
+    <RouterProvider router={router} />
   </StrictMode>,
 )

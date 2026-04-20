@@ -1,9 +1,11 @@
 export interface Env {
   OPENAI_API_KEY: string
-  CLERK_SECRET_KEY: string
-  CLERK_ISSUER_URL: string
+  GITHUB_CLIENT_ID: string
+  GITHUB_CLIENT_SECRET: string
+  SESSION_SECRET: string
   ENVIRONMENT: string
   LOGS: KVNamespace
+  INVITES: KVNamespace
   SIGNALING_ROOM: DurableObjectNamespace
 }
 

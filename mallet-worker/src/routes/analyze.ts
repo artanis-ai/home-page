@@ -44,7 +44,7 @@ app.post('/', async (c) => {
     `[analyze] Done: ${issues.length} issues in ${elapsed}ms (${usage.tasks} tasks, ${usage.inputTokens}in/${usage.outputTokens}out tok)`
   )
 
-  await logAction(c.env, 'analyze', {
+  await logAction(c, 'analyze', {
     segmentCount: segments.length,
     changedCount: changedHashes?.length ?? 0,
     inputTokens: usage.inputTokens,

@@ -3,18 +3,21 @@ main = "src/index.ts"
 compatibility_date = "2024-12-01"
 
 # Default (development) environment.
-# Secrets must be set via `wrangler secret put`:
+# Secrets must be set via `wrangler secret put` (or in .dev.vars for dev):
 #   - OPENAI_API_KEY
-#   - CLERK_SECRET_KEY
+#   - GITHUB_CLIENT_ID
+#   - GITHUB_CLIENT_SECRET
+#   - SESSION_SECRET (any long random string; used to sign session JWTs)
 [vars]
 ENVIRONMENT = "development"
-# Update this to your dev Clerk Frontend API URL (no trailing slash).
-# Find it at https://dashboard.clerk.com → API Keys → "Frontend API URL".
-CLERK_ISSUER_URL = "https://distinct-gannet-86.clerk.accounts.dev"
 
 [[kv_namespaces]]
 binding = "LOGS"
 id = "b392b1982cfb4a779ab30e16bef4a25a"
+
+[[kv_namespaces]]
+binding = "INVITES"
+id = "c07e960ae5d64528a6e220b18c736ec4"
 
 [[durable_objects.bindings]]
 name = "SIGNALING_ROOM"
@@ -27,17 +30,22 @@ new_sqlite_classes = ["SignalingRoom"]
 # Production environment.
 # Set secrets with:
 #   wrangler secret put OPENAI_API_KEY --env production
-#   wrangler secret put CLERK_SECRET_KEY --env production
+#   wrangler secret put GITHUB_CLIENT_ID --env production
+#   wrangler secret put GITHUB_CLIENT_SECRET --env production
+#   wrangler secret put SESSION_SECRET --env production
 [env.production]
 name = "mallet-api"
 
 [env.production.vars]
 ENVIRONMENT = "production"
-CLERK_ISSUER_URL = "https://clerk.artanis.ai"
 
 [[env.production.kv_namespaces]]
 binding = "LOGS"
 id = "b392b1982cfb4a779ab30e16bef4a25a"
+
+[[env.production.kv_namespaces]]
+binding = "INVITES"
+id = "5a2f239517a14fe2a76442fb6e0b0f00"
 
 [[env.production.durable_objects.bindings]]
 name = "SIGNALING_ROOM"

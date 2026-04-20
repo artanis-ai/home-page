@@ -45,7 +45,7 @@ app.post('/', async (c) => {
 
     const suggestion = JSON.parse(content)
 
-    await logAction(c.env, 'suggest', {
+    await logAction(c, 'suggest', {
       issueType,
       segmentLength: segmentText.length,
     })

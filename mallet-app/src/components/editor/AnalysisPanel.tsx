@@ -28,7 +28,7 @@ interface AnalysisPanelProps {
   onIssueClick: (id: string | null) => void
   onAcceptSuggestion: (range: [number, number], replacement: string) => void
   analyzing?: boolean
-  /** Returns a Clerk session JWT for the /api/suggest call. */
+  /** Returns the session JWT for the /api/suggest call. */
   getToken: () => Promise<string | null>
 }
 

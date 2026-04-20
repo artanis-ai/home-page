@@ -9,6 +9,8 @@ import suggestRoute from './routes/suggest'
 import detectPromptsRoute from './routes/detect-prompts'
 import createPRRoute from './routes/create-pr'
 import githubTokenRoute from './routes/github-token'
+import oauthRoute from './routes/oauth'
+import trackRoute from './routes/track'
 
 export { SignalingRoom } from './signaling'
 
@@ -39,6 +41,14 @@ app.use(
 app.get('/', (c) => {
   return c.json({ status: 'ok', service: 'mallet-api' })
 })
+
+// GitHub OAuth — unauthenticated start/callback pair. Must come before
+// the wildcard auth middleware below.
+app.route('/auth/github', oauthRoute)
+
+// Campaign-link first-touch attribution. Unauthenticated — recipients
+// haven't signed in yet when they click an email link.
+app.route('/t', trackRoute)
 
 // WebSocket signaling endpoint for y-webrtc.
 // Auth is enforced inside the Durable Object (it needs the session token in

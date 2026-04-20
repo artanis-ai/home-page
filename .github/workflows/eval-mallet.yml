@@ -41,11 +41,12 @@ jobs:
 
       - name: Write .dev.vars from secrets
         # The eval bootstraps OPENAI_API_KEY from .dev.vars if not in env;
-        # we set both so wrangler dev (background) and the test runner agree.
+        # we set it here so wrangler dev (background) and the test runner agree.
+        # SESSION_SECRET is only used by the OAuth + session routes, which the
+        # eval suite doesn't hit, so we stub it with a fixed value.
         working-directory: mallet-worker
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
         run: |
           if [ -z "$OPENAI_API_KEY" ]; then
             echo "::error::OPENAI_API_KEY secret missing — eval cannot run"
@@ -53,7 +54,7 @@ jobs:
           fi
           {
             echo "OPENAI_API_KEY=\"$OPENAI_API_KEY\""
-            echo "CLERK_SECRET_KEY=\"$CLERK_SECRET_KEY\""
+            echo "SESSION_SECRET=\"ci-eval-secret-unused\""
           } > .dev.vars
 
       - name: Start wrangler dev

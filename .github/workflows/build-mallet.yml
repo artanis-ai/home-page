@@ -61,9 +61,6 @@ jobs:
         working-directory: mallet-app
         env:
           # Production env vars used at build time. Add these as repo secrets.
-          # If a secret is missing, the build still succeeds (the SPA reads
-          # them at runtime and falls back), but features tied to it break.
-          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           VITE_WORKER_URL: ${{ secrets.VITE_WORKER_URL }}
         run: npm run build
 

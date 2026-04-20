@@ -109,7 +109,7 @@ interface PromptEditorProps {
   activeIssueId: string | null
   onActiveIssueChange: (id: string | null) => void
   onReplaceText: React.MutableRefObject<((from: number, to: number, text: string) => void) | null>
-  /** Returns a fresh Clerk session JWT for HTTP API calls (analyze/suggest only). */
+  /** Returns the session JWT for HTTP API calls (analyze/suggest only). */
   getToken: () => Promise<string | null>
 }
 

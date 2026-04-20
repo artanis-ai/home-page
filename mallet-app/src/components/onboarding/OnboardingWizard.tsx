@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, MoreHorizontal, FileText, Brain, ExternalLink } from 'lucide-react'
-import { useUser } from '@clerk/clerk-react'
-import { useGitHubSignIn } from '../../hooks/useGitHubSignIn'
+import { useSession } from '../../hooks/useSession'
 import {
   GitHubIcon,
   LangfuseIcon,
@@ -24,8 +23,10 @@ const ELSEWHERE_TOOLS: { id: ElsewhereTool; name: string; icon: React.ReactNode;
 
 export function OnboardingWizard() {
   const navigate = useNavigate()
-  const signInWithGitHub = useGitHubSignIn()
-  const { isSignedIn } = useUser()
+  const { isSignedIn, signIn } = useSession()
+  // After sign-in, land the user on /app (the signed-in landing).
+  const signInWithGitHub = () =>
+    signIn(`${window.location.origin}/mallet/#/app`)
 
   const [step, setStep] = useState<Step>('source')
   const [elsewhereTool, setElsewhereTool] = useState<ElsewhereTool | null>(null)

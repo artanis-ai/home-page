@@ -5,7 +5,6 @@ import { AppLayout } from './components/shared/AppLayout'
 import { RepoConnector } from './components/repo/RepoConnector'
 import { PromptDiscovery } from './components/repo/PromptDiscovery'
 import { EditorPage } from './components/editor/EditorPage'
-import { SSOCallback } from './components/shared/SSOCallback'
 
 export const router = createHashRouter([
   {
@@ -15,10 +14,6 @@ export const router = createHashRouter([
   {
     path: '/start',
     element: <OnboardingWizard />,
-  },
-  {
-    path: '/sso-callback',
-    element: <SSOCallback />,
   },
   {
     // Scratch document — /d/:uuid

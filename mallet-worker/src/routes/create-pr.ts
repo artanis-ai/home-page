@@ -108,7 +108,7 @@ app.post('/', async (c) => {
       }
     ) as { html_url: string; number: number }
 
-    await logAction(c.env, 'create-pr', {
+    await logAction(c, 'create-pr', {
       repoOwner,
       repoName,
       filePath,

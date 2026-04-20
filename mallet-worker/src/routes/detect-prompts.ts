@@ -129,7 +129,7 @@ app.post('/', async (c) => {
 
     const result = JSON.parse(content)
 
-    await logAction(c.env, 'detect-prompts', {
+    await logAction(c, 'detect-prompts', {
       repoOwner,
       repoName,
       totalFiles: codeFiles.length,

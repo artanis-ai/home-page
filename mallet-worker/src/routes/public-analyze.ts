@@ -81,7 +81,7 @@ app.post('/', async (c) => {
   // Telemetry only — NO prompt text, NO issue messages. Keep this in
   // sync with the "we don't store prompts" promise on the landing page
   // and in SKILL.md. If you ever add text to this payload, update both.
-  await logAction(c.env, 'public-analyze', {
+  await logAction(c, 'public-analyze', {
     promptChars: prompt.length,
     segmentCount: segments.length,
     inputTokens: usage.inputTokens,

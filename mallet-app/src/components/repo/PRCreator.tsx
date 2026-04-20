@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useAuth } from '@clerk/clerk-react'
 import { X, ExternalLink, Loader2, GitPullRequest, Check } from 'lucide-react'
+import { useSession } from '../../hooks/useSession'
 import { WORKER_URL, authedFetch } from '../../lib/api'
 
 interface PRCreatorProps {
@@ -12,7 +12,7 @@ interface PRCreatorProps {
 }
 
 export function PRCreator({ owner, repo, filePath, content, onClose }: PRCreatorProps) {
-  const { getToken } = useAuth()
+  const { getToken } = useSession()
   const [title, setTitle] = useState(`Improve prompt: ${filePath}`)
   const [description, setDescription] = useState('Prompt improvements suggested by Mallet, the free and secure prompt editor by Artanis AI.')
   const [creating, setCreating] = useState(false)

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Not found — Artanis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <script>
+      // GitHub Pages serves this file with HTTP 404 for any unmatched path.
+      // We use it for one specific redirect: cold-email campaign links shaped
+      // `/mallet/v<n>` get rewritten to `/mallet/?v=<n>` so the SPA's static
+      // index.html serves and its attribution bootstrap can pick up the `v`
+      // param. Other 404s fall through to the simple message below.
+      (function () {
+        var path = window.location.pathname || ''
+        var m = path.match(/^\/mallet\/v(\d+)\/?$/)
+        if (m) window.location.replace('/mallet/?v=' + m[1])
+      })()
+    </script>
+    <style>
+      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 32rem; margin: 6rem auto; padding: 0 1.5rem; color: #111827; }
+      a { color: #2563eb; }
+      h1 { font-size: 1.5rem; margin: 0 0 0.5rem; }
+      p { color: #4b5563; margin: 0 0 1.5rem; line-height: 1.6; }
+    </style>
+  </head>
+  <body>
+    <h1>Page not found</h1>
+    <p>That page doesn't exist. <a href="/">Go to artanis.ai</a>.</p>
+  </body>
+</html>

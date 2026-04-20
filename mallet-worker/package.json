@@ -8,7 +8,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "eval": "vitest run --config vitest.config.eval.ts"
+    "eval": "vitest run --config vitest.config.eval.ts",
+    "seed-invites": "tsx scripts/seed-invites.ts"
   },
   "dependencies": {
     "hono": "^4.7.0",
@@ -18,6 +19,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250410.0",
     "@types/ws": "^8.18.1",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.0",
     "vitest": "^4.1.4",
     "wrangler": "^4.14.0",

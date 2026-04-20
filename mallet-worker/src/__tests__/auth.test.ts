@@ -1,53 +1,84 @@
 import { describe, it, expect } from 'vitest'
-import { verifyClerkJWT } from '../lib/auth'
+import { SignJWT } from 'jose'
+import { verifySessionJWT } from '../lib/auth'
 import type { Env } from '../types'
+
+const SECRET = 'test-secret-please-ignore-32-bytes-min'
 
 const baseEnv: Env = {
   OPENAI_API_KEY: 'sk-test',
-  CLERK_SECRET_KEY: 'sk_test',
-  CLERK_ISSUER_URL: 'https://example.clerk.accounts.dev',
+  GITHUB_CLIENT_ID: 'test_client_id',
+  GITHUB_CLIENT_SECRET: 'test_client_secret',
+  SESSION_SECRET: SECRET,
   ENVIRONMENT: 'development',
   LOGS: {} as KVNamespace,
+  INVITES: {} as KVNamespace,
   SIGNALING_ROOM: {} as DurableObjectNamespace,
 }
 
-describe('verifyClerkJWT', () => {
+function key(): Uint8Array {
+  return new TextEncoder().encode(SECRET)
+}
+
+describe('verifySessionJWT', () => {
   it('accepts dev test_<userId> token in development', async () => {
-    const session = await verifyClerkJWT(baseEnv, 'test_alice')
+    const session = await verifySessionJWT(baseEnv, 'test_alice')
     expect(session.userId).toBe('alice')
     expect(session.isTest).toBe(true)
+    expect(session.githubToken).toBeTruthy()
   })
 
   it('rejects empty token', async () => {
-    await expect(verifyClerkJWT(baseEnv, '')).rejects.toThrow()
+    await expect(verifySessionJWT(baseEnv, '')).rejects.toThrow()
   })
 
   it('rejects empty test_ payload', async () => {
-    await expect(verifyClerkJWT(baseEnv, 'test_')).rejects.toThrow()
+    await expect(verifySessionJWT(baseEnv, 'test_')).rejects.toThrow()
   })
 
   it('NEVER accepts test_ tokens in production', async () => {
     const prodEnv = { ...baseEnv, ENVIRONMENT: 'production' }
-    // In production, "test_alice" is treated as a real JWT and JWKS verify
-    // will throw (it isn't a valid JWS at all).
-    await expect(verifyClerkJWT(prodEnv, 'test_alice')).rejects.toThrow()
+    await expect(verifySessionJWT(prodEnv, 'test_alice')).rejects.toThrow()
   })
 
-  it('rejects forged JWT-shaped tokens (atob-only payloads)', async () => {
-    // Construct a JWT-looking string with a valid base64 payload but no
-    // signature verification possible. Must not be accepted.
+  it('accepts a session JWT signed with SESSION_SECRET', async () => {
+    const jwt = await new SignJWT({ gh_token: 'gho_xyz' })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setSubject('42')
+      .setIssuedAt()
+      .setExpirationTime('1h')
+      .sign(key())
+    const session = await verifySessionJWT(baseEnv, jwt)
+    expect(session.userId).toBe('42')
+    expect(session.isTest).toBe(false)
+    expect(session.githubToken).toBe('gho_xyz')
+  })
+
+  it('rejects a JWT signed with the wrong secret', async () => {
+    const wrongKey = new TextEncoder().encode('not-the-server-secret')
+    const jwt = await new SignJWT({ gh_token: 'gho_xyz' })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setSubject('42')
+      .setIssuedAt()
+      .setExpirationTime('1h')
+      .sign(wrongKey)
+    await expect(verifySessionJWT(baseEnv, jwt)).rejects.toThrow()
+  })
+
+  it('rejects a JWT with alg=none', async () => {
     const header = btoa(JSON.stringify({ alg: 'none', typ: 'JWT' }))
-    const payload = btoa(JSON.stringify({ sub: 'attacker', iss: baseEnv.CLERK_ISSUER_URL }))
+    const payload = btoa(JSON.stringify({ sub: 'attacker' }))
     const forged = `${header}.${payload}.`
-    const prodEnv = { ...baseEnv, ENVIRONMENT: 'production' }
-    await expect(verifyClerkJWT(prodEnv, forged)).rejects.toThrow()
+    await expect(verifySessionJWT(baseEnv, forged)).rejects.toThrow()
   })
 
-  it('rejects tokens issued by an unexpected issuer', async () => {
-    // Even a real-looking JWT with sub but wrong issuer must fail.
-    // We can't construct a signed JWT here, but we can verify the issuer
-    // claim is enforced by jwtVerify (test serves as a regression guard).
-    const prodEnv = { ...baseEnv, ENVIRONMENT: 'production' }
-    await expect(verifyClerkJWT(prodEnv, 'a.b.c')).rejects.toThrow()
+  it('rejects expired tokens', async () => {
+    const jwt = await new SignJWT({ gh_token: 'gho_xyz' })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setSubject('42')
+      .setIssuedAt(Math.floor(Date.now() / 1000) - 7200)
+      .setExpirationTime(Math.floor(Date.now() / 1000) - 3600)
+      .sign(key())
+    await expect(verifySessionJWT(baseEnv, jwt)).rejects.toThrow()
   })
 })

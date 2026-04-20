@@ -1,28 +1,13 @@
-import { useSignIn } from '@clerk/clerk-react'
-import { useCallback } from 'react'
+import { useSession } from './useSession'
 
 /**
- * Kicks off the GitHub OAuth flow via Clerk, bypassing Clerk's hosted
- * sign-in page entirely. The browser goes:
- *   Mallet → GitHub OAuth consent → Clerk's `/sso-callback` handler → /app
+ * Kicks off the raw GitHub OAuth flow via our own worker:
+ *   Mallet → /auth/github/start → GitHub OAuth → /auth/github/callback → return_to
  *
- * We use `authenticateWithRedirect({ strategy: 'oauth_github', ... })`
- * rather than `clerk.redirectToSignIn()` because the latter renders
- * accounts.dev/sign-in with email + multiple providers; users told us
- * they want "sign in with GitHub" to feel like pure GitHub OAuth.
+ * We previously delegated this to Clerk, but Clerk's cookie collided with
+ * Artanis AI's main-product auth on the shared apex domain.
  */
 export function useGitHubSignIn() {
-  const { signIn, isLoaded } = useSignIn()
-
-  return useCallback(() => {
-    if (!isLoaded || !signIn) return
-
-    // Hash router — callback + complete URLs both live in the hash.
-    const base = window.location.origin + '/mallet/'
-    signIn.authenticateWithRedirect({
-      strategy: 'oauth_github',
-      redirectUrl: base + '#/sso-callback',
-      redirectUrlComplete: base + '#/app',
-    })
-  }, [signIn, isLoaded])
+  const { signIn } = useSession()
+  return signIn
 }

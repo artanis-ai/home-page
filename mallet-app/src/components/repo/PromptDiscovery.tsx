@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useAuth } from '@clerk/clerk-react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useSession } from '../../hooks/useSession'
 import { FileText, Search, Loader2, Bot, PenLine, Check } from 'lucide-react'
 import { useGitHubToken } from '../../hooks/useGitHubToken'
 import { WORKER_URL, authedFetch } from '../../lib/api'
@@ -17,7 +17,7 @@ type DiscoveryStep = 'scanning' | 'select' | 'agent' | 'manual'
 
 export function PromptDiscovery() {
   const { owner, repo } = useParams<{ owner: string; repo: string }>()
-  const { getToken } = useAuth()
+  const { getToken } = useSession()
   const getGitHubToken = useGitHubToken()
   const navigate = useNavigate()
 

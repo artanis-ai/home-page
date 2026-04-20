@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
-import { useUser, useAuth, UserButton, SignedIn } from '@clerk/clerk-react'
+import { useSession } from '../../hooks/useSession'
+import { UserMenu } from '../shared/UserMenu'
 import { useGitHubToken } from '../../hooks/useGitHubToken'
 import { PromptEditor, type Peer } from './PromptEditor'
 import { AnalysisPanel } from './AnalysisPanel'
@@ -18,8 +19,7 @@ import {
 export function EditorPage() {
   const { owner, repo, branch, '*': filePath, docId } = useParams()
   const location = useLocation()
-  const { user } = useUser()
-  const { getToken } = useAuth()
+  const { isSignedIn, user, getToken } = useSession()
   const getGitHubToken = useGitHubToken()
 
   // `content` is always what the editor sees.
@@ -220,9 +220,7 @@ export function EditorPage() {
             </button>
           )}
 
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
+          {isSignedIn && <UserMenu />}
         </div>
       </div>
 
@@ -237,8 +235,8 @@ export function EditorPage() {
             onPeersChange={setPeers}
             onAnalyzingChange={setAnalyzing}
             roomId={roomId}
-            userName={user?.fullName || user?.username || undefined}
-            userImageUrl={user?.imageUrl || undefined}
+            userName={user?.name || user?.login || undefined}
+            userImageUrl={user?.avatar || undefined}
             activeIssueId={activeIssueId}
             onActiveIssueChange={setActiveIssueId}
             onReplaceText={replaceTextRef}
