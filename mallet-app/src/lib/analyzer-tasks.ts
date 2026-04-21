@@ -69,15 +69,17 @@ export function scoreTask(task: AnalyzerTask, cursor: number, segByHash: Map<str
 
 /**
  * Sort tasks by ascending priority (cursor-proximity first) and chunk into
- * batches of at most `batchSize`. The worker caps out at 1000 subrequests
- * per invocation — we leave headroom for logging/OpenAI/etc., so default
- * to 400.
+ * batches of at most `batchSize`. We used to batch at 400 (well under CF's
+ * 1000-subrequest cap) but production pastes of ~110 segments still tripped
+ * CF's per-isolate CPU/memory limit, returning edge errors without our
+ * cors() headers. Dropping to 100 keeps each invocation lean; the client
+ * concurrency pool is what actually controls total throughput.
  */
 export function prioritizeAndBatch(
   tasks: AnalyzerTask[],
   cursor: number,
   segments: TaskSegment[],
-  batchSize = 400,
+  batchSize = 100,
 ): AnalyzerTask[][] {
   const segByHash = new Map(segments.map(s => [s.hash, s]))
   const sorted = [...tasks].sort((a, b) =>

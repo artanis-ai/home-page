@@ -442,7 +442,20 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
       }
 
       try {
-        await Promise.allSettled(batches.map(runBatch))
+        // Bounded concurrency — firing all batches at once swamps the browser's
+        // HTTP/2 stream pool and, worse, spawns N concurrent worker isolates
+        // that all hammer OpenAI simultaneously. A handful at a time respects
+        // the server-side rate limit and keeps the priority ordering meaningful
+        // (near-cursor batches finish and render before far-away ones start).
+        const CONCURRENCY = 4
+        let idx = 0
+        const workers = Array.from({ length: Math.min(CONCURRENCY, batches.length) }, async () => {
+          while (idx < batches.length) {
+            const i = idx++
+            await runBatch(batches[i])
+          }
+        })
+        await Promise.all(workers)
 
         prevSegmentHashes = newHashes
         cachedIssuesByHash = groupIssuesBySegment(currentIssues, apiSegments)

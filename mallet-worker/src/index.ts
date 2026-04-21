@@ -90,7 +90,10 @@ app.route('/api/public/analyze', publicAnalyzeRoute)
 // who haven't signed in yet) can use the editor end-to-end. Sign-in is
 // only forced on routes that need a GitHub token (PR creation, repo
 // discovery). IP-based rate limits apply since there's no userId.
-app.use('/api/analyze', rateLimitMiddlewareByIP(60))   // ~1/sec, debounce-friendly
+// /api/analyze is the fan-out point for client-side batching — a single
+// paste of ~100 segments can fire 50+ small requests. 180/min = 3/sec keeps
+// the batched flow comfortable while still bounding cost per IP.
+app.use('/api/analyze', rateLimitMiddlewareByIP(180))
 app.use('/api/suggest', rateLimitMiddlewareByIP(30))   // user-initiated clicks
 
 // Prompt detection works for anon users on public repos (no GitHub token
@@ -134,4 +137,39 @@ const otelConfig: ResolveConfigFn = (env: Env) => ({
   service: { name: 'mallet-api' },
 })
 
-export default instrument(app as unknown as ExportedHandler<Env>, otelConfig)
+const instrumented = instrument(app as unknown as ExportedHandler<Env>, otelConfig)
+
+// Top-level CORS guardrail. Hono's cors() middleware + onError normally
+// catch every error path, but OTel's instrument() wraps the whole handler
+// — if instrument() itself (span creation, exporter buffering, etc.) or
+// a truly exceptional runtime error throws, the response never flows
+// through cors() and the browser sees "No 'Access-Control-Allow-Origin'".
+// This wrapper catches any such escape and returns a CORS-headered 500
+// so the client can report a real error instead of `TypeError: Failed to fetch`.
+// (CF-edge errors — CPU limit, isolate kill — bypass this too; only the
+// Worker-level fix of keeping each batch small enough protects that path.)
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return await instrumented.fetch!(request as any, env, ctx)
+    } catch (err) {
+      console.error('[worker] top-level failure:', err)
+      const origin = request.headers.get('origin') ?? ''
+      const allowOrigin =
+        origin === 'https://artanis.ai' ||
+        origin.endsWith('.artanis.ai') ||
+        origin.startsWith('http://localhost:')
+          ? origin
+          : 'https://artanis.ai'
+      return new Response(JSON.stringify({ error: 'Internal server error' }), {
+        status: 500,
+        headers: {
+          'content-type': 'application/json',
+          'access-control-allow-origin': allowOrigin,
+          'vary': 'origin',
+        },
+      })
+    }
+  },
+} satisfies ExportedHandler<Env>
