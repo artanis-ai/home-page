@@ -317,3 +317,24 @@ describe('zero-leak guarantee', () => {
     expect(text).not.toContain(secretPrompt)
   }, 5000)
 })
+
+// Regression: an uncaught route exception used to bypass Hono's cors()
+// middleware — the browser would then report the 500 as "No CORS header"
+// and mask the real failure. The error boundary now sits inside cors() so
+// 5xxs carry the same Access-Control-Allow-Origin as any 2xx/4xx would.
+describe('CORS survives server errors', () => {
+  it('returns Access-Control-Allow-Origin on a 500 response', async () => {
+    const res = await fetch(`${WORKER_URL}/api/analyze`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: 'https://artanis.ai',
+      },
+      // Non-JSON body → c.req.json() throws → analyze has no try/catch →
+      // without the error boundary this is a bare 500 with no CORS.
+      body: 'not-json-at-all',
+    })
+    expect(res.status).toBeGreaterThanOrEqual(400)
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://artanis.ai')
+  }, 5000)
+})

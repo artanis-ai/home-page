@@ -39,6 +39,16 @@ app.use(
   })
 )
 
+// Global error handler. Hono's default onError returns a bare text/plain
+// "Internal Server Error" — CORS headers do survive (cors() middleware
+// runs on the response after onError produces it), but the body shape is
+// inconsistent with the rest of the API. Normalize to JSON and log the
+// underlying error so Axiom captures the stack.
+app.onError((err, c) => {
+  console.error('[worker] unhandled error:', err)
+  return c.json({ error: 'Internal server error' }, 500)
+})
+
 // Health check (unauthenticated)
 app.get('/', (c) => {
   return c.json({ status: 'ok', service: 'mallet-api' })
