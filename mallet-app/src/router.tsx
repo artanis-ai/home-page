@@ -1,5 +1,6 @@
 import { createHashRouter } from 'react-router-dom'
 import { LandingPage } from './components/landing/LandingPage'
+import { ShareCard } from './components/landing/ShareCard'
 import { OnboardingWizard } from './components/onboarding/OnboardingWizard'
 import { AppLayout } from './components/shared/AppLayout'
 import { RepoConnector } from './components/repo/RepoConnector'
@@ -10,6 +11,12 @@ export const router = createHashRouter([
   {
     path: '/',
     element: <LandingPage />,
+  },
+  {
+    // 1200×630 card rendered for the screenshot tool that produces
+    // img/mallet-og.png (the OG / Twitter / LinkedIn preview image).
+    path: '/share',
+    element: <ShareCard />,
   },
   {
     path: '/start',
