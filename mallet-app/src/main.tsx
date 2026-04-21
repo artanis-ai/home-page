@@ -5,7 +5,7 @@ import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
 import { router } from './router'
 import { ingestSessionFromHash } from './hooks/useSession'
-import { captureAttribution } from './lib/attribution'
+import { captureAttribution, getMid } from './lib/attribution'
 import './index.css'
 
 // Pull the session JWT out of the OAuth callback URL fragment BEFORE
@@ -13,8 +13,14 @@ import './index.css'
 ingestSessionFromHash()
 
 // Fire-and-forget: if this pageload came from a campaign link (?v=<n>),
-// persist the mid in localStorage and log the click server-side.
-void captureAttribution()
+// persist the mid in localStorage and log the click server-side. Once
+// it settles, register mid as a PostHog super-property so both events
+// and session recordings carry it — including the first-touch pageload
+// where localStorage wasn't yet populated when posthog.init ran.
+void captureAttribution().then(() => {
+  const mid = getMid()
+  if (mid) posthog.register({ mid })
+})
 
 // PostHog — product analytics + session replay. Masking and recording
 // enablement are configured project-side on the PostHog dashboard, so
@@ -29,6 +35,11 @@ posthog.init(
     defaults: '2026-01-30',
   }
 )
+
+// Register mid for repeat visitors (already in localStorage). First-touch
+// campaign clicks are handled in the captureAttribution().then above.
+const existingMid = getMid()
+if (existingMid) posthog.register({ mid: existingMid })
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
