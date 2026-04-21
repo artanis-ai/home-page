@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, ExternalLink, Loader2, GitPullRequest, Check } from 'lucide-react'
+import { X, ExternalLink, Loader2, GitPullRequest, Check, Sparkles } from 'lucide-react'
 import { useSession } from '../../hooks/useSession'
 import { WORKER_URL, authedFetch } from '../../lib/api'
 import { track } from '../../lib/track'
@@ -15,10 +15,36 @@ interface PRCreatorProps {
 export function PRCreator({ owner, repo, filePath, content, onClose }: PRCreatorProps) {
   const { getToken } = useSession()
   const [title, setTitle] = useState(`Improve prompt: ${filePath}`)
-  const [description, setDescription] = useState('Prompt improvements suggested by Mallet, the free and secure prompt editor by Artanis AI.')
+  const [description, setDescription] = useState('')
   const [creating, setCreating] = useState(false)
+  const [generating, setGenerating] = useState(false)
   const [prUrl, setPrUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  async function handleGenerate() {
+    setGenerating(true)
+    setError(null)
+    try {
+      const res = await authedFetch(getToken, `${WORKER_URL}/api/generate-pr-description`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repoOwner: owner, repoName: repo, filePath, content }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Failed to generate description')
+      }
+      const data = await res.json()
+      setDescription(data.description ?? '')
+      track('pr.description.generated', { owner, repo, filePath, length: (data.description ?? '').length })
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to generate description'
+      track('pr.description.failed', { owner, repo, filePath, error: msg.slice(0, 200) })
+      setError(msg)
+    } finally {
+      setGenerating(false)
+    }
+  }
 
   async function handleCreate() {
     setCreating(true)
@@ -34,6 +60,7 @@ export function PRCreator({ owner, repo, filePath, content, onClose }: PRCreator
           filePath,
           content,
           commitMessage: title,
+          description,
         }),
       })
 
@@ -92,11 +119,28 @@ export function PRCreator({ owner, repo, filePath, content, onClose }: PRCreator
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-text-mid">Description</label>
+                <div className="mb-1 flex items-center justify-between">
+                  <label className="block text-sm font-medium text-text-mid">Description</label>
+                  <button
+                    type="button"
+                    onClick={handleGenerate}
+                    disabled={generating || creating}
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-warm px-3 py-1 text-xs font-medium text-text-mid transition hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                    title="Generate a PR description from the diff"
+                  >
+                    {generating ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    {generating ? 'Generating…' : 'Generate'}
+                  </button>
+                </div>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
+                  rows={6}
+                  placeholder="Describe what changed and why. Or click Generate."
                   className="w-full rounded-lg border border-warm px-3 py-2 text-sm text-earth-dark focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>

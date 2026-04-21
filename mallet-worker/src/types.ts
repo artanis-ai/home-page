@@ -38,6 +38,14 @@ export interface CreatePRRequest {
   filePath: string
   content: string
   commitMessage: string
+  description?: string
+}
+
+export interface GeneratePRDescriptionRequest {
+  repoOwner: string
+  repoName: string
+  filePath: string
+  content: string
 }
 
 export interface AnalysisIssue {

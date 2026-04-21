@@ -31,7 +31,7 @@ async function githubAPI(
 
 app.post('/', async (c) => {
   const body = await c.req.json<CreatePRRequest>()
-  const { repoOwner, repoName, filePath, content, commitMessage } = body
+  const { repoOwner, repoName, filePath, content, commitMessage, description } = body
   const accessToken = c.get('githubToken')
 
   if (!repoOwner || !repoName || !filePath || !content) {
@@ -103,7 +103,7 @@ app.post('/', async (c) => {
           title: commitMessage || `Improve prompt: ${filePath}`,
           head: branchName,
           base: defaultBranch,
-          body: `## Prompt improvements\n\nThis PR was created by [Mallet](https://artanis.ai/mallet) — a free & secure collaborative prompt editor by Artanis AI.\n\nChanges made to \`${filePath}\` based on static analysis and AI-powered suggestions.\n\n---\n*Prompts were never stored. All analysis was ephemeral.*`,
+          body: `${(description ?? '').trim()}\n\n---\n<sub>PR created with [Mallet](https://artanis.ai/mallet).</sub>`.trimStart(),
         }),
       }
     ) as { html_url: string; number: number }

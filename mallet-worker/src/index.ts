@@ -9,6 +9,7 @@ import publicAnalyzeRoute from './routes/public-analyze'
 import suggestRoute from './routes/suggest'
 import detectPromptsRoute from './routes/detect-prompts'
 import createPRRoute from './routes/create-pr'
+import generatePRDescriptionRoute from './routes/generate-pr-description'
 import githubTokenRoute from './routes/github-token'
 import oauthRoute from './routes/oauth'
 import trackRoute from './routes/track'
@@ -115,12 +116,14 @@ app.use('/api/*', async (c, next) => {
 
 // Per-route rate limits for authed routes (bucket key is per userId).
 app.use('/api/create-pr', rateLimitMiddleware(10))    // GitHub-side cost too
+app.use('/api/generate-pr-description', rateLimitMiddleware(20))
 app.use('/api/github-token', rateLimitMiddleware(60))
 
 app.route('/api/analyze', analyzeRoute)
 app.route('/api/suggest', suggestRoute)
 app.route('/api/detect-prompts', detectPromptsRoute)
 app.route('/api/create-pr', createPRRoute)
+app.route('/api/generate-pr-description', generatePRDescriptionRoute)
 app.route('/api/github-token', githubTokenRoute)
 
 // Axiom OTel exporter config. `instrument()` wraps the fetch handler,
