@@ -24,7 +24,7 @@ export function LandingPage() {
       {/* Hero with desaturated sky gradient */}
       <section
         className="relative flex min-h-[80vh] flex-col items-center justify-center px-4 py-16 sm:px-6"
-        style={{ background: 'linear-gradient(180deg in oklab, #e7f1f6 0%, #c5dce8 20%, #c5dce8 98%, #d8c8b4 100%)' }}
+        style={{ background: 'linear-gradient(180deg in oklab, #c5dce8 0%, #d6e7ef 40%, #e7f1f6 100%)' }}
       >
         <div className="text-center">
           <div className="flex items-center justify-center gap-4 mb-3">
@@ -51,8 +51,8 @@ export function LandingPage() {
           </button>
         </div>
 
-        {/* Trust badges at bottom of hero */}
-        <div className="absolute bottom-32 left-0 right-0 flex flex-wrap items-center justify-center gap-6 text-sm text-text-muted">
+        {/* Trust badges — inline on mobile, absolutely positioned at hero bottom on larger screens */}
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-text-muted sm:absolute sm:bottom-16 sm:left-0 sm:right-0 sm:mt-0 lg:bottom-24">
           <div className="flex items-center gap-1.5">
             <Shield className="h-4 w-4 text-forest" />
             Prompts never stored

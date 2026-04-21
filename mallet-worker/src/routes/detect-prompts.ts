@@ -1,12 +1,13 @@
 import { Hono } from 'hono'
 import { createOpenAIClient } from '../lib/openai'
 import { logAction } from '../lib/logging'
-import { requireGitHubToken, type AuthVars } from '../lib/auth'
+import type { AuthVars } from '../lib/auth'
 import type { Env, DetectPromptsRequest } from '../types'
 
-const app = new Hono<{ Bindings: Env; Variables: AuthVars }>()
-
-app.use('*', requireGitHubToken())
+// Auth is optional and applied at the app level (optionalAuth in index.ts).
+// Anon users can call this for public repos; the GitHub fetches below just
+// drop the Authorization header when no session token is attached.
+const app = new Hono<{ Bindings: Env; Variables: Partial<AuthVars> }>()
 
 const DETECT_SYSTEM_PROMPT = `You are an expert at finding AI prompts in codebases. Given a list of files from a GitHub repository, identify which code locations likely contain AI/LLM prompts.
 
@@ -41,17 +42,20 @@ app.post('/', async (c) => {
     return c.json({ error: 'Invalid repo owner or name' }, 400)
   }
 
+  // Anon callers (public repos) get the unauthenticated GitHub headers — same
+  // 60/hr/IP limit as a regular curl. Signed-in callers get their session
+  // token, which lets private repos work too.
+  const ghHeaders: Record<string, string> = {
+    Accept: 'application/vnd.github.v3+json',
+    'User-Agent': 'Mallet-API',
+  }
+  if (accessToken) ghHeaders.Authorization = `Bearer ${accessToken}`
+
   try {
     // Fetch repo tree
     const treeRes = await fetch(
       `https://api.github.com/repos/${repoOwner}/${repoName}/git/trees/HEAD?recursive=1`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          Accept: 'application/vnd.github.v3+json',
-          'User-Agent': 'Mallet-API',
-        },
-      }
+      { headers: ghHeaders }
     )
 
     if (!treeRes.ok) {
@@ -80,15 +84,14 @@ app.post('/', async (c) => {
     const fileContents: { path: string; content: string }[] = []
     for (const file of promisingFiles) {
       try {
+        const rawHeaders: Record<string, string> = {
+          Accept: 'application/vnd.github.v3.raw',
+          'User-Agent': 'Mallet-API',
+        }
+        if (accessToken) rawHeaders.Authorization = `Bearer ${accessToken}`
         const contentRes = await fetch(
           `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${file.path}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              Accept: 'application/vnd.github.v3.raw',
-              'User-Agent': 'Mallet-API',
-            },
-          }
+          { headers: rawHeaders }
         )
         if (contentRes.ok) {
           const text = await contentRes.text()

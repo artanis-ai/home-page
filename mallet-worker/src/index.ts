@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { instrument, type ResolveConfigFn } from '@microlabs/otel-cf-workers'
 import type { Env } from './types'
-import { requireAuth, type AuthVars } from './lib/auth'
+import { requireAuth, optionalAuth, type AuthVars } from './lib/auth'
 import { rateLimitMiddleware, rateLimitMiddlewareByIP } from './lib/rate-limit'
 import analyzeRoute from './routes/analyze'
 import publicAnalyzeRoute from './routes/public-analyze'
@@ -83,19 +83,24 @@ app.route('/api/public/analyze', publicAnalyzeRoute)
 app.use('/api/analyze', rateLimitMiddlewareByIP(60))   // ~1/sec, debounce-friendly
 app.use('/api/suggest', rateLimitMiddlewareByIP(30))   // user-initiated clicks
 
+// Prompt detection works for anon users on public repos (no GitHub token
+// needed for the tree fetch) AND for signed-in users on private repos.
+// IP-limited to bound OpenAI spend when unauthenticated.
+app.use('/api/detect-prompts', rateLimitMiddlewareByIP(20))
+app.use('/api/detect-prompts', optionalAuth())
+
 // All other /api/* routes require auth. `/api/public/*`, `/api/analyze`,
-// and `/api/suggest` are explicitly skipped — Hono runs all path-matching
-// middleware regardless of registration order, so we can't rely on
-// "declared earlier" to exempt them; the skip has to be explicit.
+// `/api/suggest`, and `/api/detect-prompts` are explicitly skipped — Hono
+// runs all path-matching middleware regardless of registration order, so
+// we can't rely on "declared earlier" to exempt them.
 app.use('/api/*', async (c, next) => {
   const path = new URL(c.req.url).pathname
   if (path.startsWith('/api/public/')) return next()
-  if (path === '/api/analyze' || path === '/api/suggest') return next()
+  if (path === '/api/analyze' || path === '/api/suggest' || path === '/api/detect-prompts') return next()
   return requireAuth()(c, next)
 })
 
 // Per-route rate limits for authed routes (bucket key is per userId).
-app.use('/api/detect-prompts', rateLimitMiddleware(20))
 app.use('/api/create-pr', rateLimitMiddleware(10))    // GitHub-side cost too
 app.use('/api/github-token', rateLimitMiddleware(60))
 

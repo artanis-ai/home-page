@@ -95,6 +95,28 @@ export function requireGitHubToken() {
   }
 }
 
+/**
+ * Hono middleware: attach session + githubToken if a valid Bearer is
+ * present; otherwise pass through unauthenticated. Use on endpoints that
+ * work for both anon (public repo) and signed-in (private repo) users.
+ */
+export function optionalAuth() {
+  return async (c: Context<{ Bindings: Env; Variables: Partial<AuthVars> }>, next: Next) => {
+    const authHeader = c.req.header('Authorization')
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        const session = await verifySessionJWT(c.env, authHeader.slice(7))
+        c.set('session', session)
+        c.set('userId', session.userId)
+        if (session.githubToken) c.set('githubToken', session.githubToken)
+      } catch {
+        // invalid token → treat as anon rather than 401
+      }
+    }
+    return next()
+  }
+}
+
 export interface AuthVars {
   session: VerifiedSession
   userId: string

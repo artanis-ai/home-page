@@ -236,10 +236,12 @@ export function EditorPage() {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Mobile: editor and panel are mutually exclusive (toggle in header).
-            Desktop ≥lg: both visible side-by-side. */}
-        <div className={`${showPanel ? 'hidden lg:block' : ''} flex-1 overflow-auto`}>
+      <div className="relative flex flex-1 overflow-hidden">
+        {/* Editor always mounted and full-width underneath. On desktop ≥lg
+            the panel takes its own column (flex-initial w-80) so the editor
+            shrinks. On mobile the panel is a drawer that overlays the
+            editor — the editor stays visible behind the gap. */}
+        <div className="flex-1 overflow-auto">
           <PromptEditor
             initialContent={content}
             onChange={setContent}
@@ -257,7 +259,25 @@ export function EditorPage() {
           />
         </div>
 
-        <div className={`${showPanel ? 'flex-1 lg:flex-initial' : 'hidden'} lg:block h-full`}>
+        {/* Mobile drawer backdrop — tapping closes the panel. Only rendered
+            when the drawer is open AND we're below lg (hidden via lg:hidden). */}
+        {showPanel && (
+          <button
+            onClick={() => setShowPanel(false)}
+            aria-label="Close analysis panel"
+            className="absolute inset-0 z-10 cursor-pointer bg-earth-dark/20 backdrop-blur-[1px] lg:hidden"
+          />
+        )}
+
+        {/* Analysis panel. Mobile: slides in from right, leaves ~48px of the
+            editor visible on the left. Desktop ≥lg: static flex column. */}
+        <div
+          className={`
+            absolute right-0 top-0 z-20 h-full w-[calc(100%-3rem)] max-w-sm transform shadow-2xl transition-transform duration-300 ease-out
+            lg:static lg:z-auto lg:w-80 lg:max-w-none lg:shrink-0 lg:translate-x-0 lg:shadow-none lg:transition-none
+            ${showPanel ? 'translate-x-0' : 'translate-x-full'}
+          `}
+        >
           <AnalysisPanel
             content={content}
             issues={issues}
@@ -267,6 +287,7 @@ export function EditorPage() {
             analyzing={analyzing}
             getToken={getToken}
             fileContext={fileContext}
+            onClose={() => setShowPanel(false)}
           />
         </div>
       </div>

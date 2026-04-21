@@ -39,12 +39,12 @@ function probeWebSocket(url: string): Promise<{ opened: boolean; closeCode: numb
   })
 }
 
-// analyze + suggest are intentionally anonymous-allowed (they don't touch
-// GitHub, so signed-out / campaign-link users can use the editor end-to-end).
+// analyze, suggest, and detect-prompts are intentionally anonymous-allowed:
+// analyze + suggest don't touch GitHub at all, and detect-prompts uses the
+// unauthenticated GitHub API for public repos when no session is attached.
 // The remaining /api/* routes need a GitHub token via the session, so they
 // must reject unauthenticated calls.
 const ENDPOINTS = [
-  '/api/detect-prompts',
   '/api/create-pr',
   '/api/github-token',
 ] as const

@@ -14,12 +14,12 @@ import {
 type Step = 'source' | 'github-visibility' | 'github-public' | 'github-private' | 'elsewhere-pick' | 'elsewhere-instructions'
 type ElsewhereTool = 'langfuse' | 'langsmith' | 'promptlayer' | 'humanloop' | 'other'
 
-const ELSEWHERE_TOOLS: { id: ElsewhereTool; name: string; icon: React.ReactNode; instructions: string }[] = [
-  { id: 'langfuse', name: 'Langfuse', icon: <LangfuseIcon className="h-5 w-5" />, instructions: 'In Langfuse, go to Prompts in the left sidebar. Select your prompt, then click the prompt version you want to edit. Select the template text and copy it (Ctrl/Cmd+C).' },
-  { id: 'langsmith', name: 'LangSmith', icon: <LangSmithIcon className="h-5 w-5" />, instructions: 'In LangSmith, go to Prompts in the left sidebar. Click on your prompt, then select the template tab. Copy the prompt template text (Ctrl/Cmd+C).' },
-  { id: 'promptlayer', name: 'PromptLayer', icon: <PromptLayerIcon className="h-5 w-5" />, instructions: 'In PromptLayer, go to the Registry. Click on your prompt template to open it. Select the template body text and copy it (Ctrl/Cmd+C).' },
-  { id: 'humanloop', name: 'Humanloop', icon: <HumanloopIcon className="h-5 w-5" />, instructions: 'In Humanloop, open your project and go to the Editor. Select the prompt template text in the editor pane and copy it (Ctrl/Cmd+C).' },
-  { id: 'other', name: 'Other', icon: <MoreHorizontal className="h-5 w-5" />, instructions: 'Open your prompt management tool, find the prompt you want to improve, and copy the full template text. Then paste it into the Mallet editor.' },
+const ELSEWHERE_TOOLS: { id: ElsewhereTool; name: string; icon: React.ReactNode }[] = [
+  { id: 'langfuse', name: 'Langfuse', icon: <LangfuseIcon className="h-5 w-5" /> },
+  { id: 'langsmith', name: 'LangSmith', icon: <LangSmithIcon className="h-5 w-5" /> },
+  { id: 'promptlayer', name: 'PromptLayer', icon: <PromptLayerIcon className="h-5 w-5" /> },
+  { id: 'humanloop', name: 'Humanloop', icon: <HumanloopIcon className="h-5 w-5" /> },
+  { id: 'other', name: 'Other', icon: <MoreHorizontal className="h-5 w-5" /> },
 ]
 
 export function OnboardingWizard() {
@@ -33,6 +33,7 @@ export function OnboardingWizard() {
   const [elsewhereTool, setElsewhereTool] = useState<ElsewhereTool | null>(null)
   const [repoUrl, setRepoUrl] = useState('')
   const [repoError, setRepoError] = useState('')
+  const [repoChecking, setRepoChecking] = useState(false)
 
   useEffect(() => {
     track('onboarding.opened', { signedIn: isSignedIn })
@@ -56,16 +57,39 @@ export function OnboardingWizard() {
     else setStep('source')
   }
 
-  function handlePublicRepo() {
+  async function handlePublicRepo() {
     setRepoError('')
-    const match = repoUrl.trim().match(/(?:github\.com\/)?([^/\s]+)\/([^/\s]+?)(?:\.git)?$/)
+    const cleaned = repoUrl.trim().replace(/\/+$/, '')
+    const match = cleaned.match(/(?:github\.com\/)?([^/\s]+)\/([^/\s]+?)(?:\.git)?$/)
     if (!match) {
       track('onboarding.public-repo.invalid')
       setRepoError('Enter a valid repo, e.g. owner/repo or github.com/owner/repo')
       return
     }
-    track('onboarding.public-repo.submitted', { owner: match[1], repo: match[2] })
-    navigate(`/app/prompts/${match[1]}/${match[2]}`)
+    const [, owner, repo] = match
+    // Verify the repo is reachable anonymously *before* navigating, so the
+    // "not found / private" failure surfaces as an inline input error
+    // rather than a dead-end spinner on the discovery page.
+    setRepoChecking(true)
+    try {
+      const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`)
+      if (res.status === 404) {
+        track('onboarding.public-repo.not-found', { owner, repo })
+        setRepoError("Couldn't find that repo. If it's private, use the private flow instead.")
+        return
+      }
+      if (!res.ok) {
+        track('onboarding.public-repo.error', { owner, repo, status: res.status })
+        setRepoError(`GitHub returned ${res.status}. Try again in a moment.`)
+        return
+      }
+      track('onboarding.public-repo.submitted', { owner, repo })
+      navigate(`/app/prompts/${owner}/${repo}`)
+    } catch {
+      setRepoError("Couldn't reach GitHub. Check your connection and try again.")
+    } finally {
+      setRepoChecking(false)
+    }
   }
 
   const showBack = step !== 'source'
@@ -192,10 +216,10 @@ export function OnboardingWizard() {
 
           <button
             onClick={handlePublicRepo}
-            disabled={!repoUrl.trim()}
-            className="mt-4 rounded-full bg-primary px-6 py-2.5 font-medium text-white transition hover:bg-primary-dark disabled:opacity-50"
+            disabled={!repoUrl.trim() || repoChecking}
+            className="mt-4 cursor-pointer rounded-full bg-primary px-6 py-2.5 font-medium text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Find Prompts
+            {repoChecking ? 'Checking…' : 'Find Prompts'}
           </button>
         </div>
       )}
@@ -254,28 +278,30 @@ export function OnboardingWizard() {
         </div>
       )}
 
-      {/* Elsewhere: instructions + go to editor */}
+      {/* Elsewhere: "coming soon" + scratch editor */}
       {step === 'elsewhere-instructions' && elsewhereTool && (() => {
         const tool = ELSEWHERE_TOOLS.find((t) => t.id === elsewhereTool)!
+        const isOther = tool.id === 'other'
         return (
           <div>
             <h1 className="font-display text-3xl font-bold text-earth-dark">
-              Copy from {tool.name}
+              {isOther ? 'New integration, coming soon' : `${tool.name} integration, coming soon`}
             </h1>
-
-            <div className="mt-4 rounded-xl border border-warm bg-white p-4">
-              <p className="text-text-mid">{tool.instructions}</p>
-            </div>
+            <p className="mt-2 text-text-mid">
+              {isOther
+                ? "We're planning direct integrations with more prompt management tools — we've bumped this in priority based on interest."
+                : `We're working on a direct ${tool.name} integration and have bumped it in priority based on interest.`}
+            </p>
 
             <p className="mt-6 text-text-mid">
-              Then paste it into the editor:
+              For now, paste your prompt straight into the scratch editor:
             </p>
 
             <button
               onClick={() => goToEditor()}
-              className="mt-4 rounded-full bg-primary px-6 py-2.5 font-medium text-white transition hover:bg-primary-dark"
+              className="mt-4 cursor-pointer rounded-full bg-primary px-6 py-2.5 font-medium text-white transition hover:bg-primary-dark"
             >
-              Open Editor
+              Open Scratch Editor
             </button>
           </div>
         )

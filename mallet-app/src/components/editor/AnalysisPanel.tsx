@@ -33,6 +33,8 @@ interface AnalysisPanelProps {
   getToken: () => Promise<string | null>
   /** File context stamped into server logs for attribution. Optional — scratch editor has none. */
   fileContext?: { repoOwner?: string; repoName?: string; branch?: string; filePath?: string }
+  /** Mobile-only close button. Hidden on lg+ where panel is always visible. */
+  onClose?: () => void
 }
 
 export function AnalysisPanel({
@@ -44,6 +46,7 @@ export function AnalysisPanel({
   analyzing,
   getToken,
   fileContext,
+  onClose,
 }: AnalysisPanelProps) {
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null)
   const [loadingSuggestion, setLoadingSuggestion] = useState(false)
@@ -103,10 +106,21 @@ export function AnalysisPanel({
   }, [activeIssueId])
 
   return (
-    <div className="flex h-full w-full flex-col border-l border-warm bg-white lg:w-80 lg:shrink-0">
+    <div className="flex h-full w-full flex-col border-l border-warm bg-white">
       <div className="flex items-center justify-between border-b border-warm px-4 py-3">
         <h2 className="font-display text-lg font-semibold text-earth-dark">Analysis</h2>
-        {analyzing && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+        <div className="flex items-center gap-2">
+          {analyzing && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+          {onClose && (
+            <button
+              onClick={onClose}
+              aria-label="Close analysis panel"
+              className="-mr-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-text-mid transition hover:bg-warm hover:text-earth-dark lg:hidden"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-auto">
