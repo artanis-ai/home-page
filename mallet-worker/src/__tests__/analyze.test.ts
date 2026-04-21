@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import type { AnalyzerTask } from '../lib/analyzer'
 
 const WORKER_URL = 'http://localhost:8787'
 
@@ -9,14 +10,20 @@ interface Segment {
   hash: string
 }
 
-async function analyze(segments: Segment[], changedHashes: string[]) {
+interface AnalyzeBody {
+  segments: Segment[]
+  changedHashes?: string[]
+  tasks?: AnalyzerTask[]
+}
+
+async function analyzeRaw(body: AnalyzeBody) {
   const res = await fetch(`${WORKER_URL}/api/analyze`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: 'Bearer test_user_analyze',
     },
-    body: JSON.stringify({ segments, changedHashes }),
+    body: JSON.stringify(body),
   })
   expect(res.ok).toBe(true)
   return res.json() as Promise<{
@@ -24,7 +31,12 @@ async function analyze(segments: Segment[], changedHashes: string[]) {
       id: string; type: string; severity: string
       range: [number, number]; message: string
     }>
+    usage: { inputTokens: number; outputTokens: number; tasks: number }
   }>
+}
+
+async function analyze(segments: Segment[], changedHashes: string[]) {
+  return analyzeRaw({ segments, changedHashes })
 }
 
 describe('segment-level analysis API', () => {
@@ -109,6 +121,106 @@ describe('segment-level analysis API', () => {
     // Should find at least one contradiction
     expect(issues.length).toBeGreaterThanOrEqual(1)
   }, 20000)
+})
+
+describe('explicit task batching', () => {
+  // The client spreads a large prompt's N² pair fan-out across multiple
+  // /api/analyze calls by sending an explicit `tasks` list per batch.
+  // These tests guard the contract: exactly the listed tasks run, no more,
+  // and stale hashes (from a batch the client held while segments moved on)
+  // are silently skipped instead of erroring.
+
+  it('runs ONLY the listed tasks when `tasks` is set', async () => {
+    const t0 = Date.now()
+    const { issues, usage } = await analyzeRaw({
+      segments: [
+        { text: 'Be brief.', startIndex: 0, endIndex: 9, hash: 'a' },
+        { text: 'Give long answers.', startIndex: 10, endIndex: 28, hash: 'b' },
+        { text: 'Be polite.', startIndex: 29, endIndex: 39, hash: 'c' },
+      ],
+      tasks: [{ kind: 'pair', a: 'a', b: 'b' }],
+    })
+    const elapsed = Date.now() - t0
+    console.log(`[batching] single pair only: ${elapsed}ms, ${usage.tasks} tasks`)
+    // Contract: one explicit task → exactly one LLM call, not the 9-task
+    // fanout the old changedHashes-all-three path would produce.
+    expect(usage.tasks).toBe(1)
+    // The pair really is a contradiction, so the result should reflect it.
+    expect(issues.filter(i => i.type === 'contradiction').length).toBeGreaterThanOrEqual(1)
+  }, 15000)
+
+  it('ignores `changedHashes` when `tasks` is set', async () => {
+    // Send a tasks list AND a bogus changedHashes — the tasks wins, and the
+    // ambiguity/bp fan-out that changedHashes would have triggered must not run.
+    const { usage } = await analyzeRaw({
+      segments: [
+        { text: 'Be brief.', startIndex: 0, endIndex: 9, hash: 'a' },
+        { text: 'Give long answers.', startIndex: 10, endIndex: 28, hash: 'b' },
+      ],
+      changedHashes: ['a', 'b'],
+      tasks: [{ kind: 'ambiguity', h: 'a' }],
+    })
+    expect(usage.tasks).toBe(1)
+  }, 10000)
+
+  it('silently skips stale hashes', async () => {
+    // Client batched a pair against a segment that has since been deleted.
+    // Server must not 500 — just run the solvable tasks and drop the rest.
+    const { usage } = await analyzeRaw({
+      segments: [
+        { text: 'Be brief.', startIndex: 0, endIndex: 9, hash: 'a' },
+      ],
+      tasks: [
+        { kind: 'ambiguity', h: 'a' },
+        { kind: 'pair', a: 'a', b: 'gone' }, // `gone` no longer exists
+        { kind: 'bp', h: 'also-gone' },       // also dropped
+      ],
+    })
+    expect(usage.tasks).toBe(1) // only the `ambiguity` task for `a` runs
+  }, 10000)
+
+  it('empty `tasks` array → no LLM calls, empty issues', async () => {
+    const t0 = Date.now()
+    const { issues, usage } = await analyzeRaw({
+      segments: [
+        { text: 'Be brief.', startIndex: 0, endIndex: 9, hash: 'a' },
+        { text: 'Give long answers.', startIndex: 10, endIndex: 28, hash: 'b' },
+      ],
+      tasks: [],
+    })
+    const elapsed = Date.now() - t0
+    expect(usage.tasks).toBe(0)
+    expect(issues).toHaveLength(0)
+    // No LLM round trip — must return fast.
+    expect(elapsed).toBeLessThan(2000)
+  }, 5000)
+
+  it('handles a long-prompt batch (40 pair tasks) without exceeding subrequest limits', async () => {
+    // Worst-case per-batch load: 40 pair tasks = 40 OpenAI calls + logging
+    // overhead. Stays well under Cloudflare's 1000-subrequest cap per
+    // Worker invocation, which is the whole reason for client batching.
+    // 40 unique segments, pairwise = 40*39/2 = 780 pairs; we send a slice
+    // of 40 as one batch to simulate one prioritized chunk.
+    const segments: Segment[] = []
+    for (let i = 0; i < 40; i++) {
+      segments.push({
+        text: `Instruction number ${i}: be clear.`,
+        startIndex: i * 40,
+        endIndex: i * 40 + 30,
+        hash: `h${i}`,
+      })
+    }
+    const tasks: AnalyzerTask[] = []
+    for (let i = 0; i < 40; i++) {
+      // pair each segment with its neighbor — 40 tasks, fits in one batch
+      tasks.push({ kind: 'pair', a: `h${i}`, b: `h${(i + 1) % 40}` })
+    }
+    const t0 = Date.now()
+    const { usage } = await analyzeRaw({ segments, tasks })
+    const elapsed = Date.now() - t0
+    console.log(`[batching] 40-task batch: ${elapsed}ms, ${usage.tasks} tasks, ${usage.inputTokens}in/${usage.outputTokens}out tok`)
+    expect(usage.tasks).toBe(40)
+  }, 60000)
 })
 
 describe('code / JSON / variable declarations are skipped', () => {

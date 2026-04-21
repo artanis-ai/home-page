@@ -127,10 +127,29 @@ export interface AnalyzerUsage {
   tasks: number
 }
 
+/**
+ * Explicit task to run. Lets the client batch the analysis across multiple
+ * HTTP requests — we used to blow past Cloudflare's 1000-subrequest-per-
+ * invocation limit when a user pasted a big prompt (N×N pairwise fan-out).
+ * The client now generates the full task graph, prioritizes by proximity to
+ * the cursor, chunks into batches, and sends each as its own /api/analyze
+ * call with an explicit `tasks` list.
+ */
+export type AnalyzerTask =
+  | { kind: 'pair'; a: string; b: string }
+  | { kind: 'ambiguity'; h: string }
+  | { kind: 'bp'; h: string }
+
 export interface AnalyzerInput {
   segments: Segment[]
   /** Undefined = treat all segments as changed (every pair + every unary check). */
   changedHashes?: string[]
+  /**
+   * Explicit task list. When set, runs EXACTLY these tasks and ignores
+   * `changedHashes`. Tasks whose hashes aren't in `segments` are silently
+   * skipped (stale batch from a client that moved on).
+   */
+  tasks?: AnalyzerTask[]
   openaiKey: string
 }
 
@@ -140,12 +159,139 @@ export interface AnalyzerOutput {
 }
 
 type TaskResult = { issue: AnalysisIssue | null; usage: { input: number; output: number } }
+type OpenAIClient = ReturnType<typeof createOpenAIClient>
+
+const EMPTY_USAGE = { input: 0, output: 0 }
 
 function readUsage(r: { usage?: { prompt_tokens?: number; completion_tokens?: number } }) {
   return {
     input: r.usage?.prompt_tokens ?? 0,
     output: r.usage?.completion_tokens ?? 0,
   }
+}
+
+function runContradictionTask(client: OpenAIClient, a: Segment, b: Segment): Promise<TaskResult> {
+  return client.chat.completions.create({
+    model: MODEL,
+    response_format: { type: 'json_object' },
+    messages: [
+      { role: 'system', content: CONTRADICTION_PROMPT },
+      { role: 'user', content: `A: "${a.text}"\nB: "${b.text}"` },
+    ],
+    temperature: 0,
+    max_completion_tokens: 80,
+  }).then(r => {
+    const usage = readUsage(r)
+    const raw = r.choices[0]?.message?.content
+    if (!raw) return { issue: null, usage }
+    const p = JSON.parse(raw) as { contradiction: boolean; message: string }
+    if (!p.contradiction) return { issue: null, usage }
+    return {
+      issue: {
+        id: `c_${a.hash}_${b.hash}`,
+        type: 'contradiction' as const,
+        severity: 'error' as const,
+        range: [a.startIndex, a.endIndex] as [number, number],
+        message: `"${a.text}" contradicts "${b.text}": ${p.message}`,
+      },
+      usage,
+    }
+  }).catch(() => ({ issue: null, usage: EMPTY_USAGE }))
+}
+
+function runAmbiguityTask(client: OpenAIClient, seg: Segment): Promise<TaskResult> {
+  return client.chat.completions.create({
+    model: MODEL,
+    response_format: { type: 'json_object' },
+    messages: [
+      { role: 'system', content: AMBIGUITY_PROMPT },
+      { role: 'user', content: `"${seg.text}"` },
+    ],
+    temperature: 0,
+    max_completion_tokens: 80,
+  }).then(r => {
+    const usage = readUsage(r)
+    const raw = r.choices[0]?.message?.content
+    if (!raw) return { issue: null, usage }
+    const p = JSON.parse(raw) as { ambiguous: boolean; message: string }
+    if (!p.ambiguous) return { issue: null, usage }
+    return {
+      issue: {
+        id: `a_${seg.hash}`,
+        type: 'ambiguity' as const,
+        severity: 'warning' as const,
+        range: [seg.startIndex, seg.endIndex] as [number, number],
+        message: p.message,
+      },
+      usage,
+    }
+  }).catch(() => ({ issue: null, usage: EMPTY_USAGE }))
+}
+
+function runBPTask(client: OpenAIClient, seg: Segment): Promise<TaskResult> {
+  return client.chat.completions.create({
+    model: MODEL,
+    response_format: { type: 'json_object' },
+    messages: [
+      { role: 'system', content: BEST_PRACTICE_PROMPT },
+      { role: 'user', content: `"${seg.text}"` },
+    ],
+    temperature: 0,
+    max_completion_tokens: 80,
+  }).then(r => {
+    const usage = readUsage(r)
+    const raw = r.choices[0]?.message?.content
+    if (!raw) return { issue: null, usage }
+    const p = JSON.parse(raw) as { issue: boolean; message: string }
+    if (!p.issue) return { issue: null, usage }
+    return {
+      issue: {
+        id: `bp_${seg.hash}`,
+        type: 'best-practice' as const,
+        severity: 'info' as const,
+        range: [seg.startIndex, seg.endIndex] as [number, number],
+        message: p.message,
+      },
+      usage,
+    }
+  }).catch(() => ({ issue: null, usage: EMPTY_USAGE }))
+}
+
+/**
+ * Enumerate the full task graph for a `changedHashes`-style input. Shared
+ * between the legacy in-server path and the client-side task planner (via
+ * `planTasks`) so the two can never diverge on which pairs exist.
+ */
+function enumerateTasks(segments: Segment[], changedHashes: string[] | undefined): AnalyzerTask[] {
+  const analyzeAll = changedHashes === undefined
+  const changedSet = new Set(changedHashes || [])
+  const changed = analyzeAll ? segments : segments.filter(s => changedSet.has(s.hash))
+  const others = analyzeAll ? [] : segments.filter(s => !changedSet.has(s.hash))
+  if (changed.length === 0) return []
+
+  const out: AnalyzerTask[] = []
+  const seenPairs = new Set<string>()
+  for (const a of changed) {
+    for (const b of [...others, ...changed.filter(x => x.hash !== a.hash)]) {
+      const key = [a.hash, b.hash].sort().join(':')
+      if (seenPairs.has(key)) continue
+      seenPairs.add(key)
+      out.push({ kind: 'pair', a: a.hash, b: b.hash })
+    }
+  }
+  for (const seg of changed) out.push({ kind: 'ambiguity', h: seg.hash })
+  for (const seg of changed) out.push({ kind: 'bp', h: seg.hash })
+  return out
+}
+
+/**
+ * Exported so the client can plan batches with identical task semantics.
+ * The response contract is that the returned tasks, run on the same
+ * `segments`, produce the same issue set as `analyzePrompt` would have
+ * returned in a single call.
+ */
+export function planTasks(segments: Segment[], changedHashes: string[] | undefined): AnalyzerTask[] {
+  return enumerateTasks(segments, changedHashes)
 }
 
 export async function analyzePrompt(input: AnalyzerInput): Promise<AnalyzerOutput> {
@@ -155,123 +301,25 @@ export async function analyzePrompt(input: AnalyzerInput): Promise<AnalyzerOutpu
   }
 
   const client = createOpenAIClient(openaiKey)
-  // changedHashes === undefined → analyze everything (public API behavior).
-  const analyzeAll = changedHashes === undefined
-  const changedSet = new Set(changedHashes || [])
-  const changed = analyzeAll ? segments : segments.filter(s => changedSet.has(s.hash))
-  const others = analyzeAll ? [] : segments.filter(s => !changedSet.has(s.hash))
+  const segByHash = new Map(segments.map(s => [s.hash, s]))
+  const plannedTasks = input.tasks ?? enumerateTasks(segments, changedHashes)
 
-  if (changed.length === 0) {
-    return { issues: [], usage: { inputTokens: 0, outputTokens: 0, tasks: 0 } }
-  }
-
-  const tasks: Promise<TaskResult>[] = []
-  const emptyUsage = { input: 0, output: 0 }
-
-  // 1. Pairwise contradiction checks
-  const seenPairs = new Set<string>()
-  for (const a of changed) {
-    for (const b of [...others, ...changed.filter(x => x.hash !== a.hash)]) {
-      const key = [a.hash, b.hash].sort().join(':')
-      if (seenPairs.has(key)) continue
-      seenPairs.add(key)
-
-      tasks.push(
-        client.chat.completions.create({
-          model: MODEL,
-          response_format: { type: 'json_object' },
-          messages: [
-            { role: 'system', content: CONTRADICTION_PROMPT },
-            { role: 'user', content: `A: "${a.text}"\nB: "${b.text}"` },
-          ],
-          temperature: 0,
-          max_completion_tokens: 80,
-        }).then(r => {
-          const usage = readUsage(r)
-          const raw = r.choices[0]?.message?.content
-          if (!raw) return { issue: null, usage }
-          const p = JSON.parse(raw) as { contradiction: boolean; message: string }
-          if (!p.contradiction) return { issue: null, usage }
-          return {
-            issue: {
-              id: `c_${a.hash}_${b.hash}`,
-              type: 'contradiction' as const,
-              severity: 'error' as const,
-              range: [a.startIndex, a.endIndex] as [number, number],
-              message: `"${a.text}" contradicts "${b.text}": ${p.message}`,
-            },
-            usage,
-          }
-        }).catch(() => ({ issue: null, usage: emptyUsage }))
-      )
+  const taskPromises: Promise<TaskResult>[] = []
+  for (const t of plannedTasks) {
+    if (t.kind === 'pair') {
+      const a = segByHash.get(t.a)
+      const b = segByHash.get(t.b)
+      if (a && b) taskPromises.push(runContradictionTask(client, a, b))
+    } else if (t.kind === 'ambiguity') {
+      const s = segByHash.get(t.h)
+      if (s) taskPromises.push(runAmbiguityTask(client, s))
+    } else if (t.kind === 'bp') {
+      const s = segByHash.get(t.h)
+      if (s) taskPromises.push(runBPTask(client, s))
     }
   }
 
-  // 2. Per-segment ambiguity checks
-  for (const seg of changed) {
-    tasks.push(
-      client.chat.completions.create({
-        model: MODEL,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: AMBIGUITY_PROMPT },
-          { role: 'user', content: `"${seg.text}"` },
-        ],
-        temperature: 0,
-        max_completion_tokens: 80,
-      }).then(r => {
-        const usage = readUsage(r)
-        const raw = r.choices[0]?.message?.content
-        if (!raw) return { issue: null, usage }
-        const p = JSON.parse(raw) as { ambiguous: boolean; message: string }
-        if (!p.ambiguous) return { issue: null, usage }
-        return {
-          issue: {
-            id: `a_${seg.hash}`,
-            type: 'ambiguity' as const,
-            severity: 'warning' as const,
-            range: [seg.startIndex, seg.endIndex] as [number, number],
-            message: p.message,
-          },
-          usage,
-        }
-      }).catch(() => ({ issue: null, usage: emptyUsage }))
-    )
-  }
-
-  // 3. Per-segment best practice checks
-  for (const seg of changed) {
-    tasks.push(
-      client.chat.completions.create({
-        model: MODEL,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: BEST_PRACTICE_PROMPT },
-          { role: 'user', content: `"${seg.text}"` },
-        ],
-        temperature: 0,
-        max_completion_tokens: 80,
-      }).then(r => {
-        const usage = readUsage(r)
-        const raw = r.choices[0]?.message?.content
-        if (!raw) return { issue: null, usage }
-        const p = JSON.parse(raw) as { issue: boolean; message: string }
-        if (!p.issue) return { issue: null, usage }
-        return {
-          issue: {
-            id: `bp_${seg.hash}`,
-            type: 'best-practice' as const,
-            severity: 'info' as const,
-            range: [seg.startIndex, seg.endIndex] as [number, number],
-            message: p.message,
-          },
-          usage,
-        }
-      }).catch(() => ({ issue: null, usage: emptyUsage }))
-    )
-  }
-
-  const results = await Promise.allSettled(tasks)
+  const results = await Promise.allSettled(taskPromises)
 
   const issues: AnalysisIssue[] = []
   let inputTokens = 0
@@ -284,5 +332,5 @@ export async function analyzePrompt(input: AnalyzerInput): Promise<AnalyzerOutpu
     }
   }
 
-  return { issues, usage: { inputTokens, outputTokens, tasks: tasks.length } }
+  return { issues, usage: { inputTokens, outputTokens, tasks: taskPromises.length } }
 }

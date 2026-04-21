@@ -9,6 +9,7 @@ import { yCollab } from 'y-codemirror.next'
 import { segmentPrompt, hashSegment } from '../../lib/segmenter'
 import { WORKER_URL, publicFetch } from '../../lib/api'
 import { loadRoom, saveRoom, groupIssuesBySegment, rehydrateIssues } from '../../lib/segment-cache'
+import { planTasks, prioritizeAndBatch, type AnalyzerTask } from '../../lib/analyzer-tasks'
 import type { AnalysisIssue } from '../../types'
 
 // --- CodeMirror decoration setup ---
@@ -381,67 +382,75 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
         return
       }
 
+      // Build the full task graph and prioritize by cursor proximity, then
+      // chunk into per-invocation batches. Each batch is its own /api/analyze
+      // request → its own Worker invocation → its own 1000-subrequest budget.
+      // This is what lets us handle whole-repo-sized prompts without the
+      // N² pairwise fan-out tripping Cloudflare's per-invocation limit.
+      const tasks = planTasks(apiSegments, changedHashes)
+      const cursor = viewRef.current?.state.selection.main.head ?? 0
+      const batches = prioritizeAndBatch(tasks, cursor, apiSegments)
+
+      // Drop stale issues overlapping any changed segment up front so the
+      // user sees stale underlines disappear immediately; new ones trickle
+      // in per batch.
+      const changedRanges = apiSegments
+        .filter(s => changedHashes.includes(s.hash))
+        .map(s => [s.startIndex, s.endIndex] as [number, number])
+      currentIssues = currentIssues.filter(issue => {
+        for (const [start, end] of changedRanges) {
+          if (issue.range[0] < end && issue.range[1] > start) return false
+        }
+        return issue.range[1] <= docText.length
+      })
+      applyIssueDecorations(currentIssues)
+
       analyzing = true
       onAnalyzingChangeRef.current(true)
-      try {
-        const res = await publicFetch(getToken, `${WORKER_URL}/api/analyze`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            segments: apiSegments,
-            changedHashes,
-            roomId,
-            ...fileContextRef.current,
-          }),
-        })
 
-        if (!res.ok) { analyzing = false; return }
-        const data = await res.json()
-
-        // New issues from the API (for changed segments only)
-        const newIssues: AnalysisIssue[] = (data.issues || []).filter(
-          (issue: AnalysisIssue) =>
-            Array.isArray(issue.range) &&
-            typeof issue.range[0] === 'number' &&
-            typeof issue.range[1] === 'number' &&
-            issue.range[0] < issue.range[1] &&
-            issue.range[0] >= 0 &&
-            issue.range[1] <= docText.length
-        )
-
-        // Remove old issues that overlap with any changed segment's range
-        const changedRanges = apiSegments
-          .filter(s => changedHashes.includes(s.hash))
-          .map(s => [s.startIndex, s.endIndex] as [number, number])
-
-        currentIssues = currentIssues.filter(issue => {
-          // Drop if the issue overlaps any changed segment
-          for (const [start, end] of changedRanges) {
-            if (issue.range[0] < end && issue.range[1] > start) return false
+      const runBatch = async (batch: AnalyzerTask[]) => {
+        try {
+          const res = await publicFetch(getToken, `${WORKER_URL}/api/analyze`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              segments: apiSegments,
+              tasks: batch,
+              roomId,
+              ...fileContextRef.current,
+            }),
+          })
+          if (!res.ok) return
+          const data = await res.json()
+          const liveLen = ytext.toString().length
+          const incoming: AnalysisIssue[] = (data.issues || []).filter(
+            (issue: AnalysisIssue) =>
+              Array.isArray(issue.range) &&
+              typeof issue.range[0] === 'number' &&
+              typeof issue.range[1] === 'number' &&
+              issue.range[0] < issue.range[1] &&
+              issue.range[0] >= 0 &&
+              issue.range[1] <= liveLen
+          )
+          if (incoming.length > 0) {
+            currentIssues = [...currentIssues, ...incoming]
+            applyIssueDecorations(currentIssues)
           }
-          // Drop if the issue's range is now out of bounds
-          if (issue.range[1] > docText.length) return false
-          return true
-        })
+        } catch (err) {
+          console.error('[Mallet] Analysis batch error:', err)
+        }
+      }
 
-        // Add new issues
-        currentIssues = [...currentIssues, ...newIssues]
-
-        applyIssueDecorations(currentIssues)
+      try {
+        await Promise.allSettled(batches.map(runBatch))
 
         prevSegmentHashes = newHashes
-
-        // Persist the updated cache so a reload skips re-analysis.
-        // We rebuild issuesByHash from the full currentIssues so it always
-        // matches what's on screen (no stale entries from removed segments).
         cachedIssuesByHash = groupIssuesBySegment(currentIssues, apiSegments)
         if (roomId) saveRoom(roomId, {
           hashes: Array.from(newHashes),
           issuesByHash: cachedIssuesByHash,
           updatedAt: Date.now(),
         })
-      } catch (err) {
-        console.error('[Mallet] Analysis error:', err)
       } finally {
         analyzing = false
         onAnalyzingChangeRef.current(false)

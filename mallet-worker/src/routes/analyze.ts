@@ -10,7 +10,7 @@
  * no changedHashes and re-checks the entire prompt each call.
  */
 import { Hono } from 'hono'
-import { analyzePrompt } from '../lib/analyzer'
+import { analyzePrompt, type AnalyzerTask } from '../lib/analyzer'
 import type { Segment } from '../lib/segmenter'
 import { logAction } from '../lib/logging'
 import type { Env } from '../types'
@@ -19,7 +19,12 @@ const app = new Hono<{ Bindings: Env }>()
 
 interface AnalyzeRequest {
   segments: Segment[]
-  changedHashes: string[]
+  changedHashes?: string[]
+  // Explicit task batch from the client. When set, the analyzer runs
+  // EXACTLY these tasks and ignores `changedHashes`. The client uses this
+  // to spread a large prompt's N² pair fan-out across multiple requests
+  // so we stay under Cloudflare's 1000-subrequest-per-invocation limit.
+  tasks?: AnalyzerTask[]
   // Optional file context — passed by the editor for telemetry only.
   // The analyzer doesn't use these; they're logged so we can attribute
   // analysis activity to a specific repo/file.
@@ -33,17 +38,22 @@ interface AnalyzeRequest {
 app.post('/', async (c) => {
   const start = Date.now()
   const body = await c.req.json<AnalyzeRequest>()
-  const { segments, changedHashes, repoOwner, repoName, branch, filePath, roomId } = body
+  const { segments, changedHashes, tasks, repoOwner, repoName, branch, filePath, roomId } = body
 
   if (!segments || segments.length === 0) {
     return c.json({ issues: [] })
   }
 
-  console.log(`[analyze] ${changedHashes?.length ?? 0} changed of ${segments.length} total segments`)
+  if (tasks) {
+    console.log(`[analyze] ${tasks.length} explicit tasks over ${segments.length} segments`)
+  } else {
+    console.log(`[analyze] ${changedHashes?.length ?? 0} changed of ${segments.length} total segments`)
+  }
 
   const { issues, usage } = await analyzePrompt({
     segments,
     changedHashes: changedHashes || [],
+    tasks,
     openaiKey: c.env.OPENAI_API_KEY,
   })
 
@@ -59,6 +69,7 @@ app.post('/', async (c) => {
   await logAction(c, 'analyze', {
     segmentCount: segments.length,
     changedCount: changedHashes?.length ?? 0,
+    explicitTaskCount: tasks?.length ?? null,
     inputTokens: usage.inputTokens,
     outputTokens: usage.outputTokens,
     tasks: usage.tasks,
