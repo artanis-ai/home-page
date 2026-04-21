@@ -1,33 +1,39 @@
-import type { Env } from '../types'
+import { trace, type Attributes } from '@opentelemetry/api'
 
 // Structural type so this helper works from routes with or without
 // Variables (e.g. auth-protected routes use AuthVars, /t/* does not).
 interface LoggingContext {
-  env: Env
   req: { header(name: string): string | undefined }
 }
 
+const tracer = trace.getTracer('mallet-api')
+
+/**
+ * Emits one OTel span per logged action. Span name is the action, attrs
+ * carry the metadata. The @microlabs/otel-cf-workers `instrument()`
+ * wrapper ships these to Axiom via OTLP. Attrs must be primitives or
+ * arrays of primitives; nested objects are JSON-stringified.
+ */
 export async function logAction(
   c: LoggingContext,
   action: string,
   metadata: Record<string, unknown>
 ) {
-  const timestamp = Date.now()
-  const key = `log:${timestamp}:${action}`
-  const value = JSON.stringify({
-    action,
-    timestamp,
-    mid: readMid(c),
-    ...metadata,
-  })
+  const span = tracer.startSpan(action)
+  const mid = readMid(c)
+  if (mid) span.setAttribute('mallet.mid', mid)
 
-  try {
-    await c.env.LOGS.put(key, value, {
-      expirationTtl: 60 * 60 * 24 * 90, // 90 days
-    })
-  } catch (err) {
-    console.error('Failed to log action:', err)
+  for (const [k, v] of Object.entries(metadata)) {
+    if (v === null || v === undefined) continue
+    const attrKey = `mallet.${k}`
+    if (typeof v === 'object') {
+      span.setAttribute(attrKey, JSON.stringify(v))
+    } else {
+      span.setAttributes({ [attrKey]: v } as Attributes)
+    }
   }
+
+  span.end()
 }
 
 /**

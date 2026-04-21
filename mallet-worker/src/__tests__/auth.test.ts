@@ -11,7 +11,9 @@ const baseEnv: Env = {
   GITHUB_CLIENT_SECRET: 'test_client_secret',
   SESSION_SECRET: SECRET,
   ENVIRONMENT: 'development',
-  LOGS: {} as KVNamespace,
+  AXIOM_TOKEN: '',
+  AXIOM_DATASET: 'test',
+  AXIOM_TRACES_URL: 'https://api.axiom.co/v1/traces',
   INVITES: {} as KVNamespace,
   SIGNALING_ROOM: {} as DurableObjectNamespace,
 }

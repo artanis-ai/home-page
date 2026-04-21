@@ -12,6 +12,8 @@
     "seed-invites": "tsx scripts/seed-invites.ts"
   },
   "dependencies": {
+    "@microlabs/otel-cf-workers": "^1.0.0-rc.20",
+    "@opentelemetry/api": "^1.9.1",
     "hono": "^4.7.0",
     "jose": "^6.2.2",
     "openai": "^4.80.0"

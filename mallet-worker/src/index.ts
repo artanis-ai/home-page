@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { instrument, type ResolveConfigFn } from '@microlabs/otel-cf-workers'
 import type { Env } from './types'
 import { requireAuth, type AuthVars } from './lib/auth'
 import { rateLimitMiddleware, rateLimitMiddlewareByIP } from './lib/rate-limit'
@@ -104,4 +105,18 @@ app.route('/api/detect-prompts', detectPromptsRoute)
 app.route('/api/create-pr', createPRRoute)
 app.route('/api/github-token', githubTokenRoute)
 
-export default app
+// Axiom OTel exporter config. `instrument()` wraps the fetch handler,
+// auto-creates a root span per request, and flushes any child spans
+// (logAction) over OTLP at the end of the waitUntil lifecycle.
+const otelConfig: ResolveConfigFn = (env: Env) => ({
+  exporter: {
+    url: env.AXIOM_TRACES_URL || 'https://api.axiom.co/v1/traces',
+    headers: {
+      Authorization: `Bearer ${env.AXIOM_TOKEN}`,
+      'X-Axiom-Dataset': env.AXIOM_DATASET,
+    },
+  },
+  service: { name: 'mallet-api' },
+})
+
+export default instrument(app as unknown as ExportedHandler<Env>, otelConfig)

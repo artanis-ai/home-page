@@ -4,7 +4,13 @@ export interface Env {
   GITHUB_CLIENT_SECRET: string
   SESSION_SECRET: string
   ENVIRONMENT: string
-  LOGS: KVNamespace
+  // Axiom OTel ingest. Token is set via `wrangler secret put AXIOM_TOKEN`;
+  // dataset + traces URL are vars. When AXIOM_TOKEN is unset (local dev,
+  // tests) the OTel exporter still runs but its POSTs fail silently — we
+  // don't want missing telemetry to take down the worker.
+  AXIOM_TOKEN: string
+  AXIOM_DATASET: string
+  AXIOM_TRACES_URL: string
   INVITES: KVNamespace
   SIGNALING_ROOM: DurableObjectNamespace
 }

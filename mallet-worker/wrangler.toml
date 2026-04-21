@@ -1,6 +1,7 @@
 name = "mallet-api"
 main = "src/index.ts"
 compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
 
 # Default (development) environment.
 # Secrets must be set via `wrangler secret put` (or in .dev.vars for dev):
@@ -8,12 +9,11 @@ compatibility_date = "2024-12-01"
 #   - GITHUB_CLIENT_ID
 #   - GITHUB_CLIENT_SECRET
 #   - SESSION_SECRET (any long random string; used to sign session JWTs)
+#   - AXIOM_TOKEN    (Axiom ingest token — OTel exporter bearer)
 [vars]
 ENVIRONMENT = "development"
-
-[[kv_namespaces]]
-binding = "LOGS"
-id = "b392b1982cfb4a779ab30e16bef4a25a"
+AXIOM_DATASET = "mallet-dev"
+AXIOM_TRACES_URL = "https://api.axiom.co/v1/traces"
 
 [[kv_namespaces]]
 binding = "INVITES"
@@ -33,15 +33,14 @@ new_sqlite_classes = ["SignalingRoom"]
 #   wrangler secret put GITHUB_CLIENT_ID --env production
 #   wrangler secret put GITHUB_CLIENT_SECRET --env production
 #   wrangler secret put SESSION_SECRET --env production
+#   wrangler secret put AXIOM_TOKEN --env production
 [env.production]
 name = "mallet-api"
 
 [env.production.vars]
 ENVIRONMENT = "production"
-
-[[env.production.kv_namespaces]]
-binding = "LOGS"
-id = "b392b1982cfb4a779ab30e16bef4a25a"
+AXIOM_DATASET = "mallet"
+AXIOM_TRACES_URL = "https://api.axiom.co/v1/traces"
 
 [[env.production.kv_namespaces]]
 binding = "INVITES"
