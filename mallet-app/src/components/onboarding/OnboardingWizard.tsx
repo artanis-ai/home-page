@@ -285,24 +285,36 @@ export function OnboardingWizard() {
         return (
           <div>
             <h1 className="font-display text-3xl font-bold text-earth-dark">
-              {isOther ? 'New integration, coming soon' : `${tool.name} integration, coming soon`}
+              {isOther ? 'Which integration would you like to see?' : `${tool.name} integration, coming soon`}
             </h1>
             <p className="mt-2 text-text-mid">
               {isOther
-                ? "We're planning direct integrations with more prompt management tools — we've bumped this in priority based on interest."
+                ? "We're planning direct integrations with more prompt management tools — tell us which one you'd like next and we'll bump it up the list."
                 : `We're working on a direct ${tool.name} integration and have bumped it in priority based on interest.`}
             </p>
 
-            <p className="mt-6 text-text-mid">
-              For now, paste your prompt straight into the scratch editor:
-            </p>
+            {!isOther && (
+              <p className="mt-6 text-text-mid">
+                For now, paste your prompt straight into the scratch editor:
+              </p>
+            )}
 
-            <button
-              onClick={() => goToEditor()}
-              className="mt-4 cursor-pointer rounded-full bg-primary px-6 py-2.5 font-medium text-white transition hover:bg-primary-dark"
-            >
-              Open Scratch Editor
-            </button>
+            {isOther ? (
+              <a
+                href="mailto:team@artanis.ai?subject=Mallet%20integration%20request&body=Hi%20Artanis%20team%2C%0A%0AI%27d%20love%20to%20see%20Mallet%20integrate%20with%3A%20"
+                onClick={() => track('onboarding.elsewhere.contact-clicked')}
+                className="mt-6 inline-block cursor-pointer rounded-full bg-primary px-6 py-2.5 font-medium text-white transition hover:bg-primary-dark"
+              >
+                Contact us
+              </a>
+            ) : (
+              <button
+                onClick={() => goToEditor()}
+                className="mt-4 cursor-pointer rounded-full bg-primary px-6 py-2.5 font-medium text-white transition hover:bg-primary-dark"
+              >
+                Open Scratch Editor
+              </button>
+            )}
           </div>
         )
       })()}
