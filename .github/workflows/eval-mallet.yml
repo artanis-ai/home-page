@@ -31,7 +31,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: mallet-worker/package-lock.json
 
@@ -39,25 +39,39 @@ jobs:
         working-directory: mallet-worker
         run: npm ci
 
+      - name: Check OPENAI_API_KEY is set
+        id: check_secret
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        # Nightly cron runs unattended; if the repo secret isn't set yet,
+        # we skip (not fail) so the schedule stays green until someone
+        # adds the secret. Manual `workflow_dispatch` runs still surface
+        # a clear warning annotation so the person who kicked it sees why.
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::warning::OPENAI_API_KEY secret missing — skipping eval"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Write .dev.vars from secrets
         # The eval bootstraps OPENAI_API_KEY from .dev.vars if not in env;
         # we set it here so wrangler dev (background) and the test runner agree.
         # SESSION_SECRET is only used by the OAuth + session routes, which the
         # eval suite doesn't hit, so we stub it with a fixed value.
+        if: steps.check_secret.outputs.skip != 'true'
         working-directory: mallet-worker
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          if [ -z "$OPENAI_API_KEY" ]; then
-            echo "::error::OPENAI_API_KEY secret missing — eval cannot run"
-            exit 1
-          fi
           {
             echo "OPENAI_API_KEY=\"$OPENAI_API_KEY\""
             echo "SESSION_SECRET=\"ci-eval-secret-unused\""
           } > .dev.vars
 
       - name: Start wrangler dev
+        if: steps.check_secret.outputs.skip != 'true'
         working-directory: mallet-worker
         run: |
           npx wrangler dev --port 8787 > /tmp/wrangler.log 2>&1 &
@@ -74,6 +88,7 @@ jobs:
           exit 1
 
       - name: Run eval suite
+        if: steps.check_secret.outputs.skip != 'true'
         working-directory: mallet-worker
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
