@@ -68,6 +68,7 @@ export function ShareCard() {
       style={{
         width: 1200,
         height: 630,
+        boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
         background: 'linear-gradient(135deg in oklab, #B5D5E6 0%, #C8E0EE 45%, #E6F1F6 100%)',
