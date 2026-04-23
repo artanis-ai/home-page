@@ -104,6 +104,7 @@ interface PromptEditorProps {
   onIssuesChange: (issues: AnalysisIssue[]) => void
   onPeersChange: (peers: Peer[]) => void
   onAnalyzingChange: (analyzing: boolean) => void
+  onAnalysisErrorChange: (hasError: boolean) => void
   roomId: string | null
   userName?: string
   userImageUrl?: string
@@ -116,13 +117,14 @@ interface PromptEditorProps {
   fileContext?: { repoOwner?: string; repoName?: string; branch?: string; filePath?: string }
 }
 
-export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeersChange, onAnalyzingChange, roomId, userName, userImageUrl, onActiveIssueChange, onReplaceText, getToken, fileContext }: PromptEditorProps) {
+export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeersChange, onAnalyzingChange, onAnalysisErrorChange, roomId, userName, userImageUrl, onActiveIssueChange, onReplaceText, getToken, fileContext }: PromptEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const onChangeRef = useRef(onChange)
   const onIssuesChangeRef = useRef(onIssuesChange)
   const onPeersChangeRef = useRef(onPeersChange)
   const onAnalyzingChangeRef = useRef(onAnalyzingChange)
+  const onAnalysisErrorChangeRef = useRef(onAnalysisErrorChange)
   const onActiveIssueChangeRef = useRef(onActiveIssueChange)
   const fileContextRef = useRef(fileContext)
   const currentIssuesRef = useRef<AnalysisIssue[]>([])
@@ -130,6 +132,7 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
   onIssuesChangeRef.current = onIssuesChange
   onPeersChangeRef.current = onPeersChange
   onAnalyzingChangeRef.current = onAnalyzingChange
+  onAnalysisErrorChangeRef.current = onAnalysisErrorChange
   onActiveIssueChangeRef.current = onActiveIssueChange
   fileContextRef.current = fileContext
 
@@ -407,6 +410,8 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
 
       analyzing = true
       onAnalyzingChangeRef.current(true)
+      let batchSuccessCount = 0
+      let batchFailureCount = 0
 
       const runBatch = async (batch: AnalyzerTask[]) => {
         try {
@@ -420,7 +425,10 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
               ...fileContextRef.current,
             }),
           })
-          if (!res.ok) return
+          if (!res.ok) {
+            batchFailureCount++
+            return
+          }
           const data = await res.json()
           const liveLen = ytext.toString().length
           const incoming: AnalysisIssue[] = (data.issues || []).filter(
@@ -436,8 +444,10 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
             currentIssues = [...currentIssues, ...incoming]
             applyIssueDecorations(currentIssues)
           }
+          batchSuccessCount++
         } catch (err) {
           console.error('[Mallet] Analysis batch error:', err)
+          batchFailureCount++
         }
       }
 
@@ -467,6 +477,7 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
       } finally {
         analyzing = false
         onAnalyzingChangeRef.current(false)
+        onAnalysisErrorChangeRef.current(batchSuccessCount === 0 && batchFailureCount > 0)
       }
     }
 

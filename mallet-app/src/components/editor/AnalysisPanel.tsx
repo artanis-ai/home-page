@@ -29,6 +29,7 @@ interface AnalysisPanelProps {
   onIssueClick: (id: string | null) => void
   onAcceptSuggestion: (range: [number, number], replacement: string) => void
   analyzing?: boolean
+  analysisError?: boolean
   /** Returns the session JWT for the /api/suggest call. */
   getToken: () => Promise<string | null>
   /** File context stamped into server logs for attribution. Optional — scratch editor has none. */
@@ -44,6 +45,7 @@ export function AnalysisPanel({
   onIssueClick,
   onAcceptSuggestion,
   analyzing,
+  analysisError,
   getToken,
   fileContext,
   onClose,
@@ -126,7 +128,29 @@ export function AnalysisPanel({
       <div className="flex-1 overflow-auto">
         {issues.length === 0 && (
           <div className="px-4 py-8 text-center text-sm text-text-muted">
-            {content.trim() ? 'No issues found. Looking good!' : 'Start typing to see analysis.'}
+            {!content.trim() ? (
+              'Start typing to see analysis.'
+            ) : analysisError && !analyzing ? (
+              <p className="text-primary">Analysis failed. Check your connection and try editing to retry.</p>
+            ) : (
+              <>
+                <p>No issues found. Looking good!</p>
+                {!analyzing && (
+                  <p className="mt-3 text-xs">
+                    Now see how it does in prod →{' '}
+                    <a
+                      href="https://calendar.notion.so/meet/yousef/sam"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => track('analysis.clean.upsell.clicked')}
+                      className="font-medium text-primary underline hover:text-primary-dark"
+                    >
+                      Artanis
+                    </a>
+                  </p>
+                )}
+              </>
+            )}
           </div>
         )}
 

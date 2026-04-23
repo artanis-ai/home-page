@@ -105,6 +105,18 @@ export function PRCreator({ owner, repo, filePath, content, onClose }: PRCreator
             >
               Open on GitHub <ExternalLink className="h-4 w-4" />
             </a>
+            <p className="mt-6 text-sm text-text-muted">
+              See how it does in prod →{' '}
+              <a
+                href="https://calendar.notion.so/meet/yousef/sam"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => track('pr.upsell.clicked')}
+                className="font-medium text-primary underline hover:text-primary-dark"
+              >
+                Artanis
+              </a>
+            </p>
           </div>
         ) : (
           <>

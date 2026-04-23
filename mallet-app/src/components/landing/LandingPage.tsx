@@ -118,6 +118,9 @@ export function LandingPage() {
             </p>
             <a
               href="https://artanis.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => track('landing.upsell.clicked')}
               className="mt-2 inline-flex items-center gap-1 font-medium text-primary transition hover:text-primary-dark"
             >
               Try Artanis AI

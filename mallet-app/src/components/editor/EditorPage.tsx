@@ -7,7 +7,7 @@ import { useGitHubToken } from '../../hooks/useGitHubToken'
 import { PromptEditor, type Peer } from './PromptEditor'
 import { AnalysisPanel } from './AnalysisPanel'
 import { PRCreator } from '../repo/PRCreator'
-import { Share2, GitPullRequest, Check, PanelRightOpen, PanelRightClose } from 'lucide-react'
+import { Share2, GitPullRequest, Check, PanelRightOpen, PanelRightClose, Heart } from 'lucide-react'
 import type { AnalysisIssue } from '../../types'
 import {
   parseLineRangeHash,
@@ -38,6 +38,7 @@ export function EditorPage() {
   const [copied, setCopied] = useState(false)
   const [peers, setPeers] = useState<Peer[]>([])
   const [analyzing, setAnalyzing] = useState(false)
+  const [analysisError, setAnalysisError] = useState(false)
   const replaceTextRef = useRef<((from: number, to: number, text: string) => void) | null>(null)
   // Default to hidden on mobile (panel would otherwise overlay the editor and
   // there'd be nothing to type into); always visible on desktop ≥1024px where
@@ -241,13 +242,14 @@ export function EditorPage() {
             the panel takes its own column (flex-initial w-80) so the editor
             shrinks. On mobile the panel is a drawer that overlays the
             editor — the editor stays visible behind the gap. */}
-        <div className="flex-1 overflow-auto">
+        <div className="relative flex-1 overflow-auto">
           <PromptEditor
             initialContent={content}
             onChange={setContent}
             onIssuesChange={setIssues}
             onPeersChange={setPeers}
             onAnalyzingChange={setAnalyzing}
+            onAnalysisErrorChange={setAnalysisError}
             roomId={roomId}
             userName={user?.name || user?.login || undefined}
             userImageUrl={user?.avatar || undefined}
@@ -257,6 +259,32 @@ export function EditorPage() {
             getToken={getToken}
             fileContext={fileContext}
           />
+          <div className="pointer-events-none absolute bottom-3 right-3 z-10">
+            <div className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-warm bg-white/90 px-3 py-1.5 text-xs text-text-muted shadow-sm backdrop-blur">
+              <span>Made with</span>
+              <Heart className="h-3 w-3 fill-primary text-primary" />
+              <span>by</span>
+              <a
+                href="https://artanis.ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => track('editor.brand.clicked')}
+                className="font-medium text-primary hover:underline"
+              >
+                Artanis
+              </a>
+              <span>: no-code AI evals.</span>
+              <a
+                href="https://calendar.notion.so/meet/yousef/sam"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => track('editor.brand.demo.clicked')}
+                className="font-medium text-primary hover:underline"
+              >
+                Let's talk!
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Mobile drawer backdrop — tapping closes the panel. Only rendered
@@ -285,6 +313,7 @@ export function EditorPage() {
             onIssueClick={setActiveIssueId}
             onAcceptSuggestion={handleAcceptSuggestion}
             analyzing={analyzing}
+            analysisError={analysisError}
             getToken={getToken}
             fileContext={fileContext}
             onClose={() => setShowPanel(false)}
