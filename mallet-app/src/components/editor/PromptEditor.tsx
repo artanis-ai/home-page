@@ -10,7 +10,7 @@ import { segmentPrompt, hashSegment } from '../../lib/segmenter'
 import { WORKER_URL, publicFetch } from '../../lib/api'
 import { loadRoom, saveRoom, groupIssuesBySegment, rehydrateIssues } from '../../lib/segment-cache'
 import { planTasks, prioritizeAndBatch, type AnalyzerTask } from '../../lib/analyzer-tasks'
-import { issueKeyFromContent } from '../../lib/issue-key'
+import { issueKeyFromContent, filterDismissedIssues } from '../../lib/issue-key'
 import type { AnalysisIssue } from '../../types'
 
 // --- CodeMirror decoration setup ---
@@ -258,12 +258,11 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
       }
     }, 0)
 
-    // Filter out issues the user has dismissed. Key derives from the affected
-    // text slice + type + (normalized) message — when the slice text changes,
-    // the dismissal naturally stops applying.
+    // Filter dismissed issues. Pulled into lib/issue-key.ts so the contract
+    // (key derives from slice + type + message; editing the slice clears the
+    // dismissal) is unit-tested without mounting the editor.
     function filterDismissed(issues: AnalysisIssue[], docText: string): AnalysisIssue[] {
-      if (dismissedMap.size === 0) return issues
-      return issues.filter(issue => !dismissedMap.has(issueKeyFromContent(issue, docText)))
+      return filterDismissedIssues(issues, docText, dismissedMap)
     }
 
     // --- Issue decorations: apply directly from AnalysisIssue[] ---

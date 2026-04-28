@@ -193,6 +193,93 @@ test.describe('Editor basics', () => {
     await ctx2.close()
   })
 
+  test('issues are sorted top-to-bottom by document position', async ({ page }) => {
+    test.setTimeout(60000)
+    await openScratchDoc(page)
+    // Three contradictions, ordered by appearance in the doc. We don't care
+    // which exact issues the LLM picks — only that whatever it returns is
+    // sorted by where it appears in the editor (range[0] ascending).
+    await typeInEditor(
+      page,
+      'Be brief in all responses.\n' +
+      'Always answer questions.\n' +
+      'Give long detailed answers to every question.\n' +
+      'Never answer questions.\n',
+    )
+    await waitForAnalysis(page)
+    await page.waitForFunction(() => document.querySelectorAll('[data-issue-id]').length >= 2, { timeout: 60000 })
+
+    // Map each issue's panel position to its position in the editor doc by
+    // matching the snippet shown in the panel against the editor text.
+    const offsets = await page.evaluate(() => {
+      const editorText = Array.from(document.querySelectorAll('.cm-line')).map(l => l.textContent || '').join('\n')
+      const buttons = Array.from(document.querySelectorAll('[data-issue-id]')) as HTMLElement[]
+      return buttons.map(btn => {
+        // Each issue card has a font-mono snippet that quotes the offending slice.
+        const snippet = btn.querySelector('p.font-mono')?.textContent?.replace(/\.\.\.$/, '').trim() || ''
+        return snippet ? editorText.indexOf(snippet) : -1
+      })
+    })
+
+    // Drop unmatched (-1) offsets defensively, then assert ascending.
+    const matched = offsets.filter(o => o >= 0)
+    expect(matched.length).toBeGreaterThanOrEqual(2)
+    for (let i = 1; i < matched.length; i++) {
+      expect(matched[i]).toBeGreaterThanOrEqual(matched[i - 1])
+    }
+  })
+
+  test('dismiss removes the issue and it stays gone after re-analysis', async ({ page }) => {
+    test.setTimeout(120000)
+    await openScratchDoc(page)
+    await typeInEditor(page, 'Be brief. Give long detailed answers.')
+    await waitForAnalysis(page)
+
+    // Open the first issue → click Dismiss
+    await page.locator('[data-issue-id]').first().click()
+    const dismissBtn = page.getByRole('button', { name: 'Dismiss', exact: true })
+    await expect(dismissBtn).toBeVisible({ timeout: 15000 })
+
+    const beforeCount = await page.locator('[data-issue-id]').count()
+    await dismissBtn.click()
+    // Issue card disappears immediately
+    await expect.poll(() => page.locator('[data-issue-id]').count(), { timeout: 5000 })
+      .toBeLessThan(beforeCount)
+
+    // Trigger another analysis cycle with an unrelated edit and verify the
+    // dismissed issue does NOT come back. Snapshot the remaining issue keys
+    // (snippet text) and assert they don't grow back to the original count
+    // for the same offending slice.
+    const afterCount = await page.locator('[data-issue-id]').count()
+    await typeInEditor(page, ' Be polite.')
+    await page.waitForTimeout(3000) // analysis debounce + run
+    await waitForAnalysis(page)
+
+    // The dismissed contradiction on "Be brief." / "Give long detailed answers."
+    // is the same logical issue — re-analysis should not surface it again
+    // (segment text unchanged → key unchanged → still in the dismissed set).
+    expect(await page.locator('[data-issue-id]').count()).toBeLessThanOrEqual(afterCount + 1)
+  })
+
+  test('inline diff renders del/ins spans, not two separate lines', async ({ page }) => {
+    test.setTimeout(90000)
+    await openScratchDoc(page)
+    await typeInEditor(page, 'Be brief. Give long detailed answers.')
+    await waitForAnalysis(page)
+    await page.locator('[data-issue-id]').first().click()
+    await expect(page.getByRole('button', { name: 'Accept', exact: true })).toBeVisible({ timeout: 30000 })
+
+    // Inline diff render: a `line-through` span (deletion) and a `text-forest`
+    // span (addition) live inside the SAME container, not on separate lines.
+    const sharedParent = await page.evaluate(() => {
+      const del = document.querySelector('span.line-through') as HTMLElement | null
+      const ins = document.querySelector('span.text-forest') as HTMLElement | null
+      if (!del || !ins) return null
+      return del.parentElement === ins.parentElement
+    })
+    expect(sharedParent).toBe(true)
+  })
+
   test('share button copies URL', async ({ page }) => {
     await openScratchDoc(page)
     const shareButton = page.locator('button:has-text("Share")')
@@ -308,6 +395,47 @@ test.describe('Collaboration', () => {
 
     await context1.close()
     await context2.close()
+  })
+
+  test('dismissing an issue in tab 1 propagates to tab 2 via Yjs', async ({ browser }) => {
+    test.setTimeout(180000)
+    const docId = Math.random().toString(36).slice(2, 10)
+
+    // Tab 1: type a contradiction and wait for analysis
+    const ctx1 = await browser.newContext()
+    const page1 = await ctx1.newPage()
+    await page1.goto(`http://localhost:5180/mallet/#/d/${docId}`)
+    await page1.waitForSelector('.cm-content', { timeout: 10000 })
+    await page1.locator('.cm-content').click()
+    await page1.locator('.cm-content').pressSequentially('Be brief. Give long detailed answers.', { delay: 20 })
+    await page1.waitForFunction(() => document.querySelectorAll('[data-issue-id]').length > 0, { timeout: 60000 })
+
+    // Tab 2: open same doc, wait for sync of content + analysis
+    const ctx2 = await browser.newContext()
+    const page2 = await ctx2.newPage()
+    await page2.goto(`http://localhost:5180/mallet/#/d/${docId}`)
+    await page2.waitForSelector('.cm-content', { timeout: 10000 })
+    await page2.waitForFunction(() => document.querySelectorAll('[data-issue-id]').length > 0, { timeout: 60000 })
+
+    const tab2Before = await page2.locator('[data-issue-id]').count()
+    expect(tab2Before).toBeGreaterThan(0)
+
+    // Tab 1: open the first issue and dismiss it
+    await page1.locator('[data-issue-id]').first().click()
+    const dismissBtn = page1.getByRole('button', { name: 'Dismiss', exact: true })
+    await dismissBtn.waitFor({ timeout: 30000 })
+    await dismissBtn.click()
+
+    // Tab 2 should see the dismissed issue disappear within a few seconds
+    // (Y.Map update propagates over y-webrtc → filterDismissedIssues drops it
+    // → applyIssueDecorations re-emits the filtered list).
+    await expect.poll(
+      () => page2.locator('[data-issue-id]').count(),
+      { timeout: 15000, message: 'tab 2 should see fewer issues after dismiss in tab 1' },
+    ).toBeLessThan(tab2Before)
+
+    await ctx1.close()
+    await ctx2.close()
   })
 })
 

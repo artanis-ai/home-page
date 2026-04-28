@@ -24,3 +24,19 @@ export function issueKeyFromContent(issue: AnalysisIssue, content: string): stri
   const slice = content.slice(issue.range[0], issue.range[1])
   return issueKey(slice, issue.type, issue.message)
 }
+
+/**
+ * Drop any issues whose current key (computed from the live `docText`) is in
+ * the dismissed set. Pulled out of PromptEditor so it can be unit-tested
+ * without mounting the editor + Yjs stack.
+ *
+ * The set is `has`-checked, so any Set-like (real Set, Y.Map, Map) works.
+ */
+export function filterDismissedIssues(
+  issues: AnalysisIssue[],
+  docText: string,
+  dismissed: { has: (key: string) => boolean; size?: number },
+): AnalysisIssue[] {
+  if (dismissed.size === 0) return issues
+  return issues.filter(issue => !dismissed.has(issueKeyFromContent(issue, docText)))
+}
