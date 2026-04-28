@@ -1,8 +1,37 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { AlertTriangle, HelpCircle, Lightbulb, ChevronRight, Check, X, Loader2 } from 'lucide-react'
+import diff from 'fast-diff'
 import { WORKER_URL, publicFetch } from '../../lib/api'
 import { track } from '../../lib/track'
+import { issueKey } from '../../lib/issue-key'
 import type { AnalysisIssue, Suggestion } from '../../types'
+
+// Suggestion cache keyed by stable issueKey() — clicking the same issue twice
+// reuses the previous LLM result instead of firing another /api/suggest call
+// (and rolling fresh dice on the wording).
+const suggestionCache = new Map<string, Suggestion>()
+
+function renderInlineDiff(original: string, suggested: string) {
+  const parts = diff(original, suggested)
+  return parts.map(([op, text], i) => {
+    if (op === diff.EQUAL) return <span key={i}>{text}</span>
+    if (op === diff.DELETE) {
+      return (
+        <span
+          key={i}
+          className="bg-primary/10 text-primary line-through decoration-primary/60"
+        >
+          {text}
+        </span>
+      )
+    }
+    return (
+      <span key={i} className="bg-forest/10 text-forest">
+        {text}
+      </span>
+    )
+  })
+}
 
 const issueIcons: Record<string, typeof AlertTriangle> = {
   contradiction: AlertTriangle,
@@ -34,6 +63,8 @@ interface AnalysisPanelProps {
   getToken: () => Promise<string | null>
   /** File context stamped into server logs for attribution. Optional — scratch editor has none. */
   fileContext?: { repoOwner?: string; repoName?: string; branch?: string; filePath?: string }
+  /** Persistent dismissal — adds the issue to the synced dismissed-set so re-analysis won't re-flag it. */
+  onDismissIssue?: (issue: AnalysisIssue) => void
   /** Mobile-only close button. Hidden on lg+ where panel is always visible. */
   onClose?: () => void
 }
@@ -48,12 +79,21 @@ export function AnalysisPanel({
   analysisError,
   getToken,
   fileContext,
+  onDismissIssue,
   onClose,
 }: AnalysisPanelProps) {
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null)
   const [loadingSuggestion, setLoadingSuggestion] = useState(false)
   const contentRef = useRef(content)
   contentRef.current = content
+
+  // Document order — issues come back from the analyzer in cursor-proximity
+  // order (the batch scheduler optimizes near-cursor segments first), but the
+  // panel reads top-to-bottom.
+  const sortedIssues = useMemo(
+    () => [...issues].sort((a, b) => a.range[0] - b.range[0] || a.range[1] - b.range[1]),
+    [issues],
+  )
 
   async function fetchSuggestion(issue: AnalysisIssue) {
     // Read content from CM editor directly — React state is often stale with Yjs
@@ -64,6 +104,12 @@ export function AnalysisPanel({
     const currentContent = editorText || contentRef.current || content
     const segText = currentContent.slice(issue.range[0], issue.range[1])
     if (!segText.trim()) return
+    const cacheKey = issueKey(segText, issue.type, issue.message)
+    const cached = suggestionCache.get(cacheKey)
+    if (cached) {
+      setSuggestion(cached)
+      return
+    }
     setLoadingSuggestion(true)
     setSuggestion(null)
     try {
@@ -84,7 +130,8 @@ export function AnalysisPanel({
         console.error('[Mallet] Suggestion API error:', res.status, errText)
         return
       }
-      const data = await res.json()
+      const data: Suggestion = await res.json()
+      suggestionCache.set(cacheKey, data)
       setSuggestion(data)
     } catch (err) {
       console.error('[Mallet] Suggestion fetch error:', err)
@@ -154,7 +201,7 @@ export function AnalysisPanel({
           </div>
         )}
 
-        {issues.map((issue) => {
+        {sortedIssues.map((issue) => {
           const Icon = issueIcons[issue.type] || Lightbulb
           const color = issueColors[issue.type] || 'text-earth'
           const label = issueLabels[issue.type] || issue.type
@@ -205,13 +252,8 @@ export function AnalysisPanel({
 
                   {suggestion && !loadingSuggestion && (
                     <div>
-                      <div className="mb-3 rounded-lg border border-warm bg-white p-3">
-                        <div className="mb-1 font-mono text-xs">
-                          <span className="bg-primary/10 text-primary line-through">{suggestion.original}</span>
-                        </div>
-                        <div className="font-mono text-xs">
-                          <span className="bg-forest/10 text-forest">{suggestion.suggested}</span>
-                        </div>
+                      <div className="mb-3 whitespace-pre-wrap break-words rounded-lg border border-warm bg-white p-3 font-mono text-xs leading-relaxed">
+                        {renderInlineDiff(suggestion.original, suggestion.suggested)}
                       </div>
                       {suggestion.explanation && (
                         <p className="mb-3 text-xs text-text-muted">{suggestion.explanation}</p>
@@ -234,6 +276,7 @@ export function AnalysisPanel({
                         <button
                           onClick={() => {
                             track('editor.suggestion.dismissed', { issueType: issue.type })
+                            onDismissIssue?.(issue)
                             onIssueClick(null)
                             setSuggestion(null)
                           }}

@@ -10,6 +10,7 @@ import { segmentPrompt, hashSegment } from '../../lib/segmenter'
 import { WORKER_URL, publicFetch } from '../../lib/api'
 import { loadRoom, saveRoom, groupIssuesBySegment, rehydrateIssues } from '../../lib/segment-cache'
 import { planTasks, prioritizeAndBatch, type AnalyzerTask } from '../../lib/analyzer-tasks'
+import { issueKeyFromContent } from '../../lib/issue-key'
 import type { AnalysisIssue } from '../../types'
 
 // --- CodeMirror decoration setup ---
@@ -111,13 +112,14 @@ interface PromptEditorProps {
   activeIssueId: string | null
   onActiveIssueChange: (id: string | null) => void
   onReplaceText: React.MutableRefObject<((from: number, to: number, text: string) => void) | null>
+  onDismissIssue: React.MutableRefObject<((issue: AnalysisIssue) => void) | null>
   /** Returns the session JWT for HTTP API calls (analyze/suggest only). */
   getToken: () => Promise<string | null>
   /** File context stamped into server logs for attribution. Optional — scratch editor has none. */
   fileContext?: { repoOwner?: string; repoName?: string; branch?: string; filePath?: string }
 }
 
-export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeersChange, onAnalyzingChange, onAnalysisErrorChange, roomId, userName, userImageUrl, onActiveIssueChange, onReplaceText, getToken, fileContext }: PromptEditorProps) {
+export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeersChange, onAnalyzingChange, onAnalysisErrorChange, roomId, userName, userImageUrl, onActiveIssueChange, onReplaceText, onDismissIssue, getToken, fileContext }: PromptEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const onChangeRef = useRef(onChange)
@@ -144,6 +146,10 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
     const ydoc = new Y.Doc()
     const ytext = ydoc.getText('prompt')
     const undoManager = new Y.UndoManager(ytext)
+    // Per-room dismissed-issue set, keyed by issueKey() — survives re-analysis
+    // until the underlying segment text changes (the key embeds the slice, so
+    // editing the line drops the key naturally). Syncs to peers via WebRTC.
+    const dismissedMap = ydoc.getMap<true>('dismissed')
 
     // --- Set up WebRTC provider ---
     let provider: WebrtcProvider | null = null
@@ -252,15 +258,24 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
       }
     }, 0)
 
+    // Filter out issues the user has dismissed. Key derives from the affected
+    // text slice + type + (normalized) message — when the slice text changes,
+    // the dismissal naturally stops applying.
+    function filterDismissed(issues: AnalysisIssue[], docText: string): AnalysisIssue[] {
+      if (dismissedMap.size === 0) return issues
+      return issues.filter(issue => !dismissedMap.has(issueKeyFromContent(issue, docText)))
+    }
+
     // --- Issue decorations: apply directly from AnalysisIssue[] ---
     function applyIssueDecorations(issues: AnalysisIssue[]) {
       if (!viewRef.current) return
       const docText = viewRef.current.state.doc.toString()
-      currentIssuesRef.current = issues
+      const visible = filterDismissed(issues, docText)
+      currentIssuesRef.current = visible
       // Defer React state updates to next microtask to avoid re-entrancy
       setTimeout(() => {
         onChangeRef.current(docText)
-        onIssuesChangeRef.current(issues)
+        onIssuesChangeRef.current(visible)
       }, 0)
 
       // Apply decorations in next animation frame
@@ -269,7 +284,7 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
         try {
           const currentLen = viewRef.current.state.doc.length
           const decorations: { from: number; to: number; decoration: Decoration }[] = []
-          for (const issue of issues) {
+          for (const issue of visible) {
             const from = issue.range[0]
             const to = Math.min(issue.range[1], currentLen)
             if (from < 0 || to <= from || from >= currentLen) continue
@@ -289,6 +304,19 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
         }
       })
     }
+
+    // Expose dismiss action — adds the issue's key to the synced map, then
+    // re-renders against the latest `currentIssues` so the issue disappears
+    // immediately (before the next analysis cycle).
+    if (onDismissIssue) onDismissIssue.current = (issue: AnalysisIssue) => {
+      const docText = ytext.toString()
+      dismissedMap.set(issueKeyFromContent(issue, docText), true)
+      applyIssueDecorations(currentIssues)
+    }
+
+    // Re-apply when a peer dismisses something on another tab/device
+    const onDismissedRemote = () => applyIssueDecorations(currentIssues)
+    dismissedMap.observe(onDismissedRemote)
 
     // --- Incremental analysis (leader only) ---
     // Hydrate the per-room cache so reloads / remounts don't re-analyze
@@ -315,6 +343,7 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
         endIndex: s.endOffset,
       }))
       currentIssues = rehydrateIssues(cachedIssuesByHash, segs)
+      // applyIssueDecorations handles the dismissed filter; pass everything in.
       if (currentIssues.length > 0) applyIssueDecorations(currentIssues)
     }
     if (ytext.toString().trim()) {
@@ -493,6 +522,7 @@ export function PromptEditor({ initialContent, onChange, onIssuesChange, onPeers
     return () => {
       clearTimeout(seedTimer)
       if (analyzeTimer) clearTimeout(analyzeTimer)
+      dismissedMap.unobserve(onDismissedRemote)
       view.destroy()
       viewRef.current = null
       provider?.destroy()

@@ -43,7 +43,7 @@ app.post('/', async (c) => {
           content: `Issue type: ${issueType}\nIssue: ${message}\n\nSegment with issue:\n"${segmentText}"\n\nFull prompt for context:\n${fullPrompt}\n\nReturn JSON: { "original": "...", "suggested": "...", "explanation": "..." }`,
         },
       ],
-      temperature: 0.3,
+      temperature: 0,
     })
 
     const content = completion.choices[0]?.message?.content

@@ -40,6 +40,7 @@ export function EditorPage() {
   const [analyzing, setAnalyzing] = useState(false)
   const [analysisError, setAnalysisError] = useState(false)
   const replaceTextRef = useRef<((from: number, to: number, text: string) => void) | null>(null)
+  const dismissIssueRef = useRef<((issue: AnalysisIssue) => void) | null>(null)
   // Default to hidden on mobile (panel would otherwise overlay the editor and
   // there'd be nothing to type into); always visible on desktop ≥1024px where
   // the side-by-side layout has room for both.
@@ -256,6 +257,7 @@ export function EditorPage() {
             activeIssueId={activeIssueId}
             onActiveIssueChange={setActiveIssueId}
             onReplaceText={replaceTextRef}
+            onDismissIssue={dismissIssueRef}
             getToken={getToken}
             fileContext={fileContext}
           />
@@ -316,6 +318,7 @@ export function EditorPage() {
             analysisError={analysisError}
             getToken={getToken}
             fileContext={fileContext}
+            onDismissIssue={(issue) => dismissIssueRef.current?.(issue)}
             onClose={() => setShowPanel(false)}
           />
         </div>
