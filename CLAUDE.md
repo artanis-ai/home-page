@@ -4,22 +4,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a static landing page for Artanis AI (artanis.ai), deployed via GitHub Pages. The entire site is a single HTML file with no build process or dependencies.
+This repo serves three properties on the `artanis.ai` domain via GitHub Pages:
 
-**Product:** SaaS platform for measuring AI accuracy in production
-**Value Proposition:** "Seamless labelling and evals with 3 lines of code"
-**Target Audience:** Technical teams (AI engineers, ML engineers) at startups
+1. **`/` (artanis.ai)** — main landing page, single hand-written `index.html`. The Artanis platform ("measure AI accuracy in production"). Detailed below.
+2. **`/mallet/`** — Mallet (free prompt editor / lead magnet). Built from `mallet-app/` (Vite + React + Tailwind) into `mallet/` for GitHub Pages. Companion Cloudflare Worker in `mallet-worker/`. See `mallet-app/README.md` and the project memory.
+3. **`/gravel/`** — Gravel landing page, single hand-written `gravel/index.html`. Positioning: "Langfuse for [domain experts]". See the `Gravel lander` memory for structure and conventions.
+
+The Artanis main site is a single HTML file with no build. The Mallet sub-app builds via Vite. The Gravel lander is, again, a single hand-written HTML file (no build).
+
+**Main-site Product:** SaaS platform for measuring AI accuracy in production
+**Main-site Value Proposition:** "Seamless labelling and evals with 3 lines of code"
+**Main-site Target Audience:** Technical teams (AI engineers, ML engineers) at startups
 
 ## Deployment
 
-Changes deploy automatically when pushed to the `main` branch via GitHub Pages. The CNAME file configures the custom domain (artanis.ai).
+All three properties deploy together when `main` is pushed. GitHub Pages serves from the repo root. The CNAME file configures the custom domain (artanis.ai).
 
 To deploy changes:
 ```bash
-git add index.html img/
+git add <changed files>
 git commit -m "description of changes"
 git push origin main
 ```
+
+A `pages build and deployment` workflow runs on every push to `main`; takes ~30-60s.
+
+The Mallet sub-app needs to be built before pushing if `mallet-app/` source changed:
+```bash
+cd mallet-app && npm run build  # outputs to ../mallet/
+```
+There is also a GitHub Action that does this automatically (`build-mallet.yml`).
 
 ## Page Structure
 
