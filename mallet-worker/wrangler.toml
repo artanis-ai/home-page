@@ -10,6 +10,11 @@ compatibility_flags = ["nodejs_compat"]
 #   - GITHUB_CLIENT_SECRET
 #   - SESSION_SECRET (any long random string; used to sign session JWTs)
 #   - AXIOM_TOKEN    (Axiom ingest token — OTel exporter bearer)
+#   - GRAVEL_FORWARD_TOKEN (shared bearer for Gravel control-plane → Mallet
+#     proxy; generate with `openssl rand -hex 32`. Same value must be set
+#     as MALLET_FORWARD_TOKEN on the Vercel side.)
+# Optional vars (set as plain vars, not secrets):
+#   - GRAVEL_ANALYZE_RPM (per-org rate limit on /api/gravel/analyze; default 5)
 [vars]
 ENVIRONMENT = "development"
 AXIOM_DATASET = "mallet-dev"
@@ -34,6 +39,7 @@ new_sqlite_classes = ["SignalingRoom"]
 #   wrangler secret put GITHUB_CLIENT_SECRET --env production
 #   wrangler secret put SESSION_SECRET --env production
 #   wrangler secret put AXIOM_TOKEN --env production
+#   wrangler secret put GRAVEL_FORWARD_TOKEN --env production
 [env.production]
 name = "mallet-api"
 

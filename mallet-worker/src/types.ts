@@ -11,6 +11,13 @@ export interface Env {
   AXIOM_TOKEN: string
   AXIOM_DATASET: string
   AXIOM_TRACES_URL: string
+  // Shared bearer for Gravel control-plane → Mallet proxying. Set via
+  // `wrangler secret put GRAVEL_FORWARD_TOKEN`. When unset the
+  // /api/gravel/analyze route fails closed (every request → 401).
+  GRAVEL_FORWARD_TOKEN: string
+  // Optional override (string at runtime) for the per-org rate limit on
+  // /api/gravel/analyze. Defaults to 5 requests/minute when unset/invalid.
+  GRAVEL_ANALYZE_RPM?: string
   INVITES: KVNamespace
   SIGNALING_ROOM: DurableObjectNamespace
 }

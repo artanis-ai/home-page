@@ -6,6 +6,7 @@ import { requireAuth, optionalAuth, type AuthVars } from './lib/auth'
 import { rateLimitMiddleware, rateLimitMiddlewareByIP } from './lib/rate-limit'
 import analyzeRoute from './routes/analyze'
 import publicAnalyzeRoute from './routes/public-analyze'
+import gravelAnalyzeRoute from './routes/gravel-analyze'
 import suggestRoute from './routes/suggest'
 import detectPromptsRoute from './routes/detect-prompts'
 import createPRRoute from './routes/create-pr'
@@ -86,6 +87,14 @@ app.get('/signaling/:room', async (c) => {
 app.use('/api/public/analyze', rateLimitMiddlewareByIP(10))
 app.route('/api/public/analyze', publicAnalyzeRoute)
 
+// Gravel control-plane → Mallet proxy. Auth is a shared bearer
+// (GRAVEL_FORWARD_TOKEN) checked inside the route, NOT the session JWT
+// middleware below — so we exempt it from the `/api/*` requireAuth wildcard.
+// Rate limit is per-org (X-Gravel-Org / body org_id) and lives inside the
+// route itself; no IP middleware here, since the whole point is to escape
+// the Vercel-shared-IP bottleneck.
+app.route('/api/gravel/analyze', gravelAnalyzeRoute)
+
 // `/api/analyze` and `/api/suggest` are intentionally unauthenticated —
 // they don't touch GitHub, so anonymous users (and campaign-link clickers
 // who haven't signed in yet) can use the editor end-to-end. Sign-in is
@@ -110,6 +119,7 @@ app.use('/api/detect-prompts', optionalAuth())
 app.use('/api/*', async (c, next) => {
   const path = new URL(c.req.url).pathname
   if (path.startsWith('/api/public/')) return next()
+  if (path.startsWith('/api/gravel/')) return next()
   if (path === '/api/analyze' || path === '/api/suggest' || path === '/api/detect-prompts') return next()
   return requireAuth()(c, next)
 })

@@ -7,3 +7,12 @@ GITHUB_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 # Any long random string — signs session JWTs. Regenerating logs everyone out.
 SESSION_SECRET=change-me-to-a-long-random-string
+
+# Shared bearer for the Gravel control-plane → Mallet proxy
+# (POST /api/gravel/analyze). Generate with `openssl rand -hex 32`.
+# Must match MALLET_FORWARD_TOKEN on the Vercel side.
+GRAVEL_FORWARD_TOKEN=change-me-openssl-rand-hex-32
+
+# Optional: override the per-org rate limit on /api/gravel/analyze
+# (requests/minute keyed by X-Gravel-Org). Default 5.
+# GRAVEL_ANALYZE_RPM=5

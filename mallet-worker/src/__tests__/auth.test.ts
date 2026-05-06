@@ -14,6 +14,7 @@ const baseEnv: Env = {
   AXIOM_TOKEN: '',
   AXIOM_DATASET: 'test',
   AXIOM_TRACES_URL: 'https://api.axiom.co/v1/traces',
+  GRAVEL_FORWARD_TOKEN: 'test_gravel_forward_token',
   INVITES: {} as KVNamespace,
   SIGNALING_ROOM: {} as DurableObjectNamespace,
 }
