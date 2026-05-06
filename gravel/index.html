@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gravel — Embedded prompt management & evals for AI engineering teams | Artanis</title>
-    <meta name="description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts review output, manage prompts, and run evals — without touching your codebase.">
+    <title>Gravel · Embedded prompt management & evals for AI engineering teams | Artanis</title>
+    <meta name="description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts review output, manage prompts, and run evals. No engineers in the loop.">
     <link rel="canonical" href="https://artanis.ai/gravel/">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://artanis.ai/gravel/">
-    <meta property="og:title" content="Gravel — Langfuse for domain experts">
-    <meta property="og:description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts review output, manage prompts, and run evals — without touching your codebase.">
+    <meta property="og:title" content="Gravel · Langfuse for domain experts">
+    <meta property="og:description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts review output, manage prompts, and run evals. No engineers in the loop.">
     <meta property="og:image" content="https://artanis.ai/img/og-image.png">
     <meta property="og:site_name" content="Gravel by Artanis">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Gravel — Langfuse for domain experts">
-    <meta name="twitter:description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts review output, manage prompts, and run evals — without touching your codebase.">
+    <meta name="twitter:title" content="Gravel · Langfuse for domain experts">
+    <meta name="twitter:description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts review output, manage prompts, and run evals. No engineers in the loop.">
     <meta name="twitter:image" content="https://artanis.ai/img/og-image.png">
 
     <link rel="icon" href="/img/favicon.ico" sizes="any">
@@ -64,41 +64,27 @@
     </script>
 
     <style>
-        /* Hero gradient — matches root index.html sky→ground feel */
-        .hero-gradient {
-            background: linear-gradient(180deg, #C8E0EE 0%, #D4E6F0 30%, #E8DCC4 70%, #D4A76A 100%);
+        /* Hero — Mallet-style sky gradient */
+        .hero-light {
+            background: linear-gradient(180deg in oklab, #c5dce8 0%, #d6e7ef 40%, #e7f1f6 100%);
         }
 
-        /* Pavement field for Gravel — under the hero */
-        .pavement-field {
-            background: url('/img/pavement-field.png') repeat-x bottom / auto 100%;
-        }
+        /* Tabbed install widget — code box stays dark on light hero */
+        .install-tab[data-active="true"] { color: #F5EDE3; box-shadow: inset 0 -2px 0 #C4716A; }
+        .install-tab[data-active="false"] { color: rgba(245, 237, 227, 0.45); }
+        .install-tab[data-active="false"]:hover { color: rgba(245, 237, 227, 0.85); }
+        .install-pane[data-active="false"] { display: none; }
 
-        /* Cloud drift */
-        @keyframes cloud-drift {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(30px); }
-            100% { transform: translateX(0); }
-        }
-        .cloud-drift { animation: cloud-drift 20s ease-in-out infinite; }
-        .cloud-drift:nth-child(2) { animation-duration: 28s; animation-delay: -5s; }
-
-        /* Steamroller rolling */
-        @keyframes steamroller-roll {
-            0%, 100% { transform: translateY(0) rotate(0); }
-            50% { transform: translateY(-2px) rotate(0.5deg); }
-        }
-        .steamroller-roll {
-            animation: steamroller-roll 1.5s ease-in-out infinite;
-        }
+        /* Copy-button feedback */
+        .copy-btn[data-copied="true"] { color: #6BA37A; }
 
         /* Typing-cursor caret */
         .typed-cursor {
             display: inline-block;
-            width: 0.6ch;
+            width: 3px;
             background: currentColor;
             animation: blink 1s step-end infinite;
-            margin-left: 2px;
+            margin-left: 3px;
             color: #9B4340;
         }
         @keyframes blink {
@@ -106,469 +92,954 @@
             50.01%, 100% { opacity: 0; }
         }
 
-        /* Code block */
-        .code-block {
-            background: #2D1810;
-            color: #F5EDE3;
-            font-family: 'JetBrains Mono', monospace;
-            border-radius: 1rem;
-            box-shadow: 0 10px 30px rgba(46, 24, 16, 0.15);
+        /* Hero dashboard tabs */
+        .dash-tab[data-active="true"] { color: #9B4340; background: rgba(155, 67, 64, 0.10); font-weight: 500; }
+        .dash-tab[data-active="false"] { color: #6B5744; }
+        .dash-tab[data-active="false"]:hover { background: rgba(155, 67, 64, 0.04); color: #2D1810; }
+        .dash-pane[data-active="false"] { display: none; }
+
+        /* Mallet-style wavy underline for prompt analysis flags */
+        .wavy-underline {
+            background: rgba(212, 167, 106, 0.18);
+            padding: 0 2px;
+            border-radius: 2px;
+            text-decoration: wavy underline #D4A76A;
+            text-decoration-thickness: 1.5px;
+            text-decoration-skip-ink: none;
+            text-underline-offset: 2px;
         }
-        .code-block .comment { color: #9A8B7A; }
-        .code-block .keyword { color: #D4A76A; }
-        .code-block .string { color: #6BA37A; }
-        .code-block .punctuation { color: #C4716A; }
 
         /* Mockup chrome */
         .mockup-shadow {
             box-shadow: 0 20px 60px rgba(46, 24, 16, 0.18), 0 4px 12px rgba(46, 24, 16, 0.08);
         }
 
-        /* Scrollbars */
-        * { scrollbar-width: thin; scrollbar-color: #D4A76A transparent; }
-        *::-webkit-scrollbar { width: 10px; height: 10px; }
-        *::-webkit-scrollbar-thumb { background-color: #D4A76A; border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+        /* Hero mockup — slight 3D perspective tilt on desktop only */
+        @media (min-width: 1024px) {
+            .mockup-tilt {
+                perspective: 2000px;
+                perspective-origin: 50% 50%;
+            }
+            .mockup-tilt > * {
+                transform: rotateY(-9deg) rotateX(3deg);
+                transform-origin: 0% 50%;
+                transition: transform 400ms ease;
+                box-shadow:
+                    -30px 30px 80px -20px rgba(46, 24, 16, 0.28),
+                    -8px 12px 30px -8px rgba(46, 24, 16, 0.12);
+            }
+            .mockup-tilt:hover > * {
+                transform: rotateY(-4deg) rotateX(1deg);
+            }
+        }
+
     </style>
 </head>
 <body class="bg-cream antialiased">
 
-    <!-- Header -->
-    <header class="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-warm">
-        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-            <div class="flex items-center md:gap-x-8">
-                <a href="/" aria-label="Home" class="flex items-center gap-2">
-                    <img src="/img/artanis.png" alt="Artanis" class="h-9 w-auto">
-                    <span class="hidden sm:inline-flex items-center gap-1.5 text-text-mid">
-                        <span class="text-text-muted">/</span>
-                        <span class="font-display font-semibold text-text-dark text-lg">Gravel</span>
-                        <span class="ml-1 rounded-full bg-accent/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-earth-warm">Preview</span>
-                    </span>
-                </a>
-                <div class="hidden md:flex md:gap-x-6">
-                    <a href="#how" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">How it works</a>
-                    <a href="#install" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Install</a>
-                    <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Docs <svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>
-                    <a href="/" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">← Artanis</a>
-                </div>
-            </div>
-            <div class="flex items-center gap-x-4">
-                <a href="https://github.com/artanis-ai" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">
-                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                    GitHub
-                </a>
-                <a href="#install" class="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-dark transition-colors">
-                    Get started
-                </a>
-                <button type="button" class="-mr-1 md:hidden" aria-label="Toggle Navigation" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
-                    <svg class="h-3.5 w-3.5 overflow-visible stroke-text-dark" fill="none" stroke-width="2" stroke-linecap="round">
-                        <path d="M0 1H14M0 7H14M0 13H14"></path>
-                    </svg>
-                </button>
-            </div>
-        </nav>
-        <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 md:hidden pb-4">
-            <div class="rounded-2xl bg-white p-4 text-lg tracking-tight text-text-dark shadow-xl ring-1 ring-earth-dark/5">
-                <a href="#how" class="block w-full p-2">How it works</a>
-                <a href="#install" class="block w-full p-2">Install</a>
-                <a href="https://docs.artanis.ai/" class="block w-full p-2">Docs</a>
-                <a href="/" class="block w-full p-2">← Artanis</a>
-            </div>
-        </div>
-    </header>
-
-    <!-- Hero -->
-    <section class="hero-gradient relative overflow-hidden pt-20 pb-32 sm:pt-24 sm:pb-40 lg:pt-32">
-        <!-- Clouds -->
-        <img src="/img/cloud1.png" class="cloud-drift absolute w-24 sm:w-36 lg:w-44 opacity-40" style="top: 10%; left: 6%;" alt="">
-        <img src="/img/cloud3.png" class="cloud-drift absolute w-20 sm:w-28 lg:w-36 opacity-30" style="top: 14%; right: 12%;" alt="">
-
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="mx-auto max-w-4xl text-center">
-                <a href="/mallet/" class="relative z-20 mb-5 sm:mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-white/70 px-3 py-1 text-xs sm:text-sm font-medium text-primary backdrop-blur transition hover:border-primary/60 hover:bg-white">
-                    <span class="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] sm:text-xs font-semibold uppercase tracking-wide">Free</span>
-                    <span>Try Mallet — our prompt checker</span>
-                    <svg class="h-3 w-3 sm:h-3.5 sm:w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                </a>
-
-                <h1 class="font-display text-4xl font-semibold tracking-tight text-text-dark sm:text-5xl lg:text-6xl leading-tight">
-                    Langfuse for<br>
-                    <span class="text-primary">[<span id="typed-word"></span><span class="typed-cursor">&nbsp;</span>]</span>
-                </h1>
-
-                <p class="mx-auto mt-6 sm:mt-8 max-w-2xl text-lg sm:text-xl tracking-tight text-text-mid">
-                    Open-source library that mounts an admin dashboard inside your AI app. Your domain experts review output, manage prompts, and run evals &mdash; without ever touching your codebase.
-                </p>
-
-                <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="#install" class="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20">
-                        Get started
+    <!-- Light hero block — Payload-style 2-column: content left, mockup right -->
+    <div class="hero-light relative overflow-hidden">
+        <!-- Header -->
+        <header class="relative z-50">
+            <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/gravel/" aria-label="Gravel" class="flex items-center gap-2">
+                        <svg class="h-8 w-8 text-text-dark" viewBox="0 0 50 50" fill="currentColor" aria-hidden="true">
+                            <path d="M 18 10 C 17.558631 10.000415 17.169721 10.290114 17.042969 10.712891 L 14.042969 20.712891 L 5.3496094 24.980469 C 3.8876094 25.896469 3 27.499609 3 29.224609 L 3 36 C 3 36.55 3.450218 37.015487 4 37 L 8.0839844 37 C 8.0839846 33.720944 10.742184 31.062744 14.02124 31.062744 C 16.914426 31.062753 19.386363 33.148146 19.873657 36 L 21.946411 36 L 29.587402 36 L 38.75 36 C 40.129 36 41.25 34.878 41.25 33.5 C 41.25 32.122 40.129 31 38.75 31 L 29.337402 31 C 29.98632 27.88257 32.092807 25.266399 35 23.967285 L 35 21 C 35 20.45 34.55 20 34 20 L 28 20 L 28 11 C 27.999945 10.447738 27.552262 10.000055 27 10 L 18 10 z M 39.045654 25.012085 A 8.0088444 8.0088444 0 0 0 32.044434 29.131958 L 39.130615 29.131958 C 41.414937 29.131958 43.271851 31.090182 43.271851 33.495239 C 43.271851 35.900296 41.414937 37.858521 39.130615 37.858521 L 32.662964 37.858521 A 8.0088444 8.0088444 0 0 0 39.045654 41.029663 A 8.0088444 8.0088444 0 0 0 47.054565 33.020874 A 8.0088444 8.0088444 0 0 0 39.045654 25.012085 z M 14.02124 33.089966 C 11.861775 33.089935 10.111175 34.840535 10.111206 37 C 10.111175 39.159465 11.861775 40.910065 14.02124 40.910034 C 16.180705 40.910065 17.931305 39.159465 17.931274 37 C 17.931305 34.840535 16.180705 33.089935 14.02124 33.089966 z" />
+                        </svg>
+                        <span class="font-display font-semibold text-text-dark text-xl">Gravel</span>
                     </a>
-                    <a href="#how" class="inline-flex items-center gap-1.5 rounded-full border border-text-dark/20 px-5 py-3 text-sm font-medium text-text-mid hover:border-text-dark/40 hover:text-text-dark transition-colors bg-white/50 backdrop-blur">
-                        See how it works
-                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    <span class="hidden sm:inline ml-5 text-sm text-text-muted">by</span>
+                    <a href="/" class="hidden sm:inline-flex items-center ml-1.5 opacity-60 transition hover:opacity-100" aria-label="Artanis">
+                        <img src="/img/artanis.png" alt="Artanis" class="h-7 w-auto">
                     </a>
                 </div>
-            </div>
-        </div>
+                <div class="flex items-center"></div>
+            </nav>
+        </header>
 
-        <!-- Pavement + steamroller field -->
-        <div class="absolute bottom-0 left-0 right-0 h-32 sm:h-40 lg:h-48 pointer-events-none" aria-hidden="true">
-            <div class="absolute bottom-0 left-0 right-0 h-full pavement-field"></div>
-            <img src="/img/steamroller.png" class="steamroller-roll absolute bottom-3 right-[10%] sm:right-[18%] lg:right-[22%] w-32 sm:w-44 lg:w-52" alt="">
-        </div>
-    </section>
+        <!-- Hero -->
+        <section class="relative pt-10 sm:pt-16 lg:pt-20 pb-20 sm:pb-24 lg:pb-32">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-2 gap-12 lg:gap-12 items-center">
+                    <!-- Left: content -->
+                    <div class="text-left">
+                        <h1 class="font-display font-semibold tracking-tight text-text-dark leading-[1.05] text-5xl sm:text-6xl lg:text-7xl">
+                            Langfuse for<br>
+                            <span class="text-primary"><span id="typed-word"></span><span class="typed-cursor">&nbsp;</span></span>
+                        </h1>
 
-    <!-- Three pillars -->
-    <section id="how" class="bg-cream py-20 sm:py-28">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-3xl text-center mb-16">
-                <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">How it works</p>
-                <h2 class="mt-3 font-display text-3xl sm:text-4xl font-semibold tracking-tight text-text-dark">
-                    The least invasive way to ship eval discipline
-                </h2>
-                <p class="mt-5 text-lg text-text-mid">
-                    Gravel is a library, not a SaaS. It installs into your codebase, uses your database, and respects the auth you already have. Your domain experts get a polished dashboard; you keep your data.
-                </p>
-            </div>
+                        <p class="mt-7 max-w-xl text-lg sm:text-xl tracking-tight text-text-mid">
+                            Empower non-engineers to improve your AI. No more spreadsheets back and forth.
+                        </p>
 
-            <div class="grid gap-8 lg:grid-cols-3">
-                <!-- Pillar 1 -->
-                <div class="rounded-3xl bg-white p-8 ring-1 ring-warm shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    </div>
-                    <h3 class="mt-6 font-display text-xl font-semibold text-text-dark">Install in 5 minutes</h3>
-                    <p class="mt-3 text-text-mid leading-relaxed">
-                        One command. Browser-OAuth handshake. Framework detection for Next.js, Express, FastAPI, and Django. AST-aware edits with backup files on conflict &mdash; we never silently clobber.
-                    </p>
-                    <p class="mt-3 text-sm text-text-muted">
-                        Works in the codebases you already have. No restructure, no greenfield.
-                    </p>
-                </div>
-
-                <!-- Pillar 2 -->
-                <div class="rounded-3xl bg-white p-8 ring-1 ring-warm shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest/10 text-forest">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                    </div>
-                    <h3 class="mt-6 font-display text-xl font-semibold text-text-dark">Runs in your infra</h3>
-                    <p class="mt-3 text-text-mid leading-relaxed">
-                        Traces, prompts, feedback, datasets &mdash; all in your own database. Your auth, your sessions, your domain. The only data that ever leaves is the rows you actively send to be judged.
-                    </p>
-                    <p class="mt-3 text-sm text-text-muted">
-                        Apache 2.0. Audit every line. No phone-home.
-                    </p>
-                </div>
-
-                <!-- Pillar 3 -->
-                <div class="rounded-3xl bg-white p-8 ring-1 ring-warm shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/30 text-earth-warm">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                    <h3 class="mt-6 font-display text-xl font-semibold text-text-dark">Free for the basics</h3>
-                    <p class="mt-3 text-text-mid leading-relaxed">
-                        Prompt management, GitHub PRs, tracing, feedback, datasets &mdash; all free, unlimited seats, forever. Pay only for the parts that need our judges: trace evals, live evals, unlimited static analysis.
-                    </p>
-                    <p class="mt-3 text-sm text-text-muted">
-                        Per-judge-call credits. Predictable spend.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Dashboard mockup -->
-    <section class="bg-warm py-20 sm:py-28">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-3xl text-center mb-12">
-                <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">For your domain experts</p>
-                <h2 class="mt-3 font-display text-3xl sm:text-4xl font-semibold tracking-tight text-text-dark">
-                    A dashboard that doesn't speak engineer
-                </h2>
-                <p class="mt-5 text-lg text-text-mid">
-                    Mounted at <code class="rounded bg-cream px-1.5 py-0.5 font-mono text-sm text-earth-warm">/admin/ai</code> inside your own app. The clinicians, lawyers, teachers, recruiters, accountants on your team open it like any other internal tool.
-                </p>
-            </div>
-
-            <!-- Mockup chrome -->
-            <div class="mx-auto max-w-5xl rounded-2xl bg-cream mockup-shadow overflow-hidden ring-1 ring-earth-dark/10">
-                <!-- Browser bar -->
-                <div class="flex items-center gap-2 px-4 py-2.5 bg-warm border-b border-earth-dark/10">
-                    <div class="flex gap-1.5">
-                        <span class="h-3 w-3 rounded-full bg-primary/40"></span>
-                        <span class="h-3 w-3 rounded-full bg-accent/60"></span>
-                        <span class="h-3 w-3 rounded-full bg-forest/50"></span>
-                    </div>
-                    <div class="ml-3 flex-1 truncate rounded-md bg-cream px-3 py-1 text-xs text-text-muted font-mono">your-app.com/admin/ai/prompts</div>
-                </div>
-
-                <!-- App chrome -->
-                <div class="flex" style="min-height: 460px;">
-                    <!-- Sidebar -->
-                    <aside class="w-52 border-r border-warm bg-cream p-4 hidden sm:block">
-                        <div class="flex items-center gap-2 px-2 py-1 mb-6">
-                            <div class="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
-                                <svg class="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7l-10-5zm0 2.236L19.764 8 12 11.764 4.236 8 12 4.236zM4 9.618l7 3.5v7.764l-7-3.5V9.618zm9 11.264v-7.764l7-3.5v7.764l-7 3.5z"/></svg>
+                        <!-- Install widget — dark code box on light hero -->
+                        <div class="mt-9 max-w-sm rounded-xl ring-1 ring-earth-dark/10 shadow-xl shadow-earth-dark/10 overflow-hidden" style="background: #1a1208">
+                            <div class="flex items-center border-b" style="border-color: rgba(245, 237, 227, 0.10)">
+                                <button type="button" class="install-tab cursor-pointer px-5 py-3 text-sm font-medium transition" data-tab="ts" data-active="true">TypeScript</button>
+                                <button type="button" class="install-tab cursor-pointer px-5 py-3 text-sm font-medium transition" data-tab="py" data-active="false">Python</button>
                             </div>
-                            <span class="font-display font-semibold text-sm text-text-dark">Gravel</span>
+                            <div class="install-pane flex items-center gap-3 px-5 py-4 font-mono text-[13px] sm:text-sm" data-tab="ts" data-active="true">
+                                <span class="select-none text-primary-light">$</span>
+                                <span class="flex-1 text-warm"><span class="text-warm/45">npx</span> @artanis-ai/gravel init</span>
+                                <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition" data-copy="npx @artanis-ai/gravel init" aria-label="Copy command">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                </button>
+                            </div>
+                            <div class="install-pane flex items-center gap-3 px-5 py-4 font-mono text-[13px] sm:text-sm" data-tab="py" data-active="false">
+                                <span class="select-none text-primary-light">$</span>
+                                <span class="flex-1 text-warm"><span class="text-warm/45">pipx run</span> artanis-gravel init</span>
+                                <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition" data-copy="pipx run artanis-gravel init" aria-label="Copy command">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                </button>
+                            </div>
                         </div>
-                        <nav class="space-y-1 text-sm">
-                            <a class="flex items-center gap-2.5 rounded-lg bg-primary/10 px-2.5 py-1.5 font-medium text-primary">
-                                <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
-                                Prompts
+
+                        <!-- OSS callout -->
+                        <div class="mt-4 max-w-sm flex items-center justify-between gap-2 flex-wrap text-sm text-text-mid">
+                            <span class="inline-flex items-center gap-1.5">
+                                <svg class="h-4 w-4 shrink-0 text-forest" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                                Free forever
+                            </span>
+                            <span class="inline-flex items-center gap-1.5">
+                                <svg class="h-4 w-4 shrink-0 text-forest" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z"/></svg>
+                                Apache&nbsp;2.0
+                            </span>
+                            <a href="https://github.com/artanis-ai/gravel" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 font-medium text-primary hover:text-primary-dark transition">
+                                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                                Star on GitHub
                             </a>
-                            <a class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-text-mid hover:bg-warm">Traces</a>
-                            <a class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-text-mid hover:bg-warm">Datasets</a>
-                            <a class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-text-mid hover:bg-warm">Evals</a>
-                            <a class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-text-mid hover:bg-warm">Analysis</a>
-                            <a class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-text-mid hover:bg-warm">Settings</a>
-                        </nav>
-                        <div class="mt-8 rounded-xl bg-warm p-3 text-xs">
-                            <p class="text-text-muted">Environment</p>
-                            <p class="mt-0.5 font-medium text-text-dark">prod</p>
-                            <hr class="my-2 border-earth-dark/10">
-                            <p class="text-text-muted">Credits</p>
-                            <p class="mt-0.5 font-mono text-text-dark">1,247</p>
                         </div>
-                    </aside>
+                    </div>
 
-                    <!-- Main pane -->
-                    <main class="flex-1 p-5 sm:p-6 overflow-hidden">
-                        <div class="flex items-center justify-between mb-5">
-                            <div>
-                                <h3 class="font-display text-lg font-semibold text-text-dark">Prompts</h3>
-                                <p class="text-xs text-text-muted mt-0.5">14 prompts &middot; 2 with pending edits</p>
+                    <!-- Right: dashboard mockup — bleeds past hero right edge on lg+ -->
+                    <div class="mockup-tilt lg:w-[120%] xl:w-[130%] 2xl:w-[140%]">
+                        <div class="rounded-2xl bg-cream mockup-shadow overflow-hidden ring-1 ring-earth-dark/10">
+                            <!-- Browser bar -->
+                            <div class="flex items-center gap-2 px-4 py-2.5 bg-warm border-b border-earth-dark/10">
+                                <div class="flex gap-1.5">
+                                    <span class="h-3 w-3 rounded-full bg-primary/40"></span>
+                                    <span class="h-3 w-3 rounded-full bg-accent/60"></span>
+                                    <span class="h-3 w-3 rounded-full bg-forest/50"></span>
+                                </div>
+                                <div class="ml-3 flex-1 truncate rounded-md bg-cream px-3 py-1 text-xs text-text-muted font-mono"><span>your-app.com/admin/ai/</span><span id="dash-url-slug">review</span></div>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span class="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-accent/30 px-2.5 py-1 text-xs font-medium text-earth-warm">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
-                                    2 changes pending
-                                </span>
-                                <button class="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white">Submit changes</button>
+
+                            <!-- App chrome -->
+                            <div class="flex" style="min-height: 420px;">
+                                <!-- Sidebar -->
+                                <aside class="w-44 shrink-0 border-r border-warm bg-cream p-3 hidden md:flex md:flex-col">
+                                    <div class="flex items-center gap-2 px-2 py-1 mb-5">
+                                        <div class="h-7 w-7 rounded-lg flex items-center justify-center shrink-0" style="background: linear-gradient(135deg, #4A7C59 0%, #2563EB 100%)">
+                                            <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5A2.5 2.5 0 015.5 3h3A2.5 2.5 0 0111 5.5v3A2.5 2.5 0 018.5 11h-3A2.5 2.5 0 013 8.5v-3zm10 0A2.5 2.5 0 0115.5 3h3A2.5 2.5 0 0121 5.5v3a2.5 2.5 0 01-2.5 2.5h-3A2.5 2.5 0 0113 8.5v-3zm-10 10A2.5 2.5 0 015.5 13h3a2.5 2.5 0 012.5 2.5v3A2.5 2.5 0 018.5 21h-3A2.5 2.5 0 013 18.5v-3zm10 0a2.5 2.5 0 012.5-2.5h3a2.5 2.5 0 012.5 2.5v3a2.5 2.5 0 01-2.5 2.5h-3a2.5 2.5 0 01-2.5-2.5v-3z"/></svg>
+                                        </div>
+                                        <span class="font-display font-semibold text-sm text-text-dark">Your&nbsp;App</span>
+                                    </div>
+                                    <nav class="space-y-1 text-sm">
+                                        <a class="dash-tab cursor-pointer flex items-center gap-2 rounded-lg px-2.5 py-1.5 transition" data-tab="review" data-active="true">
+                                            <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                            Review
+                                            <span class="ml-auto rounded-full px-1.5 py-0.5 text-[9px] font-semibold bg-accent/40 text-earth-warm">12</span>
+                                        </a>
+                                        <a class="dash-tab cursor-pointer flex items-center gap-2 rounded-lg px-2.5 py-1.5 transition" data-tab="prompts" data-active="false">
+                                            <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                            Prompts
+                                        </a>
+                                        <a class="dash-tab cursor-pointer flex items-center gap-2 rounded-lg px-2.5 py-1.5 transition" data-tab="issues" data-active="false">
+                                            <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/></svg>
+                                            Issues
+                                            <span class="ml-auto rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style="background: #C97064">3</span>
+                                        </a>
+                                    </nav>
+                                </aside>
+
+                                <!-- Main pane -->
+                                <main class="flex-1 p-4 sm:p-5 overflow-hidden min-w-0">
+                                    <!-- Review pane (default) -->
+                                    <div class="dash-pane" data-tab="review" data-active="true">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <div>
+                                                <h3 class="font-display text-base font-semibold text-text-dark">Review queue</h3>
+                                                <p class="text-[11px] text-text-muted mt-0.5">12 pending &middot; 2 reviewed today</p>
+                                            </div>
+                                            <span class="rounded-full bg-accent/30 px-2 py-0.5 text-[10px] font-semibold text-earth-warm">12 pending</span>
+                                        </div>
+                                        <div class="space-y-1.5">
+                                            <div class="rounded-lg border border-warm bg-warm/30 px-3 py-2.5">
+                                                <p class="text-[10px] font-mono text-text-muted uppercase tracking-wider">User &middot; 14:23</p>
+                                                <p class="mt-0.5 text-xs text-text-dark line-clamp-2">"6-year-old, fever 39°C for two days, stiff neck, drowsy. Should I be worried?"</p>
+                                                <hr class="my-2 border-earth-dark/10">
+                                                <p class="text-[10px] font-mono text-primary uppercase tracking-wider">AI</p>
+                                                <p class="mt-0.5 text-xs text-text-dark line-clamp-2">"This needs urgent medical attention. Stiff neck with high fever can indicate meningitis."</p>
+                                                <div class="mt-2 flex items-center gap-1.5">
+                                                    <button class="inline-flex items-center gap-1 rounded bg-forest text-white px-2 py-0.5 text-[10px] font-semibold">
+                                                        <svg class="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.733a4 4 0 00-.8 2.6z"/></svg>
+                                                        Looks good
+                                                    </button>
+                                                    <button class="inline-flex items-center gap-1 rounded text-white px-2 py-0.5 text-[10px] font-semibold" style="background: #C97064">
+                                                        <svg class="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M18 9.5a1.5 1.5 0 11-3 0v-6a1.5 1.5 0 013 0v6zM14 9.667v-5.43a2 2 0 00-1.105-1.79l-.05-.025A4 4 0 0011.057 2H5.64a2 2 0 00-1.962 1.608l-1.2 6A2 2 0 004.44 12H8v4a2 2 0 002 2 1 1 0 001-1v-.667a4 4 0 01.8-2.4l1.4-1.866a4 4 0 00.8-2.4z"/></svg>
+                                                        Needs work
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2 opacity-70">
+                                                <p class="text-[10px] font-mono text-text-muted uppercase tracking-wider">User &middot; 14:24</p>
+                                                <p class="mt-0.5 text-xs text-text-dark truncate">"Patient denies chest pain but reports shortness of breath…"</p>
+                                            </div>
+                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2 opacity-60">
+                                                <p class="text-[10px] font-mono text-text-muted uppercase tracking-wider">User &middot; 14:24</p>
+                                                <p class="mt-0.5 text-xs text-text-dark truncate">"What's the typical recovery time for…"</p>
+                                            </div>
+                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2 opacity-50">
+                                                <p class="text-[10px] font-mono text-text-muted uppercase tracking-wider">User &middot; 14:25</p>
+                                                <p class="mt-0.5 text-xs text-text-dark truncate">"My grandmother's blood pressure reading…"</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Prompts pane -->
+                                    <div class="dash-pane" data-tab="prompts" data-active="false">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <div>
+                                                <h3 class="font-display text-base font-semibold text-text-dark">Prompts</h3>
+                                                <p class="text-[11px] text-text-muted mt-0.5">14 prompts &middot; 2 with pending edits</p>
+                                            </div>
+                                            <button class="rounded-lg bg-primary px-2.5 py-1 text-[11px] font-medium text-white whitespace-nowrap">Submit</button>
+                                        </div>
+                                        <div class="space-y-1.5">
+                                            <div class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2">
+                                                <div class="flex items-center justify-between gap-2">
+                                                    <p class="font-medium text-text-dark text-xs truncate">Triage Assistant</p>
+                                                    <span class="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary shrink-0">EDITED</span>
+                                                </div>
+                                                <p class="text-[11px] text-text-muted mt-0.5 truncate">You are a clinical triage assistant. Be concise…</p>
+                                            </div>
+                                            <div class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2">
+                                                <div class="flex items-center justify-between gap-2">
+                                                    <p class="font-medium text-text-dark text-xs truncate">Summarizer</p>
+                                                    <span class="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary shrink-0">EDITED</span>
+                                                </div>
+                                                <p class="text-[11px] text-text-muted mt-0.5 truncate">Summarize the patient note in plain language…</p>
+                                            </div>
+                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2">
+                                                <p class="font-medium text-text-dark text-xs truncate">Intake Questionnaire</p>
+                                                <p class="text-[11px] text-text-muted mt-0.5 truncate">Walk the patient through the intake questions…</p>
+                                            </div>
+                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2">
+                                                <p class="font-medium text-text-dark text-xs truncate">Red-Flag Detector</p>
+                                                <p class="text-[11px] text-text-muted mt-0.5 truncate">Identify red-flag symptoms in the patient note…</p>
+                                            </div>
+                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2">
+                                                <p class="font-medium text-text-dark text-xs truncate">Discharge Summary</p>
+                                                <p class="text-[11px] text-text-muted mt-0.5 truncate">Produce a discharge summary including diagnosis…</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Issues pane -->
+                                    <div class="dash-pane" data-tab="issues" data-active="false">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <div>
+                                                <h3 class="font-display text-base font-semibold text-text-dark">Issues</h3>
+                                                <p class="text-[11px] text-text-muted mt-0.5">Things needing your attention</p>
+                                            </div>
+                                            <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style="background: #C97064">3 open</span>
+                                        </div>
+                                        <div class="space-y-1.5">
+                                            <div class="rounded-lg border px-3 py-2.5" style="border-color: rgba(201,112,100,0.4); background: rgba(201,112,100,0.06)">
+                                                <div class="flex items-center gap-1.5">
+                                                    <svg class="h-3.5 w-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" style="color: #C97064"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+                                                    <p class="font-medium text-text-dark text-xs">Conflicting feedback</p>
+                                                    <span class="ml-auto text-[10px] text-text-muted">Triage</span>
+                                                </div>
+                                                <p class="text-[11px] text-text-mid mt-1">Alice and Bob disagreed on a recent answer about elderly confusion.</p>
+                                            </div>
+                                            <div class="rounded-lg border px-3 py-2.5" style="border-color: rgba(201,112,100,0.4); background: rgba(201,112,100,0.06)">
+                                                <div class="flex items-center gap-1.5">
+                                                    <svg class="h-3.5 w-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" style="color: #C97064"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+                                                    <p class="font-medium text-text-dark text-xs">Past correction not respected</p>
+                                                    <span class="ml-auto text-[10px] text-text-muted">Triage</span>
+                                                </div>
+                                                <p class="text-[11px] text-text-mid mt-1">Today's answer goes against your label from 2 weeks ago.</p>
+                                            </div>
+                                            <div class="rounded-lg border bg-warm/40 px-3 py-2.5" style="border-color: rgba(212,167,106,0.4)">
+                                                <div class="flex items-center gap-1.5">
+                                                    <svg class="h-3.5 w-3.5 shrink-0 text-accent" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+                                                    <p class="font-medium text-text-dark text-xs">Vague wording</p>
+                                                    <span class="ml-auto text-[10px] text-text-muted">Triage</span>
+                                                </div>
+                                                <p class="text-[11px] text-text-mid mt-1">"red flags" isn't defined. Link to your canonical list.</p>
+                                            </div>
+                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2.5 opacity-70">
+                                                <div class="flex items-center gap-1.5">
+                                                    <svg class="h-3.5 w-3.5 shrink-0 text-forest" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                                    <p class="font-medium text-text-dark text-xs">Format drift in Discharge Summary</p>
+                                                    <span class="ml-auto text-[10px] text-text-muted">Resolved</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </main>
                             </div>
                         </div>
-
-                        <div class="space-y-2">
-                            <!-- Prompt row with pending edit -->
-                            <div class="flex items-center justify-between rounded-xl border border-accent/40 bg-accent/10 px-4 py-3">
-                                <div class="min-w-0">
-                                    <p class="font-medium text-text-dark text-sm truncate">prompts/triage_assistant.md</p>
-                                    <p class="text-xs text-text-muted mt-0.5 font-mono truncate">"You are a clinical triage assistant. Be concise..."</p>
-                                </div>
-                                <div class="flex items-center gap-2 shrink-0 ml-3">
-                                    <span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">EDITED</span>
-                                    <span class="text-xs text-text-muted hidden sm:inline">by Alice</span>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center justify-between rounded-xl border border-accent/40 bg-accent/10 px-4 py-3">
-                                <div class="min-w-0">
-                                    <p class="font-medium text-text-dark text-sm truncate">src/agents/summarizer.ts <span class="text-text-muted">:42</span></p>
-                                    <p class="text-xs text-text-muted mt-0.5 font-mono truncate">SYSTEM_PROMPT = "Summarize the patient note in plain..."</p>
-                                </div>
-                                <div class="flex items-center gap-2 shrink-0 ml-3">
-                                    <span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">EDITED</span>
-                                    <span class="text-xs text-text-muted hidden sm:inline">by Mei</span>
-                                </div>
-                            </div>
-
-                            <!-- Regular rows -->
-                            <div class="flex items-center justify-between rounded-xl border border-warm bg-cream px-4 py-3">
-                                <div class="min-w-0">
-                                    <p class="font-medium text-text-dark text-sm truncate">prompts/intake_questionnaire.md</p>
-                                    <p class="text-xs text-text-muted mt-0.5 font-mono truncate">"Walk the patient through the intake questions..."</p>
-                                </div>
-                                <span class="text-xs text-text-muted shrink-0 ml-3 hidden sm:inline">edited 3 days ago</span>
-                            </div>
-
-                            <div class="flex items-center justify-between rounded-xl border border-warm bg-cream px-4 py-3">
-                                <div class="min-w-0">
-                                    <p class="font-medium text-text-dark text-sm truncate">src/agents/red_flag_detector.ts <span class="text-text-muted">:78</span></p>
-                                    <p class="text-xs text-text-muted mt-0.5 font-mono truncate">RED_FLAG_PROMPT = "Identify any red-flag symptoms..."</p>
-                                </div>
-                                <span class="text-xs text-text-muted shrink-0 ml-3 hidden sm:inline">edited 1 week ago</span>
-                            </div>
-
-                            <div class="flex items-center justify-between rounded-xl border border-warm bg-cream px-4 py-3">
-                                <div class="min-w-0">
-                                    <p class="font-medium text-text-dark text-sm truncate">prompts/discharge_summary.md</p>
-                                    <p class="text-xs text-text-muted mt-0.5 font-mono truncate">"Produce a discharge summary for the patient..."</p>
-                                </div>
-                                <span class="text-xs text-text-muted shrink-0 ml-3 hidden sm:inline">edited 2 weeks ago</span>
-                            </div>
-                        </div>
-                    </main>
+                    </div>
                 </div>
             </div>
+        </section>
+    </div>
 
-            <p class="text-center mt-6 text-sm text-text-muted">
-                Mockup. The real thing ships with v0.
+    <!-- What you see vs What they see — single consolidated section -->
+    <section id="how" class="bg-cream py-20 sm:py-28">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center mb-16 sm:mb-20">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">How it works</p>
+            <h2 class="mt-3 font-display text-3xl sm:text-5xl font-semibold tracking-tight text-text-dark leading-tight">
+                What <span class="text-text-muted">you</span> see vs<br class="hidden sm:inline">
+                what <span class="text-primary">they</span> see
+            </h2>
+            <p class="mt-5 text-lg text-text-mid">
+                Gravel embeds a new internal route into your app, no provisioning required. Non-technical members of your team can review AI outputs, edit prompts, and run evals. And us engineers can get back to engineering.
             </p>
         </div>
-    </section>
 
-    <!-- Install + config -->
-    <section id="install" class="bg-cream py-20 sm:py-28">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="grid lg:grid-cols-2 gap-12 items-start">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-20 sm:space-y-24">
 
-                <!-- Left: install command -->
-                <div>
-                    <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Get started</p>
-                    <h2 class="mt-3 font-display text-3xl sm:text-4xl font-semibold tracking-tight text-text-dark">
-                        One command. That's the whole install.
-                    </h2>
-                    <p class="mt-5 text-lg text-text-mid">
-                        The wizard detects your framework, opens a browser to authenticate, AST-edits your server entry to mount the dashboard, runs migrations, and sends a test trace before exit.
-                    </p>
-
-                    <div class="mt-7">
-                        <div class="code-block px-5 py-4 text-sm">
-                            <span class="comment"># in your repo</span><br>
-                            <span class="punctuation">$</span> npx <span class="string">@artanis/gravel</span> init
+            <!-- Pair 1: Tracing — OpenAI logs vs Review queue -->
+            <div>
+                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Tracing</p>
+                <div class="grid lg:grid-cols-2 gap-5 lg:gap-7 items-start">
+                    <div>
+                        <p class="text-xs font-mono font-bold text-text-muted uppercase tracking-widest mb-3 text-center">You see</p>
+                        <div class="rounded-xl ring-1 ring-earth-dark/10 shadow-md overflow-hidden lg:h-[380px] flex flex-col" style="background: #0d0d0d">
+                            <div class="flex items-center gap-2.5 px-4 py-2.5 border-b shrink-0" style="border-color: rgba(255,255,255,0.06)">
+                                <svg class="h-3.5 w-3.5 text-white/85" viewBox="0 0 24 24" fill="currentColor"><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023-.142-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365 2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5Z"/></svg>
+                                <span class="text-white/85 text-[11px] font-medium">platform.openai.com</span>
+                                <span class="text-white/30 text-[11px]">/</span>
+                                <span class="text-white text-[11px]">Logs</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 px-4 py-2.5 border-b flex-wrap shrink-0" style="border-color: rgba(255,255,255,0.06)">
+                                <span class="rounded bg-white/[0.03] ring-1 ring-white/10 px-2 py-0.5 text-[10px] text-white/70">Last 24h ▾</span>
+                                <span class="rounded bg-white/[0.03] ring-1 ring-white/10 px-2 py-0.5 text-[10px] text-white/70">All models ▾</span>
+                                <span class="rounded bg-white/[0.03] ring-1 ring-white/10 px-2 py-0.5 text-[10px] text-white/70">Status ▾</span>
+                                <span class="ml-auto text-[10px] text-white/40 font-mono">427 results</span>
+                            </div>
+                            <div class="grid grid-cols-[68px_1fr_56px_56px] sm:grid-cols-[70px_1fr_56px_56px_52px] gap-3 px-4 py-2 border-b text-[9px] sm:text-[10px] text-white/40 uppercase tracking-wider shrink-0" style="border-color: rgba(255,255,255,0.06)">
+                                <span>Time</span>
+                                <span>Request</span>
+                                <span class="hidden sm:inline text-right">Tokens</span>
+                                <span class="text-right">Latency</span>
+                                <span class="text-right">Cost</span>
+                            </div>
+                            <div class="flex-1 flex flex-col [&>div]:flex-1 [&>div]:items-center">
+                                <div class="grid grid-cols-[68px_1fr_56px_56px] sm:grid-cols-[70px_1fr_56px_56px_52px] gap-3 px-4 py-2 text-[11px]" style="border-bottom: 1px solid rgba(255,255,255,0.04)">
+                                    <span class="font-mono text-white/55">14:23:11</span>
+                                    <span class="truncate text-white/85"><span class="inline-block h-1.5 w-1.5 rounded-full mr-1.5 align-middle" style="background:#3fb950"></span>gpt-4o-mini · chat</span>
+                                    <span class="hidden sm:inline text-right font-mono text-white/55">609</span>
+                                    <span class="text-right font-mono text-white/55">1.21s</span>
+                                    <span class="text-right font-mono text-white/55">$0.002</span>
+                                </div>
+                                <div class="grid grid-cols-[68px_1fr_56px_56px] sm:grid-cols-[70px_1fr_56px_56px_52px] gap-3 px-4 py-2 text-[11px]" style="border-bottom: 1px solid rgba(255,255,255,0.04)">
+                                    <span class="font-mono text-white/55">14:23:29</span>
+                                    <span class="truncate text-white/85"><span class="inline-block h-1.5 w-1.5 rounded-full mr-1.5 align-middle" style="background:#3fb950"></span>claude-sonnet-4-6</span>
+                                    <span class="hidden sm:inline text-right font-mono text-white/55">2,244</span>
+                                    <span class="text-right font-mono text-white/55">2.84s</span>
+                                    <span class="text-right font-mono text-white/55">$0.014</span>
+                                </div>
+                                <div class="grid grid-cols-[68px_1fr_56px_56px] sm:grid-cols-[70px_1fr_56px_56px_52px] gap-3 px-4 py-2 text-[11px]" style="border-bottom: 1px solid rgba(255,255,255,0.04)">
+                                    <span class="font-mono text-white/55">14:24:02</span>
+                                    <span class="truncate text-white/85"><span class="inline-block h-1.5 w-1.5 rounded-full mr-1.5 align-middle" style="background:#3fb950"></span>gpt-4o-mini · chat</span>
+                                    <span class="hidden sm:inline text-right font-mono text-white/55">796</span>
+                                    <span class="text-right font-mono text-white/55">1.04s</span>
+                                    <span class="text-right font-mono text-white/55">$0.001</span>
+                                </div>
+                                <div class="grid grid-cols-[68px_1fr_56px_56px] sm:grid-cols-[70px_1fr_56px_56px_52px] gap-3 px-4 py-2 text-[11px]" style="border-bottom: 1px solid rgba(255,255,255,0.04)">
+                                    <span class="font-mono text-white/55">14:24:18</span>
+                                    <span class="truncate text-white/85"><span class="inline-block h-1.5 w-1.5 rounded-full mr-1.5 align-middle" style="background:#f85149"></span>gpt-4o-mini · chat</span>
+                                    <span class="hidden sm:inline text-right font-mono text-white/55">312</span>
+                                    <span class="text-right font-mono text-white/55">0.92s</span>
+                                    <span class="text-right font-mono text-white/55">$0.001</span>
+                                </div>
+                                <div class="grid grid-cols-[68px_1fr_56px_56px] sm:grid-cols-[70px_1fr_56px_56px_52px] gap-3 px-4 py-2 text-[11px]" style="border-bottom: 1px solid rgba(255,255,255,0.04)">
+                                    <span class="font-mono text-white/55">14:25:03</span>
+                                    <span class="truncate text-white/85"><span class="inline-block h-1.5 w-1.5 rounded-full mr-1.5 align-middle" style="background:#3fb950"></span>claude-sonnet-4-6</span>
+                                    <span class="hidden sm:inline text-right font-mono text-white/55">1,847</span>
+                                    <span class="text-right font-mono text-white/55">2.31s</span>
+                                    <span class="text-right font-mono text-white/55">$0.011</span>
+                                </div>
+                                <div class="grid grid-cols-[68px_1fr_56px_56px] sm:grid-cols-[70px_1fr_56px_56px_52px] gap-3 px-4 py-2 text-[11px]" style="border-bottom: 1px solid rgba(255,255,255,0.04)">
+                                    <span class="font-mono text-white/55">14:25:41</span>
+                                    <span class="truncate text-white/85"><span class="inline-block h-1.5 w-1.5 rounded-full mr-1.5 align-middle" style="background:#3fb950"></span>gpt-4o-mini · chat</span>
+                                    <span class="hidden sm:inline text-right font-mono text-white/55">524</span>
+                                    <span class="text-right font-mono text-white/55">1.13s</span>
+                                    <span class="text-right font-mono text-white/55">$0.002</span>
+                                </div>
+                                <div class="grid grid-cols-[68px_1fr_56px_56px] sm:grid-cols-[70px_1fr_56px_56px_52px] gap-3 px-4 py-2 text-[11px]" style="border-bottom: 1px solid rgba(255,255,255,0.04)">
+                                    <span class="font-mono text-white/55">14:26:08</span>
+                                    <span class="truncate text-white/85"><span class="inline-block h-1.5 w-1.5 rounded-full mr-1.5 align-middle" style="background:#3fb950"></span>claude-sonnet-4-6</span>
+                                    <span class="hidden sm:inline text-right font-mono text-white/55">2,103</span>
+                                    <span class="text-right font-mono text-white/55">2.52s</span>
+                                    <span class="text-right font-mono text-white/55">$0.013</span>
+                                </div>
+                                <div class="grid grid-cols-[68px_1fr_56px_56px] sm:grid-cols-[70px_1fr_56px_56px_52px] gap-3 px-4 py-2 text-[11px]">
+                                    <span class="font-mono text-white/55">14:26:34</span>
+                                    <span class="truncate text-white/85"><span class="inline-block h-1.5 w-1.5 rounded-full mr-1.5 align-middle" style="background:#3fb950"></span>gpt-4o-mini · chat</span>
+                                    <span class="hidden sm:inline text-right font-mono text-white/55">718</span>
+                                    <span class="text-right font-mono text-white/55">1.18s</span>
+                                    <span class="text-right font-mono text-white/55">$0.002</span>
+                                </div>
+                            </div>
                         </div>
-                        <p class="mt-3 text-xs text-text-muted">
-                            Or for Python: <code class="font-mono text-text-mid">python -m artanis_gravel init</code>
-                        </p>
                     </div>
 
-                    <div class="mt-8 rounded-2xl bg-warm p-5 ring-1 ring-earth-dark/5">
-                        <div class="flex items-start gap-3">
-                            <svg class="h-5 w-5 shrink-0 mt-0.5 text-accent" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h.01a1 1 0 100-2H10V9z" clip-rule="evenodd"/></svg>
-                            <div class="text-sm">
-                                <p class="font-semibold text-text-dark">In preview &mdash; ships with v0</p>
-                                <p class="mt-1 text-text-mid">The package isn't on npm yet. Star us on <a class="underline hover:text-primary" href="https://github.com/artanis-ai" target="_blank" rel="noopener noreferrer">GitHub</a> to get notified when v0 ships, or read the <a class="underline hover:text-primary" href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer">docs</a> in the meantime.</p>
+                    <div>
+                        <p class="text-xs font-mono font-bold text-primary uppercase tracking-widest mb-3 text-center">They see</p>
+                        <div class="rounded-xl bg-white ring-1 ring-earth-dark/10 shadow-md overflow-hidden lg:h-[380px] flex flex-col">
+                            <div class="px-5 py-3 border-b border-warm flex items-center justify-between shrink-0">
+                                <div>
+                                    <h4 class="font-display font-semibold text-text-dark text-sm">Patient note &middot; #4827</h4>
+                                </div>
+                                <span class="rounded-full bg-accent/30 px-2 py-0.5 text-[10px] font-semibold text-earth-warm">Pending</span>
+                            </div>
+                            <div class="grid grid-cols-2 divide-x divide-warm flex-1 min-h-0">
+                                <!-- PDF preview chrome -->
+                                <div class="overflow-hidden flex flex-col" style="background: #3a3835">
+                                    <!-- Toolbar -->
+                                    <div class="flex items-center gap-1.5 px-2.5 py-1.5 shrink-0 text-[9px] border-b" style="background: #2a2826; border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7)">
+                                        <svg class="h-3 w-3 shrink-0" style="color: #e87d6e" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16c0 1.1.9 2 2 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+                                        <span class="truncate flex-1 font-mono">patient_intake_4827.pdf</span>
+                                        <span class="rounded px-1 py-0.5 font-mono shrink-0" style="background: rgba(255,255,255,0.06)">1 / 1</span>
+                                    </div>
+                                    <!-- Page area -->
+                                    <div class="flex-1 overflow-hidden flex justify-center px-3 py-2.5" style="background: linear-gradient(180deg, #4a4842 0%, #3a3835 100%)">
+                                        <div class="bg-white w-full shadow-2xl px-3 py-2.5 overflow-hidden flex flex-col" style="font-family: Georgia, 'Times New Roman', serif; box-shadow: 0 4px 20px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.4)">
+                                            <!-- Letterhead -->
+                                            <div class="text-center pb-1.5 mb-1.5 border-b shrink-0" style="border-color: #cfc8b8">
+                                                <p class="text-[9px] font-bold tracking-[0.15em] uppercase" style="color: #2d1810">Riverside Family Clinic</p>
+                                                <p class="text-[7px] mt-0.5 italic" style="color: #6b5744; font-family: Georgia, serif">Patient Intake Form</p>
+                                            </div>
+                                            <!-- Form fields -->
+                                            <div class="text-[7.5px] mb-1.5 grid grid-cols-2 gap-x-1.5 gap-y-0.5 shrink-0" style="color: #4a3a2a; font-family: -apple-system, sans-serif">
+                                                <p><span style="color: #6b5744">Date</span> &nbsp;22 Apr 2026</p>
+                                                <p><span style="color: #6b5744">Time</span> &nbsp;14:23</p>
+                                                <p><span style="color: #6b5744">Patient</span> &nbsp;Child, age 6</p>
+                                                <p><span style="color: #6b5744">MRN</span> &nbsp;A-4827</p>
+                                                <p class="col-span-2 truncate"><span style="color: #6b5744">Caller</span> &nbsp;Parent · parent@example.com</p>
+                                            </div>
+                                            <!-- Body -->
+                                            <div class="text-[8.5px] flex-1 overflow-hidden" style="color: #2d1810; line-height: 1.45">
+                                                <p class="font-bold uppercase tracking-wider mb-0.5" style="color: #6b5744; font-size: 6px; letter-spacing: 0.1em">Presenting concern</p>
+                                                <p class="italic">"6-year-old, fever of 39°C for two days. Stiff neck and unusually drowsy. Paracetamol brought it down briefly. No rash. Two episodes of vomiting overnight. Eating very little. Hasn't wanted to play. Should I be worried?"</p>
+                                            </div>
+                                            <!-- Footer -->
+                                            <div class="text-[6px] pt-1 mt-1 border-t flex items-center justify-between shrink-0" style="border-color: #cfc8b8; color: #8b7757; font-family: -apple-system, sans-serif">
+                                                <span>Form INT-04 · v1.3</span>
+                                                <span>1 / 1</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Status bar -->
+                                    <div class="flex items-center justify-between px-2.5 py-1 text-[8px] shrink-0 border-t font-mono" style="background: #2a2826; border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.45)">
+                                        <span class="inline-flex items-center gap-1">
+                                            <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+                                            <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                                        </span>
+                                        <span>100%</span>
+                                        <span>2.4 KB</span>
+                                    </div>
+                                </div>
+
+                                <!-- Structured data panel -->
+                                <div class="p-4 bg-warm/30 overflow-hidden flex flex-col">
+                                    <div class="flex items-center justify-between shrink-0">
+                                        <p class="font-mono text-[9px] text-text-muted uppercase tracking-wider">AI extraction</p>
+                                        <span class="text-[8px] font-mono text-text-muted">v1.2 · 0.84s</span>
+                                    </div>
+                                    <div class="mt-3 flex-1 overflow-hidden flex flex-col gap-2.5 text-[10px]">
+                                        <!-- Severity -->
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-text-muted">Severity</span>
+                                            <span class="inline-flex items-center gap-1 rounded bg-primary text-white px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider">
+                                                <svg class="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+                                                High
+                                            </span>
+                                        </div>
+                                        <!-- Triage code -->
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-text-muted">Triage</span>
+                                            <span class="text-text-dark font-medium">Cat. 2 &middot; &lt; 10 min</span>
+                                        </div>
+                                        <!-- Red flags -->
+                                        <div>
+                                            <p class="text-text-muted">Red flags</p>
+                                            <div class="mt-1 flex flex-wrap gap-1">
+                                                <span class="rounded bg-primary/10 text-primary px-1.5 py-0.5 text-[9px] font-medium">fever&nbsp;39°C</span>
+                                                <span class="rounded bg-primary/10 text-primary px-1.5 py-0.5 text-[9px] font-medium">stiff&nbsp;neck</span>
+                                                <span class="rounded bg-primary/10 text-primary px-1.5 py-0.5 text-[9px] font-medium">drowsy</span>
+                                                <span class="rounded bg-accent/30 text-earth-warm px-1.5 py-0.5 text-[9px] font-medium">vomiting</span>
+                                            </div>
+                                        </div>
+                                        <!-- Differentials -->
+                                        <div>
+                                            <p class="text-text-muted">Possible</p>
+                                            <ol class="mt-0.5 text-text-dark text-[10px]">
+                                                <li><span class="text-text-muted">1.</span> Meningitis</li>
+                                                <li><span class="text-text-muted">2.</span> Severe gastroenteritis</li>
+                                            </ol>
+                                        </div>
+                                        <!-- Confidence bar -->
+                                        <div class="mt-auto pt-1">
+                                            <div class="flex items-center justify-between text-[9px] mb-0.5">
+                                                <span class="text-text-muted">Confidence</span>
+                                                <span class="text-text-dark font-mono">0.92</span>
+                                            </div>
+                                            <div class="h-1 w-full rounded-full overflow-hidden" style="background: rgba(155,67,64,0.12)">
+                                                <div class="h-full rounded-full bg-forest" style="width: 92%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="px-4 py-3 border-t border-warm flex items-center justify-center gap-3 shrink-0">
+                                <button class="inline-flex items-center gap-1.5 rounded-lg bg-forest text-white px-4 py-2 text-sm font-semibold shadow-sm hover:bg-forest-light transition">
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.733a4 4 0 00-.8 2.6z"/></svg>
+                                    Looks good
+                                </button>
+                                <button class="inline-flex items-center gap-1.5 rounded-lg text-white px-4 py-2 text-sm font-semibold shadow-sm transition" style="background: #C97064" onmouseover="this.style.background='#B05B4F'" onmouseout="this.style.background='#C97064'">
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M18 9.5a1.5 1.5 0 11-3 0v-6a1.5 1.5 0 013 0v6zM14 9.667v-5.43a2 2 0 00-1.105-1.79l-.05-.025A4 4 0 0011.057 2H5.64a2 2 0 00-1.962 1.608l-1.2 6A2 2 0 004.44 12H8v4a2 2 0 002 2 1 1 0 001-1v-.667a4 4 0 01.8-2.4l1.4-1.866a4 4 0 00.8-2.4z"/></svg>
+                                    Needs work
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Right: config snippet -->
-                <div>
-                    <p class="text-sm font-medium text-text-muted mb-3 font-mono">gravel.config.ts</p>
-                    <div class="code-block p-5 text-[13px] leading-relaxed overflow-x-auto">
-<span class="keyword">import</span> { defineConfig } <span class="keyword">from</span> <span class="string">'@artanis/gravel'</span>
-<span class="keyword">import</span> { auth } <span class="keyword">from</span> <span class="string">'@clerk/nextjs/server'</span>
-
-<span class="keyword">export const</span> config <span class="punctuation">=</span> defineConfig({
-  <span class="comment">// where the dashboard lives in your app</span>
-  mountPath: <span class="string">'/admin/ai'</span>,
-
-  <span class="comment">// your DB. Postgres or SQLite.</span>
-  database: { url: process.env.DATABASE_URL! },
-
-  <span class="comment">// your auth, your call</span>
-  auth: {
-    <span class="keyword">async</span> getUser(req) {
-      <span class="keyword">const</span> { userId, sessionClaims } <span class="punctuation">=</span> <span class="keyword">await</span> auth()
-      <span class="keyword">if</span> (!userId) <span class="keyword">return null</span>
-      <span class="keyword">return</span> {
-        id: userId,
-        firstName: sessionClaims?.first_name,
-        role: sessionClaims?.gravelAdmin ? <span class="string">'admin'</span> : <span class="string">'user'</span>,
-      }
-    },
-  },
-
-  <span class="comment">// optional: required for live evals</span>
-  <span class="keyword">async</span> runPipeline(input) {
-    <span class="keyword">return await</span> myActualLLMPipeline(input)
-  },
-})</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- The loop -->
-    <section class="bg-warm py-20 sm:py-24">
-        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-14">
-                <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">The loop</p>
-                <h2 class="mt-3 font-display text-3xl sm:text-4xl font-semibold tracking-tight text-text-dark">
-                    Tracing &rarr; feedback &rarr; PR &rarr; eval. Repeat.
-                </h2>
-                <p class="mt-5 text-lg text-text-mid mx-auto max-w-2xl">
-                    Your domain experts close the loop. Engineers stop being prompt-tweakers.
-                </p>
+                <p class="mt-10 max-w-2xl mx-auto text-center text-text-mid">Observability tools were made for engineers. You won't convince anyone to sift through your OpenAI logs. Hook into your model calls with one line of code and serve a much nicer UI straight from your app.</p>
             </div>
 
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="rounded-2xl bg-cream p-6 ring-1 ring-warm">
-                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary text-sm font-semibold">1</div>
-                    <h3 class="mt-4 font-display font-semibold text-text-dark">Auto-traced</h3>
-                    <p class="mt-2 text-sm text-text-mid">OpenAI / Anthropic / Langchain / Vercel AI SDK calls land in your DB. Nothing to instrument.</p>
-                </div>
-                <div class="rounded-2xl bg-cream p-6 ring-1 ring-warm">
-                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary text-sm font-semibold">2</div>
-                    <h3 class="mt-4 font-display font-semibold text-text-dark">DE labels</h3>
-                    <p class="mt-2 text-sm text-text-mid">Domain experts thumbs-up/down outputs and write the correct version. That becomes ground truth.</p>
-                </div>
-                <div class="rounded-2xl bg-cream p-6 ring-1 ring-warm">
-                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary text-sm font-semibold">3</div>
-                    <h3 class="mt-4 font-display font-semibold text-text-dark">Edit &rarr; PR</h3>
-                    <p class="mt-2 text-sm text-text-mid">DE edits a prompt. "Submit" creates a real GitHub PR. Engineers review and merge as normal.</p>
-                </div>
-                <div class="rounded-2xl bg-cream p-6 ring-1 ring-warm">
-                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary text-sm font-semibold">4</div>
-                    <h3 class="mt-4 font-display font-semibold text-text-dark">Eval gates regressions</h3>
-                    <p class="mt-2 text-sm text-text-mid">Click "Run eval". Our judges score new outputs against the labels. Regressions surface in plain English.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Mole / Mallet glue -->
-    <section class="bg-cream py-20 sm:py-24 border-t border-warm">
-        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <div class="rounded-3xl bg-warm p-8 sm:p-12 ring-1 ring-earth-dark/5">
-                <div class="grid lg:grid-cols-[auto_1fr] gap-8 items-center">
-                    <img src="/img/mallet.png" alt="" class="w-24 sm:w-32 mx-auto lg:mx-0">
+            <!-- Pair 2: Prompts — VSCode vs Prompts UI -->
+            <div>
+                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Prompts</p>
+                <div class="grid lg:grid-cols-2 gap-5 lg:gap-7 items-start">
                     <div>
-                        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Pair with Mallet</p>
-                        <h2 class="mt-2 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-text-dark">
-                            Mallet's prompt analyzer is built into Gravel
-                        </h2>
-                        <p class="mt-4 text-text-mid">
-                            The same engine that powers our free standalone <a href="/mallet/" class="text-primary underline hover:text-primary-dark">Mallet at artanis.ai/mallet</a> ships inside Gravel's dashboard. As your domain experts edit prompts, Mallet flags contradictions, ambiguities, and best-practice gaps inline. Free tier: rate-limited. Paid tier: unlimited.
-                        </p>
+                        <p class="text-xs font-mono font-bold text-text-muted uppercase tracking-widest mb-3 text-center">You see</p>
+                        <div class="rounded-xl ring-1 ring-earth-dark/10 shadow-md overflow-hidden flex lg:h-[380px]" style="background: #1e1e1e">
+                            <div class="flex flex-col items-center gap-4 py-3 px-2 border-r" style="background: #181818; border-color: #2a2a2a">
+                                <svg class="h-5 w-5" style="color: #ffffff" fill="currentColor" viewBox="0 0 24 24"><path d="M14.5 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V7.5L14.5 2zM18 20H6V4h7.5v5H18v11z"/></svg>
+                                <svg class="h-5 w-5" style="color: rgba(255,255,255,0.45)" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                <svg class="h-5 w-5" style="color: rgba(255,255,255,0.45)" fill="currentColor" viewBox="0 0 24 24"><path d="M2.6 10.59L8.38 4.8l1.69 1.7c-.24.85.15 1.78.93 2.23v5.54c-.6.34-1 .98-1 1.73a2 2 0 002 2 2 2 0 002-2c0-.75-.4-1.39-1-1.73V9.41l2.07 2.09c-.07.15-.07.32-.07.5a2 2 0 002 2 2 2 0 002-2 2 2 0 00-2-2c-.18 0-.35 0-.5.07L13.93 7.5a1.98 1.98 0 00-1.15-2.34c-.43-.16-.88-.2-1.28-.04L9.82 3.43l.79-.83c.78-.78 2.04-.78 2.83 0l7.99 7.99c.79.78.79 2.04 0 2.83l-7.78 7.79c-.79.78-2.05.78-2.83 0L2.6 13.41a2 2 0 010-2.82z"/></svg>
+                            </div>
+                            <div class="hidden sm:block w-44 shrink-0 border-r" style="background: #1e1e1e; border-color: #2a2a2a">
+                                <div class="px-3 py-2 text-[10px] uppercase tracking-wider" style="color: rgba(255,255,255,0.5)">Explorer</div>
+                                <div class="px-3 py-1 text-[11px] font-medium" style="color: rgba(255,255,255,0.85)">YOUR-APP</div>
+                                <div class="text-[11px] mt-1" style="color: rgba(255,255,255,0.7)">
+                                    <div class="px-3 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▾</span>📁 src</div>
+                                    <div class="pl-7 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▾</span>📁 agents</div>
+                                    <div class="pl-11 py-0.5 flex items-center gap-1.5" style="background: rgba(255,255,255,0.06); color: white">📄 triage.ts</div>
+                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📄 summarizer.ts</div>
+                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📄 red_flag_detector.ts</div>
+                                    <div class="pl-7 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▾</span>📁 prompts</div>
+                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📝 intake.md</div>
+                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📝 discharge.md</div>
+                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📝 followup.md</div>
+                                    <div class="pl-7 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▸</span>📁 lib</div>
+                                    <div class="px-3 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▸</span>📁 tests</div>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0 flex flex-col">
+                                <div class="flex border-b shrink-0" style="background: #1e1e1e; border-color: #2a2a2a">
+                                    <div class="flex items-center gap-2 px-3 py-1.5 border-r border-l-2" style="background: #1e1e1e; border-right-color: #2a2a2a; border-left-color: #007acc">
+                                        <span class="text-[11px]" style="color: rgba(255,255,255,0.85)">triage.ts</span>
+                                        <span class="text-[11px] ml-1" style="color: rgba(255,255,255,0.4)">×</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1 px-2 py-3 font-mono text-[11px] leading-[1.7] flex overflow-x-auto">
+                                    <div class="text-right pr-3 select-none shrink-0" style="color: rgba(255,255,255,0.25); min-width: 28px">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18</div>
+<pre style="color: rgba(255,255,255,0.85); margin: 0;"><span style="color:#6A9955">// triage agent</span>
+<span style="color:#C586C0">import</span> { openai } <span style="color:#C586C0">from</span> <span style="color:#CE9178">'./client'</span>
+
+<span style="color:#569cd6">const</span> <span style="color:#4FC1FF">SYSTEM_PROMPT</span> <span style="color:#d4d4d4">=</span> <span style="color:#CE9178">`You are a clinical triage</span>
+<span style="color:#CE9178">assistant. Be concise. Prioritise</span>
+<span style="color:#CE9178">urgent symptoms. Avoid speculative</span>
+<span style="color:#CE9178">diagnosis. If red flags appear,</span>
+<span style="color:#CE9178">route to in-person care.`</span>
+
+<span style="color:#C586C0">export</span> <span style="color:#569cd6">async function</span> <span style="color:#DCDCAA">triage</span>(msg) {
+  <span style="color:#C586C0">return</span> openai.chat.completions.<span style="color:#DCDCAA">create</span>({
+    model: <span style="color:#CE9178">'gpt-4o-mini'</span>,
+    messages: [
+      { role: <span style="color:#CE9178">'system'</span>, content: SYSTEM_PROMPT },
+      { role: <span style="color:#CE9178">'user'</span>, content: msg },
+    ],
+  })
+}</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-mono font-bold text-primary uppercase tracking-widest mb-3 text-center">They see</p>
+                        <div class="rounded-xl bg-white ring-1 ring-earth-dark/10 shadow-md overflow-hidden lg:h-[380px] flex flex-col">
+                            <div class="px-5 py-3 border-b border-warm flex items-center gap-3 shrink-0">
+                                <h4 class="font-display font-semibold text-text-dark text-sm shrink-0">Prompts</h4>
+                                <div class="hidden sm:flex w-44 items-center gap-1.5 rounded-lg bg-warm px-2.5 py-1.5 text-[11px] text-text-muted ml-auto">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                    Search…
+                                </div>
+                                <span class="text-[10px] text-text-muted shrink-0">14 prompts</span>
+                            </div>
+                            <div class="p-4 grid sm:grid-cols-2 gap-3 flex-1 sm:auto-rows-fr">
+                                <div class="rounded-xl border border-warm bg-warm/30 p-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-display font-semibold text-text-dark text-sm">Triage Assistant</span>
+                                        <span class="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary">EDITED</span>
+                                    </div>
+                                    <p class="mt-2 text-[11px] text-text-muted">You are a clinical triage assistant. Be concise. Prioritise urgent symptoms over speculation.</p>
+                                    <p class="mt-2 text-[10px] text-text-muted">2 min ago &middot; Alice</p>
+                                </div>
+                                <div class="rounded-xl border border-warm bg-cream p-4">
+                                    <span class="font-display font-semibold text-text-dark text-sm">Discharge Summary</span>
+                                    <p class="mt-2 text-[11px] text-text-muted">Produce a discharge summary. Include diagnosis, medications, and follow-up plan.</p>
+                                    <p class="mt-2 text-[10px] text-text-muted">3 days ago</p>
+                                </div>
+                                <div class="rounded-xl border border-warm bg-cream p-4">
+                                    <span class="font-display font-semibold text-text-dark text-sm">Red-Flag Detector</span>
+                                    <p class="mt-2 text-[11px] text-text-muted">Identify red-flag symptoms in the patient note. Output JSON with severity scores.</p>
+                                    <p class="mt-2 text-[10px] text-text-muted">1 week ago</p>
+                                </div>
+                                <div class="rounded-xl border border-warm bg-cream p-4">
+                                    <span class="font-display font-semibold text-text-dark text-sm">Intake Questionnaire</span>
+                                    <p class="mt-2 text-[11px] text-text-muted">Walk the patient through intake questions. Ask one at a time and confirm.</p>
+                                    <p class="mt-2 text-[10px] text-text-muted">2 weeks ago</p>
+                                </div>
+                            </div>
+                            <div class="px-5 pb-4 -mt-1 shrink-0 text-center">
+                                <a class="text-xs text-primary hover:text-primary-dark inline-flex items-center gap-1 font-medium">Show 10 more &rarr;</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <p class="mt-10 max-w-2xl mx-auto text-center text-text-mid">Prompts <em>should</em> live in git. Prompt management tools try to reinvent the wheel with decoupled versioning and collaboration. But git is for engineers. Gravel will find all the prompts in your codebase (yes, even variables) and serve them in a familiar Google Docs-like UI.</p>
             </div>
+
+            <!-- Pair 3: Edits — GitHub PR vs Mallet editor -->
+            <div>
+                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Edits</p>
+                <div class="grid lg:grid-cols-2 gap-5 lg:gap-7 items-start">
+                    <div>
+                        <p class="text-xs font-mono font-bold text-text-muted uppercase tracking-widest mb-3 text-center">You see</p>
+                        <div class="rounded-xl ring-1 ring-earth-dark/10 shadow-md overflow-hidden lg:h-[380px] flex flex-col" style="background: #0d1117">
+                            <div class="px-4 py-3 border-b shrink-0" style="border-color: #21262d">
+                                <div class="flex items-center gap-2">
+                                    <svg class="h-4 w-4 shrink-0" style="color: #3fb950" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 3.25a2.25 2.25 0 113 2.122v5.256a2.251 2.251 0 11-1.5 0V5.372A2.25 2.25 0 011.5 3.25zM11 2.5h-1V4h1a1 1 0 011 1v5.628a2.251 2.251 0 101.5 0V5A2.5 2.5 0 0011 2.5zm1 10.25a.75.75 0 111.5 0 .75.75 0 01-1.5 0zM3.75 12a.75.75 0 100 1.5.75.75 0 000-1.5zm0-9.5a.75.75 0 100 1.5.75.75 0 000-1.5z"/></svg>
+                                    <span class="text-white text-[13px] font-medium truncate">Improve triage prompt for elderly patients <span class="font-normal" style="color: rgba(255,255,255,0.4)">#234</span></span>
+                                    <span class="ml-auto rounded-full px-2 py-0.5 text-[10px] font-semibold text-white whitespace-nowrap" style="background: #238636">Open</span>
+                                </div>
+                                <p class="mt-1 text-[11px] ml-6" style="color: rgba(255,255,255,0.45)">gravel-bot wants to merge 1 commit into <span class="font-mono">main</span></p>
+                            </div>
+                            <div class="flex border-b text-[11px] shrink-0" style="border-color: #21262d">
+                                <div class="px-3 py-2" style="color: rgba(255,255,255,0.6)">Conversation</div>
+                                <div class="px-3 py-2" style="color: rgba(255,255,255,0.6)">Commits</div>
+                                <div class="px-3 py-2 inline-flex items-center gap-1.5" style="color: rgba(255,255,255,0.6)">Checks <span class="rounded-full px-1.5 text-[9px] py-0.5" style="background: #21262d; color: rgba(255,255,255,0.7)">3</span></div>
+                                <div class="px-3 py-2 border-b-2 inline-flex items-center gap-1.5" style="color: white; border-color: #f78166">Files <span class="rounded-full px-1.5 text-[9px] py-0.5" style="background: #21262d; color: rgba(255,255,255,0.7)">1</span></div>
+                            </div>
+                            <div class="px-4 py-2 border-b text-[11px] font-mono flex items-center gap-2 shrink-0" style="border-color: #21262d; background: #161b22">
+                                <span style="color: rgba(255,255,255,0.85)">src/agents/triage.ts</span>
+                                <span style="color: #3fb950">+3</span>
+                                <span style="color: #f85149">−1</span>
+                            </div>
+                            <div class="font-mono text-[11px] leading-[1.7] overflow-x-auto flex-1">
+                                <div class="px-4 py-1" style="background: #161b22; color: rgba(255,255,255,0.45)">@@ -3,5 +3,7 @@</div>
+                                <div class="grid grid-cols-[36px_18px_1fr]" style="color: rgba(255,255,255,0.85)">
+                                    <span class="px-2 text-right select-none" style="color: rgba(255,255,255,0.25)">3</span><span class="select-none"></span><span>You are a clinical triage assistant.</span>
+                                </div>
+                                <div class="grid grid-cols-[36px_18px_1fr]" style="color: rgba(255,255,255,0.85)">
+                                    <span class="px-2 text-right select-none" style="color: rgba(255,255,255,0.25)">4</span><span class="select-none"></span><span>Be concise. Prioritise urgent symptoms.</span>
+                                </div>
+                                <div class="grid grid-cols-[36px_18px_1fr]" style="background: rgba(248,81,73,0.15); color: rgba(255,255,255,0.95)">
+                                    <span class="px-2 text-right select-none" style="color: rgba(255,255,255,0.3)">5</span><span class="select-none text-center" style="color: #f85149">−</span><span>Avoid speculative diagnosis.</span>
+                                </div>
+                                <div class="grid grid-cols-[36px_18px_1fr]" style="background: rgba(63,185,80,0.15); color: rgba(255,255,255,0.95)">
+                                    <span class="px-2 text-right select-none" style="color: rgba(255,255,255,0.3)"></span><span class="select-none text-center" style="color: #3fb950">+</span><span>Avoid speculative diagnosis.</span>
+                                </div>
+                                <div class="grid grid-cols-[36px_18px_1fr]" style="background: rgba(63,185,80,0.15); color: rgba(255,255,255,0.95)">
+                                    <span class="px-2 text-right select-none" style="color: rgba(255,255,255,0.3)"></span><span class="select-none text-center" style="color: #3fb950">+</span><span>For patients over 65, lower the threshold</span>
+                                </div>
+                                <div class="grid grid-cols-[36px_18px_1fr]" style="background: rgba(63,185,80,0.15); color: rgba(255,255,255,0.95)">
+                                    <span class="px-2 text-right select-none" style="color: rgba(255,255,255,0.3)"></span><span class="select-none text-center" style="color: #3fb950">+</span><span>for recommending in-person care.</span>
+                                </div>
+                                <div class="grid grid-cols-[36px_18px_1fr]" style="color: rgba(255,255,255,0.85)">
+                                    <span class="px-2 text-right select-none" style="color: rgba(255,255,255,0.25)">6</span><span class="select-none"></span><span>If red flags appear, route to in-person</span>
+                                </div>
+                                <div class="grid grid-cols-[36px_18px_1fr]" style="color: rgba(255,255,255,0.85)">
+                                    <span class="px-2 text-right select-none" style="color: rgba(255,255,255,0.25)">7</span><span class="select-none"></span><span>care. Always disclose that you are an AI.</span>
+                                </div>
+                                <div class="grid grid-cols-[36px_18px_1fr]" style="color: rgba(255,255,255,0.85)">
+                                    <span class="px-2 text-right select-none" style="color: rgba(255,255,255,0.25)">8</span><span class="select-none"></span><span>Never speculate beyond the chart.</span>
+                                </div>
+                            </div>
+                            <div class="px-4 py-2.5 border-t flex items-center gap-2 text-[11px] shrink-0" style="border-color: #21262d; background: #161b22; color: rgba(255,255,255,0.55)">
+                                <span class="h-1.5 w-1.5 rounded-full" style="background: #3fb950"></span>
+                                All checks passed
+                                <span class="ml-auto">Alice edited &middot; 4m ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-mono font-bold text-primary uppercase tracking-widest mb-3 text-center">They see</p>
+                        <div class="rounded-xl bg-white ring-1 ring-earth-dark/10 shadow-md overflow-hidden lg:h-[380px] flex flex-col">
+                            <div class="px-5 py-3 border-b border-warm flex items-center gap-3 shrink-0">
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-display font-semibold text-text-dark text-sm truncate">Triage Assistant</p>
+                                </div>
+                                <!-- Collaborator avatars -->
+                                <div class="hidden sm:flex -space-x-1.5 shrink-0">
+                                    <span title="Alice" class="h-6 w-6 rounded-full text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white" style="background: #D63384">A</span>
+                                    <span title="Bob" class="h-6 w-6 rounded-full text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white" style="background: #2563EB">B</span>
+                                </div>
+                                <button class="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white whitespace-nowrap shrink-0 inline-flex items-center gap-1">
+                                    <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 3.25a2.25 2.25 0 113 2.122v5.256a2.251 2.251 0 11-1.5 0V5.372A2.25 2.25 0 011.5 3.25zM11 2.5h-1V4h1a1 1 0 011 1v5.628a2.251 2.251 0 101.5 0V5A2.5 2.5 0 0011 2.5zm1 10.25a.75.75 0 111.5 0 .75.75 0 01-1.5 0zM3.75 12a.75.75 0 100 1.5.75.75 0 000-1.5zm0-9.5a.75.75 0 100 1.5.75.75 0 000-1.5z"/></svg>
+                                    Submit
+                                </button>
+                            </div>
+                            <div id="mallet-editor" class="px-3 py-2.5 font-mono text-[11px] text-text-dark flex-1 overflow-hidden"></div>
+                            <div class="px-4 py-2.5 border-t border-warm bg-warm/30 space-y-1.5 shrink-0">
+                                <div class="flex items-start gap-2 text-[11px]">
+                                    <svg class="h-3.5 w-3.5 mt-0.5 shrink-0 text-forest" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                    <span class="text-text-mid">No contradictions with past feedback.</span>
+                                </div>
+                                <div class="flex items-start gap-2 text-[11px]">
+                                    <svg class="h-3.5 w-3.5 mt-0.5 shrink-0 text-accent" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+                                    <span class="text-text-mid"><span class="font-medium text-text-dark">"red flags":</span> ambiguous. Link to the canonical list.</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-[10px] text-text-muted">
+                                    <span class="font-mono">412 chars</span>
+                                    <span>&middot;</span>
+                                    <span>78 words</span>
+                                    <span class="ml-auto inline-flex items-center gap-1">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-forest"></span>
+                                        2 connected
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-10 max-w-2xl mx-auto text-center text-text-mid">Your team can submit draft changes to prompts but you remain in control. The source of truth is your codebase, so those submissions turn into PRs in the background, and they never need to know what a PR even is.</p>
+            </div>
+
+            <!-- Pair 4: Evals — GH Actions failure vs Regression detail -->
+            <div>
+                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Evals</p>
+                <div class="grid lg:grid-cols-2 gap-5 lg:gap-7 items-start">
+                    <div>
+                        <p class="text-xs font-mono font-bold text-text-muted uppercase tracking-widest mb-3 text-center">You see</p>
+                        <div class="rounded-xl ring-1 ring-earth-dark/10 shadow-md overflow-hidden lg:h-[380px] flex flex-col" style="background: #0d1117">
+                            <div class="px-4 py-3 border-b shrink-0" style="border-color: #21262d">
+                                <div class="flex items-center gap-2">
+                                    <svg class="h-4 w-4 shrink-0" viewBox="0 0 16 16" fill="currentColor" style="color: #f85149"><path d="M2.344 2.343h-.001a8 8 0 0111.314 11.314A8.002 8.002 0 01.234 10.089a8 8 0 012.11-7.746zm1.06 10.253a6.5 6.5 0 109.108-9.275 6.5 6.5 0 00-9.108 9.275zM6.03 4.97L8 6.94l1.97-1.97a.75.75 0 011.06 1.06L9.06 8l1.97 1.97a.75.75 0 11-1.06 1.06L8 9.06l-1.97 1.97a.75.75 0 01-1.06-1.06L6.94 8 4.97 6.03a.75.75 0 011.06-1.06z"/></svg>
+                                    <span class="text-white text-[13px] font-medium truncate">Improve triage prompt for elderly patients</span>
+                                </div>
+                                <p class="mt-1 text-[11px] ml-6" style="color: rgba(255,255,255,0.45)">on: pull_request &middot; #234 &middot; <span class="font-mono">main</span> &middot; 3m 14s &middot; <span style="color: #f85149">failed</span></p>
+                            </div>
+                            <div class="flex flex-1 min-h-0">
+                                <div class="hidden md:block w-44 shrink-0 border-r p-1" style="border-color: #21262d; background: #0d1117">
+                                    <div class="px-2 py-1 text-[9px] uppercase tracking-wider" style="color: rgba(255,255,255,0.45)">Jobs</div>
+                                    <div class="rounded px-2 py-1 flex items-center gap-2 text-[11px]" style="background: #161b22; color: rgba(255,255,255,0.85)">
+                                        <span style="color: #f85149">●</span>
+                                        <span>run-evals</span>
+                                        <span class="ml-auto" style="color: rgba(255,255,255,0.45)">3m 14s</span>
+                                    </div>
+                                    <div class="px-2 py-2 text-[9px] uppercase tracking-wider mt-1" style="color: rgba(255,255,255,0.45)">Steps</div>
+                                    <div class="text-[11px]">
+                                        <div class="px-2 py-1 flex items-center gap-2" style="color: rgba(255,255,255,0.85)"><span style="color: #3fb950">✓</span><span>Set up runner</span></div>
+                                        <div class="px-2 py-1 flex items-center gap-2" style="color: rgba(255,255,255,0.85)"><span style="color: #3fb950">✓</span><span>Checkout</span></div>
+                                        <div class="px-2 py-1 flex items-center gap-2" style="color: rgba(255,255,255,0.85)"><span style="color: #3fb950">✓</span><span>Setup Node</span></div>
+                                        <div class="px-2 py-1 flex items-center gap-2" style="color: rgba(255,255,255,0.85)"><span style="color: #3fb950">✓</span><span>pnpm install</span></div>
+                                        <div class="rounded px-2 py-1 flex items-center gap-2" style="background: rgba(248,81,73,0.12); color: white"><span style="color: #f85149">✕</span><span>gravel evals</span></div>
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0 overflow-x-auto">
+<pre class="px-4 py-3 font-mono text-[11px] leading-[1.7]" style="color: rgba(201,209,217,0.85); margin: 0;"><span style="color: rgba(255,255,255,0.4)"># Run gravel evals</span>
+<span style="color: rgba(255,255,255,0.4)">$</span> npx gravel evals run --against=production-labels
+
+  <span style="color: #3fb950">✓</span> 9 / 12 outputs pass
+  <span style="color: #f85149">✕</span> <span style="color: #f85149">3 outputs regressed against ground truth</span>
+
+  trace 2026-04-22 / Alice      <span style="color: #f85149">FAIL</span>
+  trace 2026-04-30 / Mei        <span style="color: #f85149">FAIL</span>
+  trace 2026-05-02 / Alice      <span style="color: #f85149">FAIL</span>
+
+<span style="color: #f85149">Error: regression budget exceeded (3 &gt; 1)</span>
+       see https://your-app.com/admin/ai/evals/run/8f31
+
+<span style="color: rgba(255,255,255,0.45)">##[error]Process completed with exit code 1.</span></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-mono font-bold text-primary uppercase tracking-widest mb-3 text-center">They see</p>
+                        <div class="rounded-xl bg-white ring-1 ring-earth-dark/10 shadow-md overflow-hidden lg:h-[380px] flex flex-col">
+                            <div class="px-5 py-3 border-b border-warm flex items-center gap-3 shrink-0">
+                                <svg class="h-5 w-5 shrink-0" fill="currentColor" viewBox="0 0 20 20" style="color: #C97064"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-display font-semibold text-text-dark text-sm">Conflicting feedback</p>
+                                </div>
+                            </div>
+                            <div class="p-4 flex-1 flex flex-col gap-2.5 overflow-hidden">
+                                <div class="rounded-lg border border-warm bg-warm/20 px-3 py-2">
+                                    <p class="text-[10px] font-mono uppercase tracking-wider text-text-muted">AI answer</p>
+                                    <p class="mt-1 text-[11.5px] text-text-dark italic line-clamp-2">"This could be dehydration or a urinary infection. Try increasing fluids and monitor for a few hours…"</p>
+                                </div>
+                                <div class="rounded-lg border bg-white px-3 py-2" style="border-color: #D6338426">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="h-4 w-4 rounded-full text-white text-[8px] font-bold flex items-center justify-center" style="background: #D63384">A</span>
+                                        <span class="text-[10px] font-medium text-text-dark">Alice</span>
+                                        <span class="text-[10px] text-text-muted">&middot; 2 weeks ago</span>
+                                        <svg class="ml-auto h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" style="color: #C97064"><path d="M18 9.5a1.5 1.5 0 11-3 0v-6a1.5 1.5 0 013 0v6zM14 9.667v-5.43a2 2 0 00-1.105-1.79l-.05-.025A4 4 0 0011.057 2H5.64a2 2 0 00-1.962 1.608l-1.2 6A2 2 0 004.44 12H8v4a2 2 0 002 2 1 1 0 001-1v-.667a4 4 0 01.8-2.4l1.4-1.866a4 4 0 00.8-2.4z"/></svg>
+                                    </div>
+                                    <p class="mt-1 text-[11.5px] text-text-dark">Sudden confusion in elderly = always urgent. Don't suggest waiting.</p>
+                                </div>
+                                <div class="flex items-center gap-2 text-[10px] font-medium uppercase tracking-wider self-center" style="color: #C97064">
+                                    <span class="h-px w-6" style="background: #C97064"></span>
+                                    contradicts
+                                    <span class="h-px w-6" style="background: #C97064"></span>
+                                </div>
+                                <div class="rounded-lg border bg-white px-3 py-2" style="border-color: #2563EB26">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="h-4 w-4 rounded-full text-white text-[8px] font-bold flex items-center justify-center" style="background: #2563EB">B</span>
+                                        <span class="text-[10px] font-medium text-text-dark">Bob</span>
+                                        <span class="text-[10px] text-text-muted">&middot; 4 days ago</span>
+                                        <svg class="ml-auto h-3.5 w-3.5 text-forest" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.733a4 4 0 00-.8 2.6z"/></svg>
+                                    </div>
+                                    <p class="mt-1 text-[11.5px] text-text-dark">For mild fluid imbalance, monitoring at home for a couple of hours is fine.</p>
+                                </div>
+                            </div>
+                            <div class="px-4 py-3 border-t border-warm flex items-center justify-center shrink-0">
+                                <button class="inline-flex items-center gap-1.5 rounded-lg bg-primary text-white px-4 py-2 text-sm font-semibold shadow-sm hover:bg-primary-dark transition">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                                    Update prompt
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-10 max-w-2xl mx-auto text-center text-text-mid">Let's face it: two people can disagree on how the AI should behave. The same person can disagree on a different day. When output is reviewed, or prompts change, Gravel will automatically check against all past feedback and corrections. The golden set is built as they use it!</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Data security / runs in your infra -->
+    <section class="bg-warm py-20 sm:py-28 border-y border-earth-dark/5">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center mb-12 sm:mb-16">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Data security</p>
+            <h2 class="mt-3 font-display text-3xl sm:text-5xl font-semibold tracking-tight text-text-dark leading-tight">
+                Nothing leaves your infra.
+            </h2>
+            <p class="mt-5 text-lg text-text-mid">
+                Gravel installs into your existing app. Your database, your auth, your domain.
+            </p>
+            <p class="mt-3 text-text-mid">
+                <a href="https://calendar.notion.so/meet/yousef/sam" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:text-primary-dark transition">Contact us</a> for managed deployments.
+            </p>
+        </div>
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="rounded-xl bg-cream p-4 ring-1 ring-warm">
+                        <div class="flex items-center gap-2.5">
+                            <svg class="h-4 w-4 text-forest" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/></svg>
+                            <span class="font-display font-semibold text-text-dark text-sm">Your database</span>
+                        </div>
+                        <p class="mt-2 text-xs text-text-mid">Postgres or SQLite. Tables prefixed <code class="font-mono text-[11px] text-earth-warm">gravel_*</code>.</p>
+                    </div>
+                    <div class="rounded-xl bg-cream p-4 ring-1 ring-warm">
+                        <div class="flex items-center gap-2.5">
+                            <svg class="h-4 w-4 text-forest" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                            <span class="font-display font-semibold text-text-dark text-sm">Your auth</span>
+                        </div>
+                        <p class="mt-2 text-xs text-text-mid">Pluggable <code class="font-mono text-[11px] text-earth-warm">getUser</code>. Clerk, Auth0, or your own.</p>
+                    </div>
+                    <div class="rounded-xl bg-cream p-4 ring-1 ring-warm">
+                        <div class="flex items-center gap-2.5">
+                            <svg class="h-4 w-4 text-forest" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>
+                            <span class="font-display font-semibold text-text-dark text-sm">Your region</span>
+                        </div>
+                        <p class="mt-2 text-xs text-text-mid">Wherever your app runs. EU, US, on-prem. We don't move data.</p>
+                    </div>
+                    <div class="rounded-xl bg-cream p-4 ring-1 ring-warm">
+                        <div class="flex items-center gap-2.5">
+                            <svg class="h-4 w-4 text-forest" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z"/></svg>
+                            <span class="font-display font-semibold text-text-dark text-sm">Apache 2.0</span>
+                        </div>
+                        <p class="mt-2 text-xs text-text-mid">Audit every line. Fork it. Self-host with no caveats.</p>
+                    </div>
+                </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-cream border-t border-warm">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-2">
-                    <a href="/" class="flex items-center gap-2">
-                        <img src="/img/artanis.png" alt="Artanis" class="h-7 w-auto">
-                        <span class="font-display font-semibold text-text-dark">Artanis</span>
-                    </a>
-                    <span class="text-text-muted">/</span>
-                    <span class="font-display text-text-mid">Gravel</span>
-                </div>
-                <div class="flex items-center gap-x-6 text-sm text-text-mid">
-                    <a href="/" class="hover:text-text-dark">Artanis</a>
-                    <a href="/mallet/" class="hover:text-text-dark">Mallet</a>
-                    <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="hover:text-text-dark">Docs</a>
-                    <a href="https://github.com/artanis-ai" target="_blank" rel="noopener noreferrer" class="hover:text-text-dark">GitHub</a>
-                    <a href="/privacy.html" class="hover:text-text-dark">Privacy</a>
+    <footer style="background: #0f0a05">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col items-center py-10 sm:flex-row sm:justify-between">
+                <p class="text-sm text-warm/50">
+                    &copy; 2026 Artanis Ltd. All rights reserved.
+                </p>
+                <div class="mt-6 flex gap-x-6 text-sm sm:mt-0">
+                    <a href="/terms" class="text-warm/50 hover:text-warm transition-colors">Terms</a>
+                    <a href="/privacy" class="text-warm/50 hover:text-warm transition-colors">Privacy</a>
+                    <a href="/dpa" class="text-warm/50 hover:text-warm transition-colors">DPA</a>
                 </div>
             </div>
-            <p class="mt-6 text-xs text-text-muted">
-                &copy; 2026 Artanis AI. Open-source under Apache 2.0 when v0 ships.
-            </p>
         </div>
     </footer>
 
     <script>
-        // Typing animation for the bracketed word in the hero
+        // Hero install tabs
         (function () {
-            const words = ['domain experts', 'clinicians', 'lawyers', 'teachers', 'recruiters', 'accountants', 'analysts', 'underwriters', 'researchers']
+            const tabs = document.querySelectorAll('.install-tab')
+            const panes = document.querySelectorAll('.install-pane')
+            tabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-tab')
+                    tabs.forEach((t) => t.setAttribute('data-active', t.getAttribute('data-tab') === target ? 'true' : 'false'))
+                    panes.forEach((p) => p.setAttribute('data-active', p.getAttribute('data-tab') === target ? 'true' : 'false'))
+                })
+            })
+        })();
+
+        // Hero dashboard mockup tabs
+        (function () {
+            const tabs = document.querySelectorAll('.dash-tab')
+            const panes = document.querySelectorAll('.dash-pane')
+            const urlSlug = document.getElementById('dash-url-slug')
+            tabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-tab')
+                    tabs.forEach((t) => t.setAttribute('data-active', t.getAttribute('data-tab') === target ? 'true' : 'false'))
+                    panes.forEach((p) => p.setAttribute('data-active', p.getAttribute('data-tab') === target ? 'true' : 'false'))
+                    if (urlSlug) urlSlug.textContent = target
+                })
+            })
+        })();
+
+        // Hero copy-to-clipboard buttons
+        (function () {
+            document.querySelectorAll('.copy-btn').forEach((btn) => {
+                btn.addEventListener('click', async () => {
+                    try {
+                        await navigator.clipboard.writeText(btn.getAttribute('data-copy'))
+                        btn.setAttribute('data-copied', 'true')
+                        setTimeout(() => btn.removeAttribute('data-copied'), 1400)
+                    } catch (e) { /* clipboard blocked */ }
+                })
+            })
+        })();
+
+        // Typing animation for the cycling word in the hero
+        (function () {
+            const words = ['domain experts', 'lawyers', 'clinicians', 'teachers', 'recruiters', 'accountants', 'analysts', 'underwriters', 'researchers']
             const el = document.getElementById('typed-word')
             if (!el) return
 
@@ -602,6 +1073,148 @@
                 }
             }
             tick()
+        })();
+
+        // Mallet-style collaborative editor — Alice and Bob editing different lines
+        (function () {
+            const editor = document.getElementById('mallet-editor')
+            if (!editor) return
+
+            const INITIAL_LINES = [
+                'You are a clinical triage assistant.',
+                'Be concise. Prioritise urgent symptoms.',
+                'Avoid speculative diagnosis.',
+                'For patients over 65, lower the threshold',
+                'for recommending in-person care.',
+                'If red flags appear, route to in-person',
+                'care. Always disclose that you are an AI.',
+                'Never speculate beyond the chart.',
+            ]
+            const USERS = [
+                { name: 'Alice', color: '#D63384' },
+                { name: 'Bob', color: '#2563EB' },
+            ]
+            const HIGHLIGHTED = new Set([3, 4])
+            const WAVY_TARGET = 'red flags'
+            const EDITS = [
+                { line: 3, from: '65', to: '70', user: 0 },
+                { line: 1, from: 'urgent', to: 'critical', user: 1 },
+                { line: 3, from: '70', to: '65', user: 0 },
+                { line: 1, from: 'critical', to: 'urgent', user: 1 },
+            ]
+
+            let lines = [...INITIAL_LINES]
+            let cursors = [
+                { line: 3, col: INITIAL_LINES[3].indexOf('65') + '65'.length },
+                { line: 1, col: INITIAL_LINES[1].indexOf('urgent') + 'urgent'.length },
+            ]
+
+            function makeCursor(user) {
+                const wrap = document.createElement('span')
+                wrap.style.cssText = 'position: relative; display: inline-block; width: 0; height: 14px; vertical-align: middle;'
+                const label = document.createElement('span')
+                label.className = 'whitespace-nowrap rounded-t rounded-br px-1 py-0.5 text-[8px] font-semibold text-white leading-none'
+                label.style.cssText = `position: absolute; background: ${user.color}; bottom: 100%; left: -1px; z-index: 10;`
+                label.textContent = user.name
+                wrap.appendChild(label)
+                const bar = document.createElement('span')
+                bar.style.cssText = `position: absolute; background: ${user.color}; width: 2px; height: 14px; left: -1px; top: 0;`
+                wrap.appendChild(bar)
+                return wrap
+            }
+
+            function maybeAppendCursors(target, lineIdx, col) {
+                USERS.forEach((user, userIdx) => {
+                    if (cursors[userIdx].line === lineIdx && cursors[userIdx].col === col) {
+                        target.appendChild(makeCursor(user))
+                    }
+                })
+            }
+
+            function appendChars(target, text, lineIdx, baseCol) {
+                for (let i = 0; i < text.length; i++) {
+                    maybeAppendCursors(target, lineIdx, baseCol + i)
+                    const c = document.createElement('span')
+                    c.textContent = text[i]
+                    target.appendChild(c)
+                }
+            }
+
+            function render() {
+                editor.innerHTML = ''
+                lines.forEach((line, lineIdx) => {
+                    const row = document.createElement('div')
+                    row.className = 'flex h-[22px] items-center'
+                    if (HIGHLIGHTED.has(lineIdx)) {
+                        row.style.background = 'rgba(74, 124, 89, 0.10)'
+                    }
+                    const num = document.createElement('span')
+                    num.className = 'mr-2 w-4 text-right text-text-muted select-none'
+                    num.textContent = String(lineIdx + 1)
+                    row.appendChild(num)
+                    const content = document.createElement('span')
+                    content.className = 'relative'
+                    content.style.whiteSpace = 'pre'
+                    const wavyIdx = line.indexOf(WAVY_TARGET)
+                    if (wavyIdx !== -1) {
+                        appendChars(content, line.slice(0, wavyIdx), lineIdx, 0)
+                        const wavySpan = document.createElement('span')
+                        wavySpan.className = 'wavy-underline'
+                        appendChars(wavySpan, WAVY_TARGET, lineIdx, wavyIdx)
+                        content.appendChild(wavySpan)
+                        appendChars(content, line.slice(wavyIdx + WAVY_TARGET.length), lineIdx, wavyIdx + WAVY_TARGET.length)
+                    } else {
+                        appendChars(content, line, lineIdx, 0)
+                    }
+                    maybeAppendCursors(content, lineIdx, line.length)
+                    row.appendChild(content)
+                    editor.appendChild(row)
+                })
+            }
+
+            function wait(ms) {
+                return new Promise((r) => setTimeout(r, ms))
+            }
+
+            let mounted = true
+
+            async function animate() {
+                await wait(1500)
+                while (mounted) {
+                    for (const edit of EDITS) {
+                        if (!mounted) return
+                        const lineText = lines[edit.line]
+                        const wordIdx = lineText.indexOf(edit.from)
+                        if (wordIdx === -1) continue
+                        cursors[edit.user] = { line: edit.line, col: wordIdx + edit.from.length }
+                        render()
+                        await wait(300)
+                        const before = lineText.slice(0, wordIdx)
+                        const after = lineText.slice(wordIdx + edit.from.length)
+                        for (let i = edit.from.length; i > 0; i--) {
+                            if (!mounted) return
+                            const remaining = edit.from.slice(0, i - 1)
+                            lines[edit.line] = before + remaining + after
+                            cursors[edit.user] = { line: edit.line, col: wordIdx + remaining.length }
+                            render()
+                            await wait(55 + Math.random() * 30)
+                        }
+                        await wait(120)
+                        for (let i = 1; i <= edit.to.length; i++) {
+                            if (!mounted) return
+                            const typed = edit.to.slice(0, i)
+                            lines[edit.line] = before + typed + after
+                            cursors[edit.user] = { line: edit.line, col: wordIdx + i }
+                            render()
+                            await wait(40 + Math.random() * 25)
+                        }
+                        await wait(900)
+                    }
+                }
+            }
+
+            render()
+            animate()
         })()
     </script>
 </body>
