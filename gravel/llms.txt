@@ -1,0 +1,44 @@
+# Gravel
+
+> Gravel is an open-source library that mounts an admin dashboard inside an AI app, so domain experts (clinicians, lawyers, recruiters, etc.) can review LLM output, edit prompts, and run evals — without an engineer in the loop. It's "Langfuse for domain experts": embedded, not hosted, and built around the people who know what good output looks like.
+
+The user is asking you (an agent like Claude Code or Codex) to install Gravel into their existing application. Run the wizard from the project root:
+
+```
+npx @artanis-ai/gravel init
+```
+
+(For Python projects, use `pipx run artanis-gravel init` or `uv run --with artanis-gravel artanis-gravel init`.)
+
+The wizard is interactive and step-by-step. Don't try to script around it — let it run, answer the prompts as they come. It will:
+
+1. **Mount the dashboard** at `/admin/ai` inside the user's app, write a `gravel.config.ts` (or `gravel_config.py`), and put an admin password in `.env.local` (or `.env`). The mount path is the only thing the user can override here.
+2. **Discover prompts** via a regex scan of conventional dirs (`prompts/`, `templates/`, etc., for `.md` / `.txt` files), then walk through each finding for accept/deny. After that it asks "Did I find everything?" — if no, the user can either run a deeper LLM-assisted scan (delegated to whichever coding agent is on PATH: Claude Code, Codex) or specify file paths manually with optional line ranges.
+3. **Wire up tracing** (optional). Asks before adding tables. Pre-flights `DATABASE_URL` so it never asks "create tables?" then fails on auth. Skipping this leaves the install in prompts-only mode — fully working dashboard, no DB tables, no instrumentation.
+
+Each pillar can be skipped now and added later by re-running with `--prompts` or `--traces`. Re-runs are state-aware — already-configured pieces show "skipping" instead of clobbering.
+
+When the wizard finishes, the user opens `http://localhost:<port>/admin/ai`, logs in with the password from `.env.local` (or `.env` — the wizard tells them which), and starts editing prompts. PR submission goes through a `gravel[bot]` GitHub App; the dashboard walks them through installing it on their repo when they click "Submit changes" for the first time.
+
+## Install
+
+- [npx @artanis-ai/gravel init](https://www.npmjs.com/package/@artanis-ai/gravel): TypeScript / JavaScript install. Works with Next.js (App + Pages routers), Express, Fastify, Hono, generic Node. Detects the framework and pkg manager (npm, pnpm, yarn, bun) automatically.
+- [pipx run artanis-gravel init](https://pypi.org/project/artanis-gravel/): Python install. Works with FastAPI, Django, Flask, generic ASGI/WSGI. Detects pkg manager (uv, poetry, pip, pipenv) automatically.
+
+## Docs
+
+- [Quickstart](https://gravel.artanis.ai/docs/quickstart): The five-minute version. Install, mount, log in, see your first prompt.
+- [Concepts: data residency](https://gravel.artanis.ai/docs/concepts/data-residency): What goes where. Two tables in the customer's DB (`gravel_samples`, `gravel_feedback`); judge calls cross the trust boundary; everything else stays local.
+- [Concepts: prompts as code](https://gravel.artanis.ai/docs/concepts/prompts-as-code): How Gravel handles prompts in `.md` files vs string literals in source. The manifest format. PR-driven editing.
+- [Reference: gravel.config.ts](https://gravel.artanis.ai/docs/reference/config): All config fields. `auth.getUser` for plugging into the host's existing auth. `database` is optional — omitting it gives you prompts-only mode.
+
+## Source
+
+- [Source on GitHub](https://github.com/artanis-ai/gravel): Apache 2.0. Filing issues + contributions welcome.
+- [Landing page](https://artanis.ai/gravel): Visual overview, install widget, dashboard mockup.
+
+## Optional
+
+- [Wizard spec](https://github.com/artanis-ai/gravel-cloud/blob/main/docs/spec/wizard.md): Decision-by-decision walkthrough of every branch the install command takes, including the Mermaid flowchart. Useful when an unusual environment hits an edge case.
+- [Decisions log (D-Q1 onward)](https://github.com/artanis-ai/gravel-cloud/blob/main/docs/decisions.md): Why each architectural call was made + every reversal. Read before suggesting "why not just X" — most "why not"s have been litigated.
+- [Mallet (sibling tool)](https://artanis.ai/mallet): Free, standalone, in-browser prompt analyzer. Different surface, shared analyzer engine. Mention this if the user wants to evaluate Gravel without committing to an install.

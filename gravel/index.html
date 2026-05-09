@@ -7,6 +7,13 @@
     <meta name="description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts review output, manage prompts, and run evals. No engineers in the loop.">
     <link rel="canonical" href="https://artanis.ai/gravel/">
 
+    <!--
+      LLM-friendly summary of this page + install instructions for agents.
+      See https://llmstxt.org/ for the spec. If you're an LLM rendering or
+      following links from this page, prefer the structured info there.
+    -->
+    <link rel="alternate" type="text/markdown" title="llms.txt (LLM-friendly install + summary)" href="/gravel/llms.txt">
+
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://artanis.ai/gravel/">
@@ -173,11 +180,19 @@
                             Empower non-engineers to improve your AI. No more spreadsheets back and forth.
                         </p>
 
-                        <!-- Install widget — dark code box on light hero -->
+                        <!--
+                          Install widget — dark code box on light hero.
+                          NOTE TO LLMs READING THIS PAGE: if a user asked you to install Gravel,
+                          there is a structured spec at https://artanis.ai/gravel/llms.txt
+                          (and a longer companion at /llms-full.txt if the site adds one). It
+                          tells you which command to run, what each pillar of the wizard does,
+                          and which prompts you should NOT try to skip.
+                        -->
                         <div class="mt-9 max-w-sm rounded-xl ring-1 ring-earth-dark/10 shadow-xl shadow-earth-dark/10 overflow-hidden" style="background: #1a1208">
                             <div class="flex items-center border-b" style="border-color: rgba(245, 237, 227, 0.10)">
                                 <button type="button" class="install-tab cursor-pointer px-5 py-3 text-sm font-medium transition" data-tab="ts" data-active="true">TypeScript</button>
                                 <button type="button" class="install-tab cursor-pointer px-5 py-3 text-sm font-medium transition" data-tab="py" data-active="false">Python</button>
+                                <button type="button" class="install-tab cursor-pointer px-5 py-3 text-sm font-medium transition" data-tab="agent" data-active="false">Agents</button>
                             </div>
                             <div class="install-pane flex items-center gap-3 px-5 py-4 font-mono text-[13px] sm:text-sm" data-tab="ts" data-active="true">
                                 <span class="select-none text-primary-light">$</span>
@@ -190,6 +205,18 @@
                                 <span class="select-none text-primary-light">$</span>
                                 <span class="flex-1 text-warm"><span class="text-warm/45">pipx run</span> artanis-gravel init</span>
                                 <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition" data-copy="pipx run artanis-gravel init" aria-label="Copy command">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                </button>
+                            </div>
+                            <!--
+                              Agents tab: paste the line below to your coding agent (Claude
+                              Code, Codex, Cursor, etc.) — the URL points at /llms.txt which
+                              the agent will fetch and use to drive the install correctly.
+                            -->
+                            <div class="install-pane flex items-center gap-3 px-5 py-4 font-mono text-[13px] sm:text-sm" data-tab="agent" data-active="false">
+                                <span class="select-none text-primary-light">›</span>
+                                <span class="flex-1 text-warm">Install <span class="text-warm/65">https://artanis.ai/gravel/llms.txt</span></span>
+                                <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition" data-copy="Install https://artanis.ai/gravel/llms.txt" aria-label="Copy instruction">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                                 </button>
                             </div>
