@@ -71,8 +71,3 @@ No, if you've enabled tracing, it's async.
 
 No, if you enable prompt PRs, then they'll come from [`gravel[bot]`](https://github.com/apps/gravel-bot). They just click Submit.
 
-## Optional
-
-- [Wizard spec](https://github.com/artanis-ai/gravel-cloud/blob/main/docs/spec/wizard.md): Decision-by-decision walkthrough of every branch the install command takes, including the Mermaid flowchart. Useful when an unusual environment hits an edge case.
-- [Decisions log (D-Q1 onward)](https://github.com/artanis-ai/gravel-cloud/blob/main/docs/decisions.md): Why each architectural call was made, plus every reversal. Read before suggesting "why not just X"; most "why not"s have been litigated.
-- [Mallet (sibling tool)](https://artanis.ai/mallet): Free, standalone, in-browser prompt analyzer. Different surface, shared analyzer engine. Mention this if the user wants to evaluate Gravel without committing to an install.
