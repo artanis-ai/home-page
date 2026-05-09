@@ -249,10 +249,13 @@
                                     <span class="h-3 w-3 rounded-full bg-accent/60"></span>
                                     <span class="h-3 w-3 rounded-full bg-forest/50"></span>
                                 </div>
-                                <div class="ml-3 flex-1 truncate rounded-md bg-cream px-3 py-1 text-xs text-text-muted font-mono"><span>your-app.com/admin/ai/</span><span id="dash-url-slug">review</span></div>
+                                <div class="ml-3 flex-1 truncate rounded-md bg-cream px-3 py-1 text-xs text-text-muted font-mono"><span>your-app.com/admin/ai/</span><span id="dash-url-slug">prompts</span></div>
                             </div>
 
-                            <!-- App chrome -->
+                            <!-- App chrome. Mirrors packages/dashboard/src/components/Layout.tsx,
+                                 which now ships two tabs (Prompts, Review). The mockup leads
+                                 with Prompts since that's the default landing route in the
+                                 real dashboard. -->
                             <div class="flex" style="min-height: 420px;">
                                 <!-- Sidebar -->
                                 <aside class="w-12 sm:w-44 shrink-0 border-r border-warm bg-cream p-2 sm:p-3 flex flex-col items-center sm:items-stretch">
@@ -263,147 +266,123 @@
                                         <span class="hidden sm:inline font-display font-semibold text-sm text-text-dark">Your&nbsp;App</span>
                                     </div>
                                     <nav class="space-y-1 text-sm w-full">
-                                        <a class="dash-tab cursor-pointer flex items-center justify-center sm:justify-start gap-2 rounded-lg px-2 sm:px-2.5 py-1.5 transition relative" data-tab="review" data-active="true">
+                                        <a class="dash-tab cursor-pointer flex items-center justify-center sm:justify-start gap-2 rounded-lg px-2 sm:px-2.5 py-1.5 transition" data-tab="prompts" data-active="true">
+                                            <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                            <span class="hidden sm:inline">Prompts</span>
+                                            <span class="absolute sm:static top-0.5 right-0.5 sm:ml-auto h-1.5 w-1.5 rounded-full bg-primary" aria-label="2 drafts"></span>
+                                        </a>
+                                        <a class="dash-tab cursor-pointer flex items-center justify-center sm:justify-start gap-2 rounded-lg px-2 sm:px-2.5 py-1.5 transition relative" data-tab="review" data-active="false">
                                             <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                                             <span class="hidden sm:inline">Review</span>
                                             <span class="absolute sm:static top-0.5 right-0.5 sm:ml-auto rounded-full px-1 sm:px-1.5 py-0 sm:py-0.5 text-[8px] sm:text-[9px] font-semibold bg-accent/40 text-earth-warm leading-none sm:leading-normal min-w-[14px] sm:min-w-0 text-center">12</span>
-                                        </a>
-                                        <a class="dash-tab cursor-pointer flex items-center justify-center sm:justify-start gap-2 rounded-lg px-2 sm:px-2.5 py-1.5 transition" data-tab="prompts" data-active="false">
-                                            <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                            <span class="hidden sm:inline">Prompts</span>
-                                        </a>
-                                        <a class="dash-tab cursor-pointer flex items-center justify-center sm:justify-start gap-2 rounded-lg px-2 sm:px-2.5 py-1.5 transition relative" data-tab="issues" data-active="false">
-                                            <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/></svg>
-                                            <span class="hidden sm:inline">Issues</span>
-                                            <span class="absolute sm:static top-0.5 right-0.5 sm:ml-auto rounded-full px-1 sm:px-1.5 py-0 sm:py-0.5 text-[8px] sm:text-[9px] font-semibold text-white leading-none sm:leading-normal min-w-[14px] sm:min-w-0 text-center" style="background: #C97064">3</span>
                                         </a>
                                     </nav>
                                 </aside>
 
                                 <!-- Main pane -->
                                 <main class="flex-1 p-4 sm:p-5 overflow-hidden min-w-0">
-                                    <!-- Review pane (default) -->
-                                    <div class="dash-pane" data-tab="review" data-active="true">
-                                        <div class="flex items-center justify-between mb-3">
-                                            <div>
-                                                <h3 class="font-display text-base font-semibold text-text-dark">Review queue</h3>
-                                                <p class="text-[11px] text-text-muted mt-0.5">12 pending &middot; 2 reviewed today</p>
+                                    <!-- Prompts pane (default). Real layout: search + Submit
+                                         changes button, then a card grid with file name + var
+                                         name + draft dot + file/embedded badge. -->
+                                    <div class="dash-pane" data-tab="prompts" data-active="true">
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <div class="flex-1 flex items-center gap-2 rounded-lg border border-warm bg-cream px-2.5 py-1.5">
+                                                <svg class="h-3.5 w-3.5 text-text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.5-4.5"/></svg>
+                                                <span class="text-[11px] text-text-muted">Search prompts</span>
                                             </div>
-                                            <span class="rounded-full bg-accent/30 px-2 py-0.5 text-[10px] font-semibold text-earth-warm">12 pending</span>
+                                            <button class="rounded-lg bg-primary px-2.5 py-1.5 text-[11px] font-medium text-white whitespace-nowrap shadow-sm">Submit changes (2)</button>
                                         </div>
-                                        <div class="space-y-1.5">
-                                            <div class="rounded-lg border border-warm bg-warm/30 px-3 py-2.5">
-                                                <p class="text-[10px] font-mono text-text-muted uppercase tracking-wider">User &middot; 14:23</p>
-                                                <p class="mt-0.5 text-xs text-text-dark line-clamp-2">"6-year-old, fever 39°C for two days, stiff neck, drowsy. Should I be worried?"</p>
-                                                <hr class="my-2 border-earth-dark/10">
-                                                <p class="text-[10px] font-mono text-primary uppercase tracking-wider">AI</p>
-                                                <p class="mt-0.5 text-xs text-text-dark line-clamp-2">"This needs urgent medical attention. Stiff neck with high fever can indicate meningitis."</p>
-                                                <div class="mt-2 flex items-center gap-1.5">
-                                                    <button class="inline-flex items-center gap-1 rounded bg-forest text-white px-2 py-0.5 text-[10px] font-semibold">
-                                                        <svg class="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.733a4 4 0 00-.8 2.6z"/></svg>
-                                                        Looks good
-                                                    </button>
-                                                    <button class="inline-flex items-center gap-1 rounded text-white px-2 py-0.5 text-[10px] font-semibold" style="background: #C97064">
-                                                        <svg class="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M18 9.5a1.5 1.5 0 11-3 0v-6a1.5 1.5 0 013 0v6zM14 9.667v-5.43a2 2 0 00-1.105-1.79l-.05-.025A4 4 0 0011.057 2H5.64a2 2 0 00-1.962 1.608l-1.2 6A2 2 0 004.44 12H8v4a2 2 0 002 2 1 1 0 001-1v-.667a4 4 0 01.8-2.4l1.4-1.866a4 4 0 00.8-2.4z"/></svg>
-                                                        Needs work
-                                                    </button>
-                                                </div>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <!-- Card with draft -->
+                                            <div class="relative rounded-xl border border-warm bg-cream p-2.5">
+                                                <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary" aria-label="Has draft"></span>
+                                                <p class="font-mono text-[11px] font-medium text-text-dark truncate pr-3">triage.md</p>
+                                                <p class="mt-0.5 font-mono text-[10px] text-text-muted truncate">prompts/</p>
+                                                <span class="mt-2 inline-block rounded-full bg-warm px-1.5 py-0.5 text-[9px] font-semibold text-text-mid">file</span>
                                             </div>
-                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2 opacity-70">
-                                                <p class="text-[10px] font-mono text-text-muted uppercase tracking-wider">User &middot; 14:24</p>
-                                                <p class="mt-0.5 text-xs text-text-dark truncate">"Patient denies chest pain but reports shortness of breath…"</p>
+                                            <!-- Card with draft -->
+                                            <div class="relative rounded-xl border border-warm bg-cream p-2.5">
+                                                <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary" aria-label="Has draft"></span>
+                                                <p class="font-mono text-[11px] font-medium text-text-dark truncate pr-3">agent.ts</p>
+                                                <p class="mt-0.5 font-mono text-[10px] text-text-muted truncate">SYSTEM_PROMPT</p>
+                                                <span class="mt-2 inline-block rounded-full bg-accent/30 px-1.5 py-0.5 text-[9px] font-semibold text-earth-warm">embedded</span>
                                             </div>
-                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2 opacity-60">
-                                                <p class="text-[10px] font-mono text-text-muted uppercase tracking-wider">User &middot; 14:24</p>
-                                                <p class="mt-0.5 text-xs text-text-dark truncate">"What's the typical recovery time for…"</p>
+                                            <div class="rounded-xl border border-warm bg-cream p-2.5">
+                                                <p class="font-mono text-[11px] font-medium text-text-dark truncate">summarizer.md</p>
+                                                <p class="mt-0.5 font-mono text-[10px] text-text-muted truncate">prompts/</p>
+                                                <span class="mt-2 inline-block rounded-full bg-warm px-1.5 py-0.5 text-[9px] font-semibold text-text-mid">file</span>
                                             </div>
-                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2 opacity-50">
-                                                <p class="text-[10px] font-mono text-text-muted uppercase tracking-wider">User &middot; 14:25</p>
-                                                <p class="mt-0.5 text-xs text-text-dark truncate">"My grandmother's blood pressure reading…"</p>
+                                            <div class="rounded-xl border border-warm bg-cream p-2.5">
+                                                <p class="font-mono text-[11px] font-medium text-text-dark truncate">intake.md</p>
+                                                <p class="mt-0.5 font-mono text-[10px] text-text-muted truncate">prompts/</p>
+                                                <span class="mt-2 inline-block rounded-full bg-warm px-1.5 py-0.5 text-[9px] font-semibold text-text-mid">file</span>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Prompts pane -->
-                                    <div class="dash-pane" data-tab="prompts" data-active="false">
-                                        <div class="flex items-center justify-between mb-3">
-                                            <div>
-                                                <h3 class="font-display text-base font-semibold text-text-dark">Prompts</h3>
-                                                <p class="text-[11px] text-text-muted mt-0.5">14 prompts &middot; 2 with pending edits</p>
+                                            <div class="rounded-xl border border-warm bg-cream p-2.5">
+                                                <p class="font-mono text-[11px] font-medium text-text-dark truncate">red-flags.md</p>
+                                                <p class="mt-0.5 font-mono text-[10px] text-text-muted truncate">prompts/</p>
+                                                <span class="mt-2 inline-block rounded-full bg-warm px-1.5 py-0.5 text-[9px] font-semibold text-text-mid">file</span>
                                             </div>
-                                            <button class="rounded-lg bg-primary px-2.5 py-1 text-[11px] font-medium text-white whitespace-nowrap">Submit</button>
-                                        </div>
-                                        <div class="space-y-1.5">
-                                            <div class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2">
-                                                <div class="flex items-center justify-between gap-2">
-                                                    <p class="font-medium text-text-dark text-xs truncate">Triage Assistant</p>
-                                                    <span class="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary shrink-0">EDITED</span>
-                                                </div>
-                                                <p class="text-[11px] text-text-muted mt-0.5 truncate">You are a clinical triage assistant. Be concise…</p>
-                                            </div>
-                                            <div class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2">
-                                                <div class="flex items-center justify-between gap-2">
-                                                    <p class="font-medium text-text-dark text-xs truncate">Summarizer</p>
-                                                    <span class="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary shrink-0">EDITED</span>
-                                                </div>
-                                                <p class="text-[11px] text-text-muted mt-0.5 truncate">Summarize the patient note in plain language…</p>
-                                            </div>
-                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2">
-                                                <p class="font-medium text-text-dark text-xs truncate">Intake Questionnaire</p>
-                                                <p class="text-[11px] text-text-muted mt-0.5 truncate">Walk the patient through the intake questions…</p>
-                                            </div>
-                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2">
-                                                <p class="font-medium text-text-dark text-xs truncate">Red-Flag Detector</p>
-                                                <p class="text-[11px] text-text-muted mt-0.5 truncate">Identify red-flag symptoms in the patient note…</p>
-                                            </div>
-                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2">
-                                                <p class="font-medium text-text-dark text-xs truncate">Discharge Summary</p>
-                                                <p class="text-[11px] text-text-muted mt-0.5 truncate">Produce a discharge summary including diagnosis…</p>
+                                            <div class="rounded-xl border border-warm bg-cream p-2.5">
+                                                <p class="font-mono text-[11px] font-medium text-text-dark truncate">discharge.ts</p>
+                                                <p class="mt-0.5 font-mono text-[10px] text-text-muted truncate">DISCHARGE_TEMPLATE</p>
+                                                <span class="mt-2 inline-block rounded-full bg-accent/30 px-1.5 py-0.5 text-[9px] font-semibold text-earth-warm">embedded</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- Issues pane -->
-                                    <div class="dash-pane" data-tab="issues" data-active="false">
-                                        <div class="flex items-center justify-between mb-3">
-                                            <div>
-                                                <h3 class="font-display text-base font-semibold text-text-dark">Issues</h3>
-                                                <p class="text-[11px] text-text-muted mt-0.5">Things needing your attention</p>
-                                            </div>
-                                            <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style="background: #C97064">3 open</span>
+                                    <!-- Review pane. Real layout: filter row + sortable
+                                         table of LLM samples (When / Name / Model / Env /
+                                         Tokens / Duration / Status / Feedback). Compressed
+                                         here to the columns that read best at hero size. -->
+                                    <div class="dash-pane" data-tab="review" data-active="false">
+                                        <div class="flex items-center gap-2 mb-3 text-[10px] text-text-muted">
+                                            <span class="rounded-md border border-warm bg-cream px-2 py-1">env: <span class="text-text-dark font-medium">prod</span></span>
+                                            <span class="rounded-md border border-warm bg-cream px-2 py-1">model: <span class="text-text-dark font-medium">gpt-4o</span></span>
+                                            <span class="ml-auto rounded-full bg-accent/30 px-2 py-0.5 text-[10px] font-semibold text-earth-warm">12 to review</span>
                                         </div>
-                                        <div class="space-y-1.5">
-                                            <div class="rounded-lg border px-3 py-2.5" style="border-color: rgba(201,112,100,0.4); background: rgba(201,112,100,0.06)">
-                                                <div class="flex items-center gap-1.5">
-                                                    <svg class="h-3.5 w-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" style="color: #C97064"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
-                                                    <p class="font-medium text-text-dark text-xs">Conflicting feedback</p>
-                                                    <span class="ml-auto text-[10px] text-text-muted">Triage</span>
-                                                </div>
-                                                <p class="text-[11px] text-text-mid mt-1">Alice and Bob disagreed on a recent answer about elderly confusion.</p>
-                                            </div>
-                                            <div class="rounded-lg border px-3 py-2.5" style="border-color: rgba(201,112,100,0.4); background: rgba(201,112,100,0.06)">
-                                                <div class="flex items-center gap-1.5">
-                                                    <svg class="h-3.5 w-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" style="color: #C97064"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
-                                                    <p class="font-medium text-text-dark text-xs">Past correction not respected</p>
-                                                    <span class="ml-auto text-[10px] text-text-muted">Triage</span>
-                                                </div>
-                                                <p class="text-[11px] text-text-mid mt-1">Today's answer goes against your label from 2 weeks ago.</p>
-                                            </div>
-                                            <div class="rounded-lg border bg-warm/40 px-3 py-2.5" style="border-color: rgba(212,167,106,0.4)">
-                                                <div class="flex items-center gap-1.5">
-                                                    <svg class="h-3.5 w-3.5 shrink-0 text-accent" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
-                                                    <p class="font-medium text-text-dark text-xs">Vague wording</p>
-                                                    <span class="ml-auto text-[10px] text-text-muted">Triage</span>
-                                                </div>
-                                                <p class="text-[11px] text-text-mid mt-1">"red flags" isn't defined. Link to your canonical list.</p>
-                                            </div>
-                                            <div class="rounded-lg border border-warm bg-cream px-3 py-2.5 opacity-70">
-                                                <div class="flex items-center gap-1.5">
-                                                    <svg class="h-3.5 w-3.5 shrink-0 text-forest" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                                                    <p class="font-medium text-text-dark text-xs">Format drift in Discharge Summary</p>
-                                                    <span class="ml-auto text-[10px] text-text-muted">Resolved</span>
-                                                </div>
-                                            </div>
+                                        <div class="rounded-lg border border-warm bg-cream overflow-hidden">
+                                            <table class="w-full text-[11px]">
+                                                <thead class="bg-warm/60 text-[9px] uppercase tracking-wider text-text-muted">
+                                                    <tr>
+                                                        <th class="px-2.5 py-1.5 text-left font-medium">When</th>
+                                                        <th class="px-2.5 py-1.5 text-left font-medium">Name</th>
+                                                        <th class="px-2.5 py-1.5 text-left font-medium">Status</th>
+                                                        <th class="px-2.5 py-1.5 text-left font-medium">Feedback</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-warm">
+                                                    <tr class="bg-warm/20">
+                                                        <td class="px-2.5 py-1.5 text-text-mid">2m ago</td>
+                                                        <td class="px-2.5 py-1.5 font-mono text-text-dark truncate max-w-[8rem]">openai.chat.completions</td>
+                                                        <td class="px-2.5 py-1.5"><span class="inline-flex items-center gap-1 rounded-full bg-forest/15 px-1.5 py-0.5 text-[9px] font-semibold text-forest"><span class="h-1 w-1 rounded-full bg-forest"></span>OK</span></td>
+                                                        <td class="px-2.5 py-1.5"><span class="inline-flex items-center gap-1 text-[10px]" style="color: #C97064">▼ flagged</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="px-2.5 py-1.5 text-text-mid">5m ago</td>
+                                                        <td class="px-2.5 py-1.5 font-mono text-text-dark truncate max-w-[8rem]">triage.run</td>
+                                                        <td class="px-2.5 py-1.5"><span class="inline-flex items-center gap-1 rounded-full bg-forest/15 px-1.5 py-0.5 text-[9px] font-semibold text-forest"><span class="h-1 w-1 rounded-full bg-forest"></span>OK</span></td>
+                                                        <td class="px-2.5 py-1.5 text-text-muted">·</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="px-2.5 py-1.5 text-text-mid">12m ago</td>
+                                                        <td class="px-2.5 py-1.5 font-mono text-text-dark truncate max-w-[8rem]">summarize.note</td>
+                                                        <td class="px-2.5 py-1.5"><span class="inline-flex items-center gap-1 rounded-full bg-forest/15 px-1.5 py-0.5 text-[9px] font-semibold text-forest"><span class="h-1 w-1 rounded-full bg-forest"></span>OK</span></td>
+                                                        <td class="px-2.5 py-1.5 text-forest">▲ approved</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="px-2.5 py-1.5 text-text-mid">14m ago</td>
+                                                        <td class="px-2.5 py-1.5 font-mono text-text-dark truncate max-w-[8rem]">anthropic.messages</td>
+                                                        <td class="px-2.5 py-1.5"><span class="inline-flex items-center gap-1 rounded-full bg-accent/30 px-1.5 py-0.5 text-[9px] font-semibold text-earth-warm"><span class="h-1 w-1 rounded-full" style="background:#C97064"></span>err</span></td>
+                                                        <td class="px-2.5 py-1.5 text-text-muted">·</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="px-2.5 py-1.5 text-text-mid">22m ago</td>
+                                                        <td class="px-2.5 py-1.5 font-mono text-text-dark truncate max-w-[8rem]">openai.chat.completions</td>
+                                                        <td class="px-2.5 py-1.5"><span class="inline-flex items-center gap-1 rounded-full bg-forest/15 px-1.5 py-0.5 text-[9px] font-semibold text-forest"><span class="h-1 w-1 rounded-full bg-forest"></span>OK</span></td>
+                                                        <td class="px-2.5 py-1.5 text-text-muted">·</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </main>
