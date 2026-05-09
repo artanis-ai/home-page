@@ -961,9 +961,8 @@
     <!-- Data security / runs in your infra -->
     <section class="bg-warm py-20 sm:py-28 border-y border-earth-dark/5">
         <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center mb-12 sm:mb-16">
-            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Data security</p>
-            <h2 class="mt-3 font-display text-3xl sm:text-5xl font-semibold tracking-tight text-text-dark leading-tight">
-                Nothing leaves your infra.
+            <h2 class="font-display text-3xl sm:text-5xl font-semibold tracking-tight text-text-dark leading-tight">
+                Nothing leaves your infra
             </h2>
             <p class="mt-5 text-lg text-text-mid">
                 Gravel installs into your existing app. Your database, your auth, your domain.
@@ -1008,47 +1007,78 @@
 
     <section class="bg-cream py-20 sm:py-28">
         <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center mb-12 sm:mb-16">
-            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">FAQ</p>
-            <h2 class="mt-3 font-display text-3xl sm:text-5xl font-semibold tracking-tight text-text-dark leading-tight">
-                Common questions.
+            <h2 class="font-display text-3xl sm:text-5xl font-semibold tracking-tight text-text-dark leading-tight">
+                FAQ
             </h2>
         </div>
         <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <dl class="divide-y divide-warm">
-                <div class="py-5">
-                    <dt class="font-display text-lg font-semibold text-text-dark">Who built this?</dt>
-                    <dd class="mt-2 text-text-mid">The founders of <a href="https://artanis.ai/team" class="text-primary hover:text-primary-dark transition">Artanis</a> to better support their customers. Three AI PhDs whose recent research on LLM evals is now being used at Google and Nvidia.</dd>
-                </div>
-                <div class="py-5">
-                    <dt class="font-display text-lg font-semibold text-text-dark">Is it really free?</dt>
-                    <dd class="mt-2 text-text-mid">Yes, the library is free and open source forever (Apache 2.0). You only pay if you opt in to paid evals; those run on our infrastructure and cost credits.</dd>
-                </div>
-                <div class="py-5">
-                    <dt class="font-display text-lg font-semibold text-text-dark">How do I get support?</dt>
-                    <dd class="mt-2 text-text-mid">We will answer you in three places: GitHub issues, <a href="mailto:team@artanis.ai" class="text-primary hover:text-primary-dark transition">team@artanis.ai</a>, or our Slack. Feel free to <a href="https://calendar.notion.so/meet/yousef/sam" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark transition">hop on a call</a> with us if you have any questions!</dd>
-                </div>
-                <div class="py-5">
-                    <dt class="font-display text-lg font-semibold text-text-dark">How is this different from Langfuse / LangSmith?</dt>
-                    <dd class="mt-2 text-text-mid">Those are built for engineers. Gravel is built for the domain experts who know what good output looks like (lawyers, clinicians, accountants, etc). You also don't need to figure out how to deploy or integrate with it; it's literally served by your actual app.</dd>
-                </div>
-                <div class="py-5">
-                    <dt class="font-display text-lg font-semibold text-text-dark">How secure is it?</dt>
-                    <dd class="mt-2 text-text-mid">As secure as your actual app, since it's just part of it. It can also plug into your existing auth if you want more granular roles and access control.</dd>
-                </div>
-                <div class="py-5">
-                    <dt class="font-display text-lg font-semibold text-text-dark">Does it need a database?</dt>
-                    <dd class="mt-2 text-text-mid">If you don't want to capture feedback on traces, then no. If you do, it detects and piggybacks on your existing DB and adds two tables to it with the prefix <code class="font-mono text-[13px] text-earth-warm">gravel_*</code>.</dd>
-                </div>
-                <div class="py-5">
-                    <dt class="font-display text-lg font-semibold text-text-dark">Will it slow my LLM calls down?</dt>
-                    <dd class="mt-2 text-text-mid">No, if you've enabled tracing, it's async.</dd>
-                </div>
-                <div class="py-5">
-                    <dt class="font-display text-lg font-semibold text-text-dark">Do my domain experts need GitHub accounts?</dt>
-                    <dd class="mt-2 text-text-mid">No, if you enable prompt PRs, then they'll come from <a href="https://github.com/apps/gravel-bot" target="_blank" rel="noopener noreferrer" class="font-mono text-primary hover:text-primary-dark transition">gravel[bot]</a>. They just click Submit.</dd>
-                </div>
-            </dl>
+            <div class="divide-y divide-warm">
+                <details class="group py-5" name="faq">
+                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
+                        <span>Who built this?</span>
+                        <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </summary>
+                    <p class="mt-3 text-text-mid">The founders of <a href="https://artanis.ai/team" class="text-primary hover:text-primary-dark transition">Artanis</a> to better support their customers. Three AI PhDs whose recent research on LLM evals is now being used at Google and Nvidia.</p>
+                </details>
+                <details class="group py-5" name="faq">
+                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
+                        <span>Is it really free?</span>
+                        <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </summary>
+                    <p class="mt-3 text-text-mid">Yes, the library is free and open source forever (Apache 2.0). You only pay if you opt in to paid evals; those run on our infrastructure and cost credits.</p>
+                </details>
+                <details class="group py-5" name="faq">
+                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
+                        <span>How do I get support?</span>
+                        <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </summary>
+                    <p class="mt-3 text-text-mid">We will answer you in three places: GitHub issues, <a href="mailto:team@artanis.ai" class="text-primary hover:text-primary-dark transition">team@artanis.ai</a>, or our Slack. Feel free to <a href="https://calendar.notion.so/meet/yousef/sam" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark transition">hop on a call</a> with us if you have any questions!</p>
+                </details>
+                <details class="group py-5" name="faq">
+                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
+                        <span>How is this different from Langfuse / LangSmith?</span>
+                        <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </summary>
+                    <p class="mt-3 text-text-mid">Those are built for engineers. Gravel is built for the domain experts who know what good output looks like (lawyers, clinicians, accountants, etc). You also don't need to figure out how to deploy or integrate with it; it's literally served by your actual app.</p>
+                </details>
+                <details class="group py-5" name="faq">
+                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
+                        <span>How secure is it?</span>
+                        <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </summary>
+                    <p class="mt-3 text-text-mid">As secure as your actual app, since it's just part of it. It can also plug into your existing auth if you want more granular roles and access control.</p>
+                </details>
+                <details class="group py-5" name="faq">
+                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
+                        <span>Does it need a database?</span>
+                        <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </summary>
+                    <p class="mt-3 text-text-mid">If you don't want to capture feedback on traces, then no. If you do, it detects and piggybacks on your existing DB and adds two tables to it with the prefix <code class="font-mono text-[13px] text-earth-warm">gravel_*</code>.</p>
+                </details>
+                <details class="group py-5" name="faq">
+                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
+                        <span>Will it slow my LLM calls down?</span>
+                        <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </summary>
+                    <p class="mt-3 text-text-mid">No, if you've enabled tracing, it's async.</p>
+                </details>
+                <details class="group py-5" name="faq">
+                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
+                        <span>Do my domain experts need GitHub accounts?</span>
+                        <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </summary>
+                    <p class="mt-3 text-text-mid">No, if you enable prompt PRs, then they'll come from <a href="https://github.com/apps/gravel-bot" target="_blank" rel="noopener noreferrer" class="font-mono text-primary hover:text-primary-dark transition">gravel[bot]</a>. They just click Submit.</p>
+                </details>
+            </div>
         </div>
+
+        <style>
+            /* Hide the default disclosure marker on Safari/Firefox so the
+               chevron is the only affordance — list-none class above
+               handles modern Chromium. */
+            details > summary::-webkit-details-marker { display: none; }
+            details > summary { list-style: none; }
+        </style>
     </section>
 
     <!-- Footer -->
