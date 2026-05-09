@@ -1006,6 +1006,51 @@
         </div>
     </section>
 
+    <section class="bg-cream py-20 sm:py-28">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center mb-12 sm:mb-16">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">FAQ</p>
+            <h2 class="mt-3 font-display text-3xl sm:text-5xl font-semibold tracking-tight text-text-dark leading-tight">
+                Common questions.
+            </h2>
+        </div>
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+            <dl class="divide-y divide-warm">
+                <div class="py-5">
+                    <dt class="font-display text-lg font-semibold text-text-dark">Who built this?</dt>
+                    <dd class="mt-2 text-text-mid">The founders of <a href="https://artanis.ai/team" class="text-primary hover:text-primary-dark transition">Artanis</a> to better support their customers. Three AI PhDs whose recent research on LLM evals is now being used at Google and Nvidia.</dd>
+                </div>
+                <div class="py-5">
+                    <dt class="font-display text-lg font-semibold text-text-dark">Is it really free?</dt>
+                    <dd class="mt-2 text-text-mid">Yes, the library is free and open source forever (Apache 2.0). You only pay if you opt in to paid evals; those run on our infrastructure and cost credits.</dd>
+                </div>
+                <div class="py-5">
+                    <dt class="font-display text-lg font-semibold text-text-dark">How do I get support?</dt>
+                    <dd class="mt-2 text-text-mid">We will answer you in three places: GitHub issues, <a href="mailto:team@artanis.ai" class="text-primary hover:text-primary-dark transition">team@artanis.ai</a>, or our Slack. Feel free to <a href="https://calendar.notion.so/meet/yousef/sam" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark transition">hop on a call</a> with us if you have any questions!</dd>
+                </div>
+                <div class="py-5">
+                    <dt class="font-display text-lg font-semibold text-text-dark">How is this different from Langfuse / LangSmith?</dt>
+                    <dd class="mt-2 text-text-mid">Those are built for engineers. Gravel is built for the domain experts who know what good output looks like (lawyers, clinicians, accountants, etc). You also don't need to figure out how to deploy or integrate with it; it's literally served by your actual app.</dd>
+                </div>
+                <div class="py-5">
+                    <dt class="font-display text-lg font-semibold text-text-dark">How secure is it?</dt>
+                    <dd class="mt-2 text-text-mid">As secure as your actual app, since it's just part of it. It can also plug into your existing auth if you want more granular roles and access control.</dd>
+                </div>
+                <div class="py-5">
+                    <dt class="font-display text-lg font-semibold text-text-dark">Does it need a database?</dt>
+                    <dd class="mt-2 text-text-mid">If you don't want to capture feedback on traces, then no. If you do, it detects and piggybacks on your existing DB and adds two tables to it with the prefix <code class="font-mono text-[13px] text-earth-warm">gravel_*</code>.</dd>
+                </div>
+                <div class="py-5">
+                    <dt class="font-display text-lg font-semibold text-text-dark">Will it slow my LLM calls down?</dt>
+                    <dd class="mt-2 text-text-mid">No, if you've enabled tracing, it's async.</dd>
+                </div>
+                <div class="py-5">
+                    <dt class="font-display text-lg font-semibold text-text-dark">Do my domain experts need GitHub accounts?</dt>
+                    <dd class="mt-2 text-text-mid">No, if you enable prompt PRs, then they'll come from <a href="https://github.com/apps/gravel-bot" target="_blank" rel="noopener noreferrer" class="font-mono text-primary hover:text-primary-dark transition">gravel[bot]</a>. They just click Submit.</dd>
+                </div>
+            </dl>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer style="background: #0f0a05">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
