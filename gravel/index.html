@@ -99,11 +99,17 @@
             50.01%, 100% { opacity: 0; }
         }
 
-        /* Hero dashboard tabs */
-        .dash-tab[data-active="true"] { color: #9B4340; background: rgba(155, 67, 64, 0.10); font-weight: 500; }
-        .dash-tab[data-active="false"] { color: #6B5744; }
-        .dash-tab[data-active="false"]:hover { background: rgba(155, 67, 64, 0.04); color: #2D1810; }
+        /* Hero dashboard tabs — segmented control pill that matches
+           Layout.tsx's Tabs component (rounded card raised on bg-warm/80
+           track). */
+        .dash-tab[data-active="true"] { background: #FFFBF5; color: #2D1810; box-shadow: 0 0 0 1px #F5EDE3, 0 1px 2px 0 rgba(46, 24, 16, 0.08); }
+        .dash-tab[data-active="false"] { background: transparent; color: #6B5744; }
+        .dash-tab[data-active="false"]:hover { color: #2D1810; }
         .dash-pane[data-active="false"] { display: none; }
+        /* line-clamp helper for prompt previews (Tailwind CDN ships the
+           utility but we keep the rule here so older CDN snapshots still
+           render correctly). */
+        .dash-line-clamp-4 { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 
         /* Hero dashboard list/detail toggle inside a pane. Clicking a
            card / row in the list flips the same pane to detail mode
@@ -275,81 +281,83 @@
                                 <div class="ml-3 flex-1 truncate rounded-md bg-cream px-3 py-1 text-xs text-text-muted font-mono"><span>your-app.com/admin/ai/</span><span id="dash-url-slug">prompts</span></div>
                             </div>
 
-                            <!-- App chrome. Mirrors packages/dashboard/src/components/Layout.tsx,
-                                 which now ships two tabs (Prompts, Review). The mockup leads
-                                 with Prompts since that's the default landing route in the
-                                 real dashboard. -->
-                            <div class="flex" style="min-height: 420px;">
-                                <!-- Sidebar -->
-                                <aside class="w-12 sm:w-44 shrink-0 border-r border-warm bg-cream p-2 sm:p-3 flex flex-col items-center sm:items-stretch">
-                                    <div class="flex items-center gap-2 px-0 sm:px-2 py-1 mb-4 sm:mb-5">
-                                        <div class="h-7 w-7 rounded-lg flex items-center justify-center shrink-0" style="background: linear-gradient(135deg, #4A7C59 0%, #2563EB 100%)">
-                                            <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5A2.5 2.5 0 015.5 3h3A2.5 2.5 0 0111 5.5v3A2.5 2.5 0 018.5 11h-3A2.5 2.5 0 013 8.5v-3zm10 0A2.5 2.5 0 0115.5 3h3A2.5 2.5 0 0121 5.5v3a2.5 2.5 0 01-2.5 2.5h-3A2.5 2.5 0 0113 8.5v-3zm-10 10A2.5 2.5 0 015.5 13h3a2.5 2.5 0 012.5 2.5v3A2.5 2.5 0 018.5 21h-3A2.5 2.5 0 013 18.5v-3zm10 0a2.5 2.5 0 012.5-2.5h3a2.5 2.5 0 012.5 2.5v3a2.5 2.5 0 01-2.5 2.5h-3a2.5 2.5 0 01-2.5-2.5v-3z"/></svg>
-                                        </div>
-                                        <span class="hidden sm:inline font-display font-semibold text-sm text-text-dark">Your&nbsp;App</span>
-                                    </div>
-                                    <nav class="space-y-1 text-sm w-full">
-                                        <a class="dash-tab cursor-pointer flex items-center justify-center sm:justify-start gap-2 rounded-lg px-2 sm:px-2.5 py-1.5 transition" data-tab="prompts" data-active="true">
-                                            <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                            <span class="hidden sm:inline">Prompts</span>
-                                            <span class="absolute sm:static top-0.5 right-0.5 sm:ml-auto h-1.5 w-1.5 rounded-full bg-primary" aria-label="2 drafts"></span>
+                            <!-- App chrome. Mirrors packages/dashboard/src/components/Layout.tsx
+                                 1:1: a cream header strip with a centered segmented-control
+                                 pill (Prompts / Review), then the route content below. No
+                                 sidebar — the real dashboard dropped it. -->
+                            <div class="flex flex-col bg-cream" style="min-height: 460px;">
+                                <!-- Cream header with centered pill tabs -->
+                                <header class="flex justify-center px-4 pt-3.5 pb-2.5">
+                                    <nav class="inline-flex items-center gap-1 rounded-2xl p-1 text-[11px]" style="background: rgba(245, 237, 227, 0.85)">
+                                        <a class="dash-tab cursor-pointer inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-medium transition-colors" data-tab="prompts" data-active="true">
+                                            <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="14 3 14 9 20 9"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+                                            Prompts
                                         </a>
-                                        <a class="dash-tab cursor-pointer flex items-center justify-center sm:justify-start gap-2 rounded-lg px-2 sm:px-2.5 py-1.5 transition relative" data-tab="review" data-active="false">
-                                            <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                                            <span class="hidden sm:inline">Review</span>
-                                            <span class="absolute sm:static top-0.5 right-0.5 sm:ml-auto rounded-full px-1 sm:px-1.5 py-0 sm:py-0.5 text-[8px] sm:text-[9px] font-semibold bg-accent/40 text-earth-warm leading-none sm:leading-normal min-w-[14px] sm:min-w-0 text-center">12</span>
+                                        <a class="dash-tab cursor-pointer inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-medium transition-colors" data-tab="samples" data-active="false">
+                                            <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6"/><polyline points="14 3 14 9 20 9"/><circle cx="17" cy="17" r="3"/><line x1="19.2" y1="19.2" x2="22" y2="22"/></svg>
+                                            Review
                                         </a>
                                     </nav>
-                                </aside>
+                                </header>
 
                                 <!-- Main pane -->
-                                <main class="flex-1 p-4 sm:p-5 overflow-hidden min-w-0">
+                                <main class="flex-1 px-4 sm:px-5 pt-2 pb-4 overflow-hidden min-w-0">
                                     <!-- Prompts pane (default). Mirrors packages/dashboard/src/routes/Prompts.tsx
                                          (list) + PromptDetail.tsx (detail). Cards click into a
                                          suggestion-editor view with insertions underlined and
                                          deletions struck through, exactly like the real
                                          SuggestionEditor decorations. -->
                                     <div class="dash-pane" data-tab="prompts" data-active="true" data-view="list" data-detail-slug="prompts/p_44c977098dc4">
-                                        <div class="dash-list">
-                                            <div class="flex items-center gap-2 mb-3">
-                                                <div class="flex-1 flex items-center gap-2 rounded-lg border border-warm bg-cream px-2.5 py-1.5">
-                                                    <svg class="h-3.5 w-3.5 text-text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.5-4.5"/></svg>
-                                                    <span class="text-[11px] text-text-muted">Search prompts</span>
+                                        <div class="dash-list space-y-3">
+                                            <!-- Search + Submit changes -->
+                                            <div class="flex items-center gap-2">
+                                                <div class="flex-1 flex items-center gap-2 rounded-lg border border-warm bg-white px-2.5 py-1.5">
+                                                    <svg class="h-3 w-3 text-text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.5-4.5"/></svg>
+                                                    <span class="text-[10px] text-text-muted">Search prompts</span>
                                                 </div>
-                                                <button class="rounded-lg bg-primary px-2.5 py-1.5 text-[11px] font-medium text-white whitespace-nowrap shadow-sm cursor-pointer">Submit changes (2)</button>
+                                                <button class="rounded-lg bg-primary px-2 py-1.5 text-[10px] font-medium text-white whitespace-nowrap shadow-sm cursor-pointer">Submit changes (2)</button>
                                             </div>
+                                            <!-- Prompt card grid. Each card shows filename + optional
+                                                 varName + draft dot + type badge in a header row, then
+                                                 a multi-line preview of the prompt content (mirrors the
+                                                 PromptCard component). -->
                                             <div class="grid grid-cols-2 gap-2">
-                                                <div class="dash-clickable dash-card-clickable relative rounded-xl border border-warm bg-cream p-2.5" data-action="open-detail">
-                                                    <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary" aria-label="Has draft"></span>
-                                                    <p class="font-mono text-[11px] font-medium text-text-dark truncate pr-3">triage.md</p>
-                                                    <p class="mt-0.5 font-mono text-[10px] text-text-muted truncate">prompts/</p>
-                                                    <span class="mt-2 inline-block rounded-full bg-warm px-1.5 py-0.5 text-[9px] font-semibold text-text-mid">file</span>
+                                                <div class="dash-clickable dash-card-clickable rounded-2xl border border-warm bg-cream p-2.5 shadow-sm" data-action="open-detail">
+                                                    <div class="flex items-start justify-between gap-2">
+                                                        <p class="truncate font-mono text-[11px] font-medium text-text-dark min-w-0 flex-1">triage.md</p>
+                                                        <div class="flex shrink-0 items-center gap-1.5">
+                                                            <span class="h-1.5 w-1.5 rounded-full bg-primary" aria-label="Has draft"></span>
+                                                            <span class="rounded-full bg-warm px-1.5 py-0.5 text-[8px] font-semibold text-text-mid">file</span>
+                                                        </div>
+                                                    </div>
+                                                    <p class="mt-1.5 text-[9px] leading-snug text-text-mid dash-line-clamp-4"># Clinical triage assistant<br>You are a clinical triage assistant. Be concise. Prioritise urgent symptoms over speculative diagnosis. For patients over 65, lower the threshold for in-person care.</p>
                                                 </div>
-                                                <div class="relative rounded-xl border border-warm bg-cream p-2.5">
-                                                    <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary" aria-label="Has draft"></span>
-                                                    <p class="font-mono text-[11px] font-medium text-text-dark truncate pr-3">agent.ts</p>
-                                                    <p class="mt-0.5 font-mono text-[10px] text-text-muted truncate">SYSTEM_PROMPT</p>
-                                                    <span class="mt-2 inline-block rounded-full bg-accent/30 px-1.5 py-0.5 text-[9px] font-semibold text-earth-warm">embedded</span>
+                                                <div class="rounded-2xl border border-warm bg-cream p-2.5 shadow-sm">
+                                                    <div class="flex items-start justify-between gap-2">
+                                                        <div class="min-w-0 flex-1">
+                                                            <p class="truncate font-mono text-[11px] font-medium text-text-dark">agent.ts</p>
+                                                            <p class="mt-0.5 truncate font-mono text-[9px] text-text-muted">SYSTEM_PROMPT</p>
+                                                        </div>
+                                                        <div class="flex shrink-0 items-center gap-1.5">
+                                                            <span class="h-1.5 w-1.5 rounded-full bg-primary" aria-label="Has draft"></span>
+                                                            <span class="rounded-full bg-accent/30 px-1.5 py-0.5 text-[8px] font-semibold text-earth-warm">embedded</span>
+                                                        </div>
+                                                    </div>
+                                                    <p class="mt-1.5 text-[9px] leading-snug text-text-mid dash-line-clamp-4">You are a precise document summarization assistant. Your job is to read the document supplied by the user and produce a concise, faithful summary that captures the essential meaning without invention.</p>
                                                 </div>
-                                                <div class="rounded-xl border border-warm bg-cream p-2.5">
-                                                    <p class="font-mono text-[11px] font-medium text-text-dark truncate">summarizer.md</p>
-                                                    <p class="mt-0.5 font-mono text-[10px] text-text-muted truncate">prompts/</p>
-                                                    <span class="mt-2 inline-block rounded-full bg-warm px-1.5 py-0.5 text-[9px] font-semibold text-text-mid">file</span>
+                                                <div class="rounded-2xl border border-warm bg-cream p-2.5 shadow-sm">
+                                                    <div class="flex items-start justify-between gap-2">
+                                                        <p class="truncate font-mono text-[11px] font-medium text-text-dark min-w-0 flex-1">discharge.md</p>
+                                                        <span class="rounded-full bg-warm px-1.5 py-0.5 text-[8px] font-semibold text-text-mid shrink-0">file</span>
+                                                    </div>
+                                                    <p class="mt-1.5 text-[9px] leading-snug text-text-mid dash-line-clamp-4">Produce a discharge summary from the patient note. Include diagnosis, medications, follow-up plan, and any red flags the receiving clinician needs.</p>
                                                 </div>
-                                                <div class="rounded-xl border border-warm bg-cream p-2.5">
-                                                    <p class="font-mono text-[11px] font-medium text-text-dark truncate">intake.md</p>
-                                                    <p class="mt-0.5 font-mono text-[10px] text-text-muted truncate">prompts/</p>
-                                                    <span class="mt-2 inline-block rounded-full bg-warm px-1.5 py-0.5 text-[9px] font-semibold text-text-mid">file</span>
-                                                </div>
-                                                <div class="rounded-xl border border-warm bg-cream p-2.5">
-                                                    <p class="font-mono text-[11px] font-medium text-text-dark truncate">red-flags.md</p>
-                                                    <p class="mt-0.5 font-mono text-[10px] text-text-muted truncate">prompts/</p>
-                                                    <span class="mt-2 inline-block rounded-full bg-warm px-1.5 py-0.5 text-[9px] font-semibold text-text-mid">file</span>
-                                                </div>
-                                                <div class="rounded-xl border border-warm bg-cream p-2.5">
-                                                    <p class="font-mono text-[11px] font-medium text-text-dark truncate">discharge.ts</p>
-                                                    <p class="mt-0.5 font-mono text-[10px] text-text-muted truncate">DISCHARGE_TEMPLATE</p>
-                                                    <span class="mt-2 inline-block rounded-full bg-accent/30 px-1.5 py-0.5 text-[9px] font-semibold text-earth-warm">embedded</span>
+                                                <div class="rounded-2xl border border-warm bg-cream p-2.5 shadow-sm">
+                                                    <div class="flex items-start justify-between gap-2">
+                                                        <p class="truncate font-mono text-[11px] font-medium text-text-dark min-w-0 flex-1">intake.md</p>
+                                                        <span class="rounded-full bg-warm px-1.5 py-0.5 text-[8px] font-semibold text-text-mid shrink-0">file</span>
+                                                    </div>
+                                                    <p class="mt-1.5 text-[9px] leading-snug text-text-mid dash-line-clamp-4">Walk the patient through intake questions. Ask one at a time and confirm before moving on. If they mention pain over 7/10, route to triage immediately.</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -389,56 +397,90 @@
                                     <!-- Review pane. Mirrors packages/dashboard/src/routes/Samples.tsx
                                          (list table) and the sample-detail Sheet that opens when
                                          a row is clicked: input/output payloads + feedback. -->
-                                    <div class="dash-pane" data-tab="review" data-active="false" data-view="list" data-detail-slug="samples/sample_abc">
-                                        <div class="dash-list">
-                                            <div class="flex items-center gap-2 mb-3 text-[10px] text-text-muted">
-                                                <span class="rounded-md border border-warm bg-cream px-2 py-1">env: <span class="text-text-dark font-medium">prod</span></span>
-                                                <span class="rounded-md border border-warm bg-cream px-2 py-1">model: <span class="text-text-dark font-medium">gpt-4o</span></span>
-                                                <span class="ml-auto rounded-full bg-accent/30 px-2 py-0.5 text-[10px] font-semibold text-earth-warm">12 to review</span>
+                                    <div class="dash-pane" data-tab="samples" data-active="false" data-view="list" data-detail-slug="samples/sample_abc">
+                                        <div class="dash-list space-y-3">
+                                            <!-- Search + date pickers -->
+                                            <div class="flex items-center gap-1.5">
+                                                <div class="flex-1 flex items-center gap-2 rounded-lg border border-warm bg-white px-2.5 py-1.5 min-w-0">
+                                                    <svg class="h-3 w-3 text-text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.5-4.5"/></svg>
+                                                    <span class="text-[10px] text-text-muted truncate">Search prompts, responses, models…</span>
+                                                </div>
+                                                <span class="rounded-lg border border-warm bg-white px-1.5 py-1.5 text-[9px] text-text-muted font-mono shrink-0">dd/mm/yyyy</span>
+                                                <span class="text-text-muted text-[10px] shrink-0">→</span>
+                                                <span class="rounded-lg border border-warm bg-white px-1.5 py-1.5 text-[9px] text-text-muted font-mono shrink-0">dd/mm/yyyy</span>
                                             </div>
-                                            <div class="rounded-lg border border-warm bg-cream overflow-hidden">
-                                                <table class="w-full text-[11px]">
-                                                    <thead class="bg-warm/60 text-[9px] uppercase tracking-wider text-text-muted">
-                                                        <tr>
-                                                            <th class="px-2.5 py-1.5 text-left font-medium">When</th>
-                                                            <th class="px-2.5 py-1.5 text-left font-medium">Name</th>
-                                                            <th class="px-2.5 py-1.5 text-left font-medium">Status</th>
-                                                            <th class="px-2.5 py-1.5 text-left font-medium">Feedback</th>
+                                            <!-- Sample table — column order matches Samples.tsx:
+                                                 When · Name · Model · Env · Tokens · Duration ·
+                                                 Status · Feedback. Headers render sort affordance
+                                                 on the active column. -->
+                                            <div class="overflow-x-auto -mx-1">
+                                                <table class="w-full text-[10px]">
+                                                    <thead class="text-[8px] uppercase tracking-wider text-text-muted">
+                                                        <tr class="border-b border-warm">
+                                                            <th class="px-1 py-1.5 text-left font-medium whitespace-nowrap">When ▾</th>
+                                                            <th class="px-1 py-1.5 text-left font-medium">Name</th>
+                                                            <th class="px-1 py-1.5 text-left font-medium">Model</th>
+                                                            <th class="px-1 py-1.5 text-left font-medium">Env</th>
+                                                            <th class="px-1 py-1.5 text-right font-medium">Tokens</th>
+                                                            <th class="px-1 py-1.5 text-right font-medium">Duration</th>
+                                                            <th class="px-1 py-1.5 text-left font-medium">Status</th>
+                                                            <th class="px-1 py-1.5 text-left font-medium">Feedback</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody class="divide-y divide-warm">
-                                                        <tr class="dash-clickable dash-row-clickable bg-warm/20" data-action="open-detail">
-                                                            <td class="px-2.5 py-1.5 text-text-mid">2m ago</td>
-                                                            <td class="px-2.5 py-1.5 font-mono text-text-dark truncate max-w-[8rem]">openai.chat.completions</td>
-                                                            <td class="px-2.5 py-1.5"><span class="inline-flex items-center gap-1 rounded-full bg-forest/15 px-1.5 py-0.5 text-[9px] font-semibold text-forest"><span class="h-1 w-1 rounded-full bg-forest"></span>OK</span></td>
-                                                            <td class="px-2.5 py-1.5"><span class="inline-flex items-center gap-1 text-[10px]" style="color: #C97064">▼ flagged</span></td>
+                                                    <tbody>
+                                                        <tr class="dash-clickable dash-row-clickable border-b border-warm/60" data-action="open-detail">
+                                                            <td class="px-1 py-1.5 text-text-mid whitespace-nowrap">2m ago</td>
+                                                            <td class="px-1 py-1.5 font-mono text-text-dark truncate max-w-[7rem]">fetch:openai.chat.completions</td>
+                                                            <td class="px-1 py-1.5 font-mono text-text-mid">gpt-4o</td>
+                                                            <td class="px-1 py-1.5 text-text-mid">prod</td>
+                                                            <td class="px-1 py-1.5 text-right font-mono text-text-mid whitespace-nowrap">784 / 226</td>
+                                                            <td class="px-1 py-1.5 text-right font-mono text-text-mid whitespace-nowrap">3.09s</td>
+                                                            <td class="px-1 py-1.5"><span class="inline-flex items-center gap-0.5 rounded-full bg-forest/15 px-1.5 py-0.5 text-[8px] font-semibold text-forest"><svg class="h-2 w-2" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>ok</span></td>
+                                                            <td class="px-1 py-1.5"><span class="inline-flex items-center rounded-full bg-forest/10 px-1.5 py-0.5 text-[8px] font-semibold text-forest">↑ 1</span></td>
+                                                        </tr>
+                                                        <tr class="border-b border-warm/60">
+                                                            <td class="px-1 py-1.5 text-text-mid whitespace-nowrap">5m ago</td>
+                                                            <td class="px-1 py-1.5 font-mono text-text-dark truncate max-w-[7rem]">fetch:openai.chat.completions</td>
+                                                            <td class="px-1 py-1.5 font-mono text-text-mid">gpt-4o</td>
+                                                            <td class="px-1 py-1.5 text-text-mid">prod</td>
+                                                            <td class="px-1 py-1.5 text-right font-mono text-text-mid whitespace-nowrap">206 / 26</td>
+                                                            <td class="px-1 py-1.5 text-right font-mono text-text-mid whitespace-nowrap">2.08s</td>
+                                                            <td class="px-1 py-1.5"><span class="inline-flex items-center gap-0.5 rounded-full bg-forest/15 px-1.5 py-0.5 text-[8px] font-semibold text-forest"><svg class="h-2 w-2" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>ok</span></td>
+                                                            <td class="px-1 py-1.5 text-text-muted">—</td>
+                                                        </tr>
+                                                        <tr class="border-b border-warm/60">
+                                                            <td class="px-1 py-1.5 text-text-mid whitespace-nowrap">12m ago</td>
+                                                            <td class="px-1 py-1.5 font-mono text-text-dark truncate max-w-[7rem]">triage.run</td>
+                                                            <td class="px-1 py-1.5 font-mono text-text-mid">gpt-4o-mini</td>
+                                                            <td class="px-1 py-1.5 text-text-mid">prod</td>
+                                                            <td class="px-1 py-1.5 text-right font-mono text-text-mid whitespace-nowrap">512 / 128</td>
+                                                            <td class="px-1 py-1.5 text-right font-mono text-text-mid whitespace-nowrap">1.21s</td>
+                                                            <td class="px-1 py-1.5"><span class="inline-flex items-center gap-0.5 rounded-full bg-forest/15 px-1.5 py-0.5 text-[8px] font-semibold text-forest"><svg class="h-2 w-2" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>ok</span></td>
+                                                            <td class="px-1 py-1.5"><span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[8px] font-semibold" style="background: rgba(201, 112, 100, 0.15); color: #B05B4F">↓ 1</span></td>
+                                                        </tr>
+                                                        <tr class="border-b border-warm/60">
+                                                            <td class="px-1 py-1.5 text-text-mid whitespace-nowrap">14m ago</td>
+                                                            <td class="px-1 py-1.5 font-mono text-text-dark truncate max-w-[7rem]">anthropic.messages</td>
+                                                            <td class="px-1 py-1.5 font-mono text-text-mid">sonnet-4-6</td>
+                                                            <td class="px-1 py-1.5 text-text-mid">prod</td>
+                                                            <td class="px-1 py-1.5 text-right font-mono text-text-mid whitespace-nowrap">1,847 / 312</td>
+                                                            <td class="px-1 py-1.5 text-right font-mono text-text-mid whitespace-nowrap">2.31s</td>
+                                                            <td class="px-1 py-1.5"><span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[8px] font-semibold" style="background: rgba(201, 112, 100, 0.25); color: #B05B4F">err</span></td>
+                                                            <td class="px-1 py-1.5 text-text-muted">—</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="px-2.5 py-1.5 text-text-mid">5m ago</td>
-                                                            <td class="px-2.5 py-1.5 font-mono text-text-dark truncate max-w-[8rem]">triage.run</td>
-                                                            <td class="px-2.5 py-1.5"><span class="inline-flex items-center gap-1 rounded-full bg-forest/15 px-1.5 py-0.5 text-[9px] font-semibold text-forest"><span class="h-1 w-1 rounded-full bg-forest"></span>OK</span></td>
-                                                            <td class="px-2.5 py-1.5 text-text-muted">·</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="px-2.5 py-1.5 text-text-mid">12m ago</td>
-                                                            <td class="px-2.5 py-1.5 font-mono text-text-dark truncate max-w-[8rem]">summarize.note</td>
-                                                            <td class="px-2.5 py-1.5"><span class="inline-flex items-center gap-1 rounded-full bg-forest/15 px-1.5 py-0.5 text-[9px] font-semibold text-forest"><span class="h-1 w-1 rounded-full bg-forest"></span>OK</span></td>
-                                                            <td class="px-2.5 py-1.5 text-forest">▲ approved</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="px-2.5 py-1.5 text-text-mid">14m ago</td>
-                                                            <td class="px-2.5 py-1.5 font-mono text-text-dark truncate max-w-[8rem]">anthropic.messages</td>
-                                                            <td class="px-2.5 py-1.5"><span class="inline-flex items-center gap-1 rounded-full bg-accent/30 px-1.5 py-0.5 text-[9px] font-semibold text-earth-warm"><span class="h-1 w-1 rounded-full" style="background:#C97064"></span>err</span></td>
-                                                            <td class="px-2.5 py-1.5 text-text-muted">·</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="px-2.5 py-1.5 text-text-mid">22m ago</td>
-                                                            <td class="px-2.5 py-1.5 font-mono text-text-dark truncate max-w-[8rem]">openai.chat.completions</td>
-                                                            <td class="px-2.5 py-1.5"><span class="inline-flex items-center gap-1 rounded-full bg-forest/15 px-1.5 py-0.5 text-[9px] font-semibold text-forest"><span class="h-1 w-1 rounded-full bg-forest"></span>OK</span></td>
-                                                            <td class="px-2.5 py-1.5 text-text-muted">·</td>
+                                                            <td class="px-1 py-1.5 text-text-mid whitespace-nowrap">22m ago</td>
+                                                            <td class="px-1 py-1.5 font-mono text-text-dark truncate max-w-[7rem]">summarize.note</td>
+                                                            <td class="px-1 py-1.5 font-mono text-text-mid">gpt-4o-mini</td>
+                                                            <td class="px-1 py-1.5 text-text-mid">prod</td>
+                                                            <td class="px-1 py-1.5 text-right font-mono text-text-mid whitespace-nowrap">718 / 96</td>
+                                                            <td class="px-1 py-1.5 text-right font-mono text-text-mid whitespace-nowrap">1.18s</td>
+                                                            <td class="px-1 py-1.5"><span class="inline-flex items-center gap-0.5 rounded-full bg-forest/15 px-1.5 py-0.5 text-[8px] font-semibold text-forest"><svg class="h-2 w-2" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>ok</span></td>
+                                                            <td class="px-1 py-1.5"><span class="inline-flex items-center rounded-full bg-forest/10 px-1.5 py-0.5 text-[8px] font-semibold text-forest">↑ 2</span></td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                                <p class="mt-2 px-1 text-[9px] text-text-muted">Showing <span class="text-text-dark font-medium">1–5</span> of <span class="text-text-dark font-medium">12</span></p>
                                             </div>
                                         </div>
                                         <!-- Sample detail. Mirrors the Sheet that opens when a row
