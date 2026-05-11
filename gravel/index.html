@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gravel · Embedded prompt management & evals for AI engineering teams | Artanis</title>
-    <meta name="description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts review output, manage prompts, and run evals. No engineers in the loop.">
+    <title>Gravel · AI admin for non-engineers | Artanis</title>
+    <meta name="description" content="Open-source library that mounts an admin dashboard inside your AI app. Non-engineers edit prompts (kept in your git) and review output. 1-minute install.">
     <link rel="canonical" href="https://artanis.ai/gravel/">
 
     <!--
@@ -17,15 +17,15 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://artanis.ai/gravel/">
-    <meta property="og:title" content="Gravel · Langfuse for domain experts">
-    <meta property="og:description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts review output, manage prompts, and run evals. No engineers in the loop.">
+    <meta property="og:title" content="Gravel · AI admin for non-engineers">
+    <meta property="og:description" content="Open-source library that mounts an admin dashboard inside your AI app. Non-engineers edit prompts (kept in your git) and review output. 1-minute install.">
     <meta property="og:image" content="https://artanis.ai/img/og-image.png">
     <meta property="og:site_name" content="Gravel by Artanis">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Gravel · Langfuse for domain experts">
-    <meta name="twitter:description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts review output, manage prompts, and run evals. No engineers in the loop.">
+    <meta name="twitter:title" content="Gravel · AI admin for non-engineers">
+    <meta name="twitter:description" content="Open-source library that mounts an admin dashboard inside your AI app. Non-engineers edit prompts (kept in your git) and review output. 1-minute install.">
     <meta name="twitter:image" content="https://artanis.ai/img/og-image.png">
 
     <link rel="icon" href="/img/favicon.ico" sizes="any">
@@ -188,13 +188,20 @@
                     <!-- Left: content -->
                     <div class="text-left">
                         <h1 class="font-display font-semibold tracking-tight text-text-dark leading-[1.05] text-5xl sm:text-6xl lg:text-7xl">
-                            Langfuse for<br>
+                            AI admin for<br>
                             <span class="text-primary"><span id="typed-word"></span><span class="typed-cursor">&nbsp;</span></span>
                         </h1>
 
                         <p class="mt-7 max-w-xl text-lg sm:text-xl tracking-tight text-text-mid">
-                            Empower non-engineers to improve your AI. No more spreadsheets back and forth.
+                            Served straight from your app with prompts in your git. No more spreadsheets back and forth, no more out-of-sync docs.
                         </p>
+
+                        <!-- 1-minute install pill. The repeated feedback was "is this 5 min
+                             or a day?", so put the answer obnoxiously above the command. -->
+                        <div class="mt-7 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                            <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            1-minute install
+                        </div>
 
                         <!--
                           Install widget — dark code box on light hero.
@@ -204,7 +211,7 @@
                           tells you which command to run, what each pillar of the wizard does,
                           and which prompts you should NOT try to skip.
                         -->
-                        <div class="mt-9 max-w-sm rounded-xl ring-1 ring-earth-dark/10 shadow-xl shadow-earth-dark/10 overflow-hidden" style="background: #1a1208">
+                        <div class="mt-3 max-w-sm rounded-xl ring-1 ring-earth-dark/10 shadow-xl shadow-earth-dark/10 overflow-hidden" style="background: #1a1208">
                             <div class="flex items-center border-b" style="border-color: rgba(245, 237, 227, 0.10)">
                                 <button type="button" class="install-tab cursor-pointer px-5 py-3 text-sm font-medium transition" data-tab="ts" data-active="true">TypeScript</button>
                                 <button type="button" class="install-tab cursor-pointer px-5 py-3 text-sm font-medium transition" data-tab="py" data-active="false">Python</button>
@@ -504,7 +511,113 @@
 
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-20 sm:space-y-24">
 
-            <!-- Pair 1: Tracing — OpenAI logs vs Review queue -->
+            <!-- Pair 1: Prompts — VSCode vs Prompts UI -->
+            <div>
+                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Prompts</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
+                    <div>
+                        <p class="text-xs font-mono font-bold text-text-muted uppercase tracking-widest mb-3 text-center">You see</p>
+                        <div class="rounded-xl ring-1 ring-earth-dark/10 shadow-md overflow-hidden flex lg:h-[380px]" style="background: #1e1e1e">
+                            <div class="flex flex-col items-center gap-4 py-3 px-2 border-r" style="background: #181818; border-color: #2a2a2a">
+                                <svg class="h-5 w-5" style="color: #ffffff" fill="currentColor" viewBox="0 0 24 24"><path d="M14.5 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V7.5L14.5 2zM18 20H6V4h7.5v5H18v11z"/></svg>
+                                <svg class="h-5 w-5" style="color: rgba(255,255,255,0.45)" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                <svg class="h-5 w-5" style="color: rgba(255,255,255,0.45)" fill="currentColor" viewBox="0 0 24 24"><path d="M2.6 10.59L8.38 4.8l1.69 1.7c-.24.85.15 1.78.93 2.23v5.54c-.6.34-1 .98-1 1.73a2 2 0 002 2 2 2 0 002-2c0-.75-.4-1.39-1-1.73V9.41l2.07 2.09c-.07.15-.07.32-.07.5a2 2 0 002 2 2 2 0 002-2 2 2 0 00-2-2c-.18 0-.35 0-.5.07L13.93 7.5a1.98 1.98 0 00-1.15-2.34c-.43-.16-.88-.2-1.28-.04L9.82 3.43l.79-.83c.78-.78 2.04-.78 2.83 0l7.99 7.99c.79.78.79 2.04 0 2.83l-7.78 7.79c-.79.78-2.05.78-2.83 0L2.6 13.41a2 2 0 010-2.82z"/></svg>
+                            </div>
+                            <div class="block w-36 sm:w-44 shrink-0 border-r" style="background: #1e1e1e; border-color: #2a2a2a">
+                                <div class="px-3 py-2 text-[10px] uppercase tracking-wider" style="color: rgba(255,255,255,0.5)">Explorer</div>
+                                <div class="px-3 py-1 text-[11px] font-medium" style="color: rgba(255,255,255,0.85)">YOUR-APP</div>
+                                <div class="text-[11px] mt-1" style="color: rgba(255,255,255,0.7)">
+                                    <div class="px-3 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▾</span>📁 src</div>
+                                    <div class="pl-7 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▾</span>📁 agents</div>
+                                    <div class="pl-11 py-0.5 flex items-center gap-1.5" style="background: rgba(255,255,255,0.06); color: white">📄 triage.ts</div>
+                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📄 summarizer.ts</div>
+                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📄 red_flag_detector.ts</div>
+                                    <div class="pl-7 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▾</span>📁 prompts</div>
+                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📝 intake.md</div>
+                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📝 discharge.md</div>
+                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📝 followup.md</div>
+                                    <div class="pl-7 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▸</span>📁 lib</div>
+                                    <div class="px-3 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▸</span>📁 tests</div>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0 flex flex-col">
+                                <div class="flex border-b shrink-0" style="background: #1e1e1e; border-color: #2a2a2a">
+                                    <div class="flex items-center gap-2 px-3 py-1.5 border-r border-l-2" style="background: #1e1e1e; border-right-color: #2a2a2a; border-left-color: #007acc">
+                                        <span class="text-[11px]" style="color: rgba(255,255,255,0.85)">triage.ts</span>
+                                        <span class="text-[11px] ml-1" style="color: rgba(255,255,255,0.4)">×</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1 px-2 py-3 font-mono text-[11px] leading-[1.7] flex overflow-x-auto">
+                                    <div class="text-right pr-3 select-none shrink-0" style="color: rgba(255,255,255,0.25); min-width: 28px">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18</div>
+<pre style="color: rgba(255,255,255,0.85); margin: 0;"><span style="color:#6A9955">// triage agent</span>
+<span style="color:#C586C0">import</span> { openai } <span style="color:#C586C0">from</span> <span style="color:#CE9178">'./client'</span>
+
+<span style="color:#569cd6">const</span> <span style="color:#4FC1FF">SYSTEM_PROMPT</span> <span style="color:#d4d4d4">=</span> <span style="color:#CE9178">`You are a clinical triage</span>
+<span style="color:#CE9178">assistant. Be concise. Prioritise</span>
+<span style="color:#CE9178">urgent symptoms. Avoid speculative</span>
+<span style="color:#CE9178">diagnosis. If red flags appear,</span>
+<span style="color:#CE9178">route to in-person care.`</span>
+
+<span style="color:#C586C0">export</span> <span style="color:#569cd6">async function</span> <span style="color:#DCDCAA">triage</span>(msg) {
+  <span style="color:#C586C0">return</span> openai.chat.completions.<span style="color:#DCDCAA">create</span>({
+    model: <span style="color:#CE9178">'gpt-4o-mini'</span>,
+    messages: [
+      { role: <span style="color:#CE9178">'system'</span>, content: SYSTEM_PROMPT },
+      { role: <span style="color:#CE9178">'user'</span>, content: msg },
+    ],
+  })
+}</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-mono font-bold text-primary uppercase tracking-widest mb-3 text-center">They see</p>
+                        <div class="rounded-xl bg-white ring-1 ring-earth-dark/10 shadow-md overflow-hidden lg:h-[380px] flex flex-col">
+                            <div class="px-5 py-3 border-b border-warm flex items-center gap-3 shrink-0">
+                                <h4 class="font-display font-semibold text-text-dark text-sm shrink-0">Prompts</h4>
+                                <div class="hidden sm:flex w-44 items-center gap-1.5 rounded-lg bg-warm px-2.5 py-1.5 text-[11px] text-text-muted ml-auto">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                    Search…
+                                </div>
+                                <span class="text-[10px] text-text-muted shrink-0">14 prompts</span>
+                            </div>
+                            <div class="p-4 grid sm:grid-cols-2 gap-3 flex-1 sm:auto-rows-fr">
+                                <div class="rounded-xl border border-warm bg-warm/30 p-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-display font-semibold text-text-dark text-sm">Triage Assistant</span>
+                                        <span class="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary">EDITED</span>
+                                    </div>
+                                    <p class="mt-2 text-[11px] text-text-muted">You are a clinical triage assistant. Be concise. Prioritise urgent symptoms over speculation.</p>
+                                    <p class="mt-2 text-[10px] text-text-muted">2 min ago &middot; Alice</p>
+                                </div>
+                                <div class="rounded-xl border border-warm bg-cream p-4">
+                                    <span class="font-display font-semibold text-text-dark text-sm">Discharge Summary</span>
+                                    <p class="mt-2 text-[11px] text-text-muted">Produce a discharge summary. Include diagnosis, medications, and follow-up plan.</p>
+                                    <p class="mt-2 text-[10px] text-text-muted">3 days ago</p>
+                                </div>
+                                <div class="rounded-xl border border-warm bg-cream p-4">
+                                    <span class="font-display font-semibold text-text-dark text-sm">Red-Flag Detector</span>
+                                    <p class="mt-2 text-[11px] text-text-muted">Identify red-flag symptoms in the patient note. Output JSON with severity scores.</p>
+                                    <p class="mt-2 text-[10px] text-text-muted">1 week ago</p>
+                                </div>
+                                <div class="rounded-xl border border-warm bg-cream p-4">
+                                    <span class="font-display font-semibold text-text-dark text-sm">Intake Questionnaire</span>
+                                    <p class="mt-2 text-[11px] text-text-muted">Walk the patient through intake questions. Ask one at a time and confirm.</p>
+                                    <p class="mt-2 text-[10px] text-text-muted">2 weeks ago</p>
+                                </div>
+                            </div>
+                            <div class="px-5 pb-4 -mt-1 shrink-0 text-center">
+                                <a class="text-xs text-primary hover:text-primary-dark inline-flex items-center gap-1 font-medium">Show 10 more &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-10 max-w-2xl mx-auto text-center text-text-mid">Prompts <em>should</em> live in git. Prompt management tools try to reinvent the wheel with decoupled versioning and collaboration. But git is for engineers. Gravel will find all the prompts in your codebase (yes, even variables) and serve them in a familiar Google Docs-like UI.</p>
+            </div>
+
+            <!-- Pair 2: Tracing — OpenAI logs vs Review queue -->
             <div>
                 <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Tracing</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
@@ -713,112 +826,6 @@
                     </div>
                 </div>
                 <p class="mt-10 max-w-2xl mx-auto text-center text-text-mid">Observability tools were made for engineers. You won't convince anyone to sift through your OpenAI logs. Hook into your model calls with one line of code and serve a much nicer UI straight from your app.</p>
-            </div>
-
-            <!-- Pair 2: Prompts — VSCode vs Prompts UI -->
-            <div>
-                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Prompts</p>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
-                    <div>
-                        <p class="text-xs font-mono font-bold text-text-muted uppercase tracking-widest mb-3 text-center">You see</p>
-                        <div class="rounded-xl ring-1 ring-earth-dark/10 shadow-md overflow-hidden flex lg:h-[380px]" style="background: #1e1e1e">
-                            <div class="flex flex-col items-center gap-4 py-3 px-2 border-r" style="background: #181818; border-color: #2a2a2a">
-                                <svg class="h-5 w-5" style="color: #ffffff" fill="currentColor" viewBox="0 0 24 24"><path d="M14.5 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V7.5L14.5 2zM18 20H6V4h7.5v5H18v11z"/></svg>
-                                <svg class="h-5 w-5" style="color: rgba(255,255,255,0.45)" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                                <svg class="h-5 w-5" style="color: rgba(255,255,255,0.45)" fill="currentColor" viewBox="0 0 24 24"><path d="M2.6 10.59L8.38 4.8l1.69 1.7c-.24.85.15 1.78.93 2.23v5.54c-.6.34-1 .98-1 1.73a2 2 0 002 2 2 2 0 002-2c0-.75-.4-1.39-1-1.73V9.41l2.07 2.09c-.07.15-.07.32-.07.5a2 2 0 002 2 2 2 0 002-2 2 2 0 00-2-2c-.18 0-.35 0-.5.07L13.93 7.5a1.98 1.98 0 00-1.15-2.34c-.43-.16-.88-.2-1.28-.04L9.82 3.43l.79-.83c.78-.78 2.04-.78 2.83 0l7.99 7.99c.79.78.79 2.04 0 2.83l-7.78 7.79c-.79.78-2.05.78-2.83 0L2.6 13.41a2 2 0 010-2.82z"/></svg>
-                            </div>
-                            <div class="block w-36 sm:w-44 shrink-0 border-r" style="background: #1e1e1e; border-color: #2a2a2a">
-                                <div class="px-3 py-2 text-[10px] uppercase tracking-wider" style="color: rgba(255,255,255,0.5)">Explorer</div>
-                                <div class="px-3 py-1 text-[11px] font-medium" style="color: rgba(255,255,255,0.85)">YOUR-APP</div>
-                                <div class="text-[11px] mt-1" style="color: rgba(255,255,255,0.7)">
-                                    <div class="px-3 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▾</span>📁 src</div>
-                                    <div class="pl-7 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▾</span>📁 agents</div>
-                                    <div class="pl-11 py-0.5 flex items-center gap-1.5" style="background: rgba(255,255,255,0.06); color: white">📄 triage.ts</div>
-                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📄 summarizer.ts</div>
-                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📄 red_flag_detector.ts</div>
-                                    <div class="pl-7 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▾</span>📁 prompts</div>
-                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📝 intake.md</div>
-                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📝 discharge.md</div>
-                                    <div class="pl-11 py-0.5 flex items-center gap-1.5">📝 followup.md</div>
-                                    <div class="pl-7 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▸</span>📁 lib</div>
-                                    <div class="px-3 py-0.5 flex items-center gap-1.5"><span class="text-[9px] opacity-50">▸</span>📁 tests</div>
-                                </div>
-                            </div>
-                            <div class="flex-1 min-w-0 flex flex-col">
-                                <div class="flex border-b shrink-0" style="background: #1e1e1e; border-color: #2a2a2a">
-                                    <div class="flex items-center gap-2 px-3 py-1.5 border-r border-l-2" style="background: #1e1e1e; border-right-color: #2a2a2a; border-left-color: #007acc">
-                                        <span class="text-[11px]" style="color: rgba(255,255,255,0.85)">triage.ts</span>
-                                        <span class="text-[11px] ml-1" style="color: rgba(255,255,255,0.4)">×</span>
-                                    </div>
-                                </div>
-                                <div class="flex-1 px-2 py-3 font-mono text-[11px] leading-[1.7] flex overflow-x-auto">
-                                    <div class="text-right pr-3 select-none shrink-0" style="color: rgba(255,255,255,0.25); min-width: 28px">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18</div>
-<pre style="color: rgba(255,255,255,0.85); margin: 0;"><span style="color:#6A9955">// triage agent</span>
-<span style="color:#C586C0">import</span> { openai } <span style="color:#C586C0">from</span> <span style="color:#CE9178">'./client'</span>
-
-<span style="color:#569cd6">const</span> <span style="color:#4FC1FF">SYSTEM_PROMPT</span> <span style="color:#d4d4d4">=</span> <span style="color:#CE9178">`You are a clinical triage</span>
-<span style="color:#CE9178">assistant. Be concise. Prioritise</span>
-<span style="color:#CE9178">urgent symptoms. Avoid speculative</span>
-<span style="color:#CE9178">diagnosis. If red flags appear,</span>
-<span style="color:#CE9178">route to in-person care.`</span>
-
-<span style="color:#C586C0">export</span> <span style="color:#569cd6">async function</span> <span style="color:#DCDCAA">triage</span>(msg) {
-  <span style="color:#C586C0">return</span> openai.chat.completions.<span style="color:#DCDCAA">create</span>({
-    model: <span style="color:#CE9178">'gpt-4o-mini'</span>,
-    messages: [
-      { role: <span style="color:#CE9178">'system'</span>, content: SYSTEM_PROMPT },
-      { role: <span style="color:#CE9178">'user'</span>, content: msg },
-    ],
-  })
-}</pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <p class="text-xs font-mono font-bold text-primary uppercase tracking-widest mb-3 text-center">They see</p>
-                        <div class="rounded-xl bg-white ring-1 ring-earth-dark/10 shadow-md overflow-hidden lg:h-[380px] flex flex-col">
-                            <div class="px-5 py-3 border-b border-warm flex items-center gap-3 shrink-0">
-                                <h4 class="font-display font-semibold text-text-dark text-sm shrink-0">Prompts</h4>
-                                <div class="hidden sm:flex w-44 items-center gap-1.5 rounded-lg bg-warm px-2.5 py-1.5 text-[11px] text-text-muted ml-auto">
-                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                                    Search…
-                                </div>
-                                <span class="text-[10px] text-text-muted shrink-0">14 prompts</span>
-                            </div>
-                            <div class="p-4 grid sm:grid-cols-2 gap-3 flex-1 sm:auto-rows-fr">
-                                <div class="rounded-xl border border-warm bg-warm/30 p-4">
-                                    <div class="flex items-center justify-between">
-                                        <span class="font-display font-semibold text-text-dark text-sm">Triage Assistant</span>
-                                        <span class="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary">EDITED</span>
-                                    </div>
-                                    <p class="mt-2 text-[11px] text-text-muted">You are a clinical triage assistant. Be concise. Prioritise urgent symptoms over speculation.</p>
-                                    <p class="mt-2 text-[10px] text-text-muted">2 min ago &middot; Alice</p>
-                                </div>
-                                <div class="rounded-xl border border-warm bg-cream p-4">
-                                    <span class="font-display font-semibold text-text-dark text-sm">Discharge Summary</span>
-                                    <p class="mt-2 text-[11px] text-text-muted">Produce a discharge summary. Include diagnosis, medications, and follow-up plan.</p>
-                                    <p class="mt-2 text-[10px] text-text-muted">3 days ago</p>
-                                </div>
-                                <div class="rounded-xl border border-warm bg-cream p-4">
-                                    <span class="font-display font-semibold text-text-dark text-sm">Red-Flag Detector</span>
-                                    <p class="mt-2 text-[11px] text-text-muted">Identify red-flag symptoms in the patient note. Output JSON with severity scores.</p>
-                                    <p class="mt-2 text-[10px] text-text-muted">1 week ago</p>
-                                </div>
-                                <div class="rounded-xl border border-warm bg-cream p-4">
-                                    <span class="font-display font-semibold text-text-dark text-sm">Intake Questionnaire</span>
-                                    <p class="mt-2 text-[11px] text-text-muted">Walk the patient through intake questions. Ask one at a time and confirm.</p>
-                                    <p class="mt-2 text-[10px] text-text-muted">2 weeks ago</p>
-                                </div>
-                            </div>
-                            <div class="px-5 pb-4 -mt-1 shrink-0 text-center">
-                                <a class="text-xs text-primary hover:text-primary-dark inline-flex items-center gap-1 font-medium">Show 10 more &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <p class="mt-10 max-w-2xl mx-auto text-center text-text-mid">Prompts <em>should</em> live in git. Prompt management tools try to reinvent the wheel with decoupled versioning and collaboration. But git is for engineers. Gravel will find all the prompts in your codebase (yes, even variables) and serve them in a familiar Google Docs-like UI.</p>
             </div>
 
             <!-- Pair 3: Edits — GitHub PR vs Mallet editor -->
@@ -1252,7 +1259,7 @@
 
         // Typing animation for the cycling word in the hero
         (function () {
-            const words = ['domain experts', 'lawyers', 'clinicians', 'teachers', 'recruiters', 'accountants', 'analysts', 'underwriters', 'researchers']
+            const words = ['non-engineers', 'lawyers', 'clinicians', 'teachers', 'recruiters', 'accountants', 'analysts', 'underwriters', 'researchers']
             const el = document.getElementById('typed-word')
             if (!el) return
 

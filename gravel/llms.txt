@@ -27,8 +27,8 @@ When the wizard finishes, the user opens `http://localhost:<port>/admin/ai`, log
 
 ## Docs
 
-- [Quickstart](https://gravel.artanis.ai/docs/quickstart): The five-minute version. Install, mount, log in, see your first prompt.
-- [Concepts: data residency](https://gravel.artanis.ai/docs/concepts/data-residency): What goes where. Two tables in the customer's DB (`gravel_samples`, `gravel_feedback`); judge calls cross the trust boundary; everything else stays local.
+- [Quickstart](https://gravel.artanis.ai/docs/quickstart): The one-minute version. Install, mount, log in, see your first prompt.
+- [Concepts: data residency](https://gravel.artanis.ai/docs/concepts/data-residency): What goes where. Two tables in the customer's DB (`gravel_samples`, `gravel_feedback`); trace-eval calls cross the trust boundary; everything else stays local.
 - [Concepts: prompts as code](https://gravel.artanis.ai/docs/concepts/prompts-as-code): How Gravel handles prompts in `.md` files vs string literals in source. The manifest format. PR-driven editing.
 - [Reference: gravel.config.ts](https://gravel.artanis.ai/docs/reference/config): All config fields. `auth.getUser` for plugging into the host's existing auth. `database` is optional; omitting it gives you prompts-only mode.
 
