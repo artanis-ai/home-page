@@ -239,64 +239,40 @@
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                                 </button>
                             </div>
-                            <!-- TypeScript: pnpm/npm/yarn/bun all support the same `bin` invocation -->
-                            <div class="install-pane px-5 py-4 font-mono text-[12px] sm:text-[13px]" data-tab="ts" data-active="false">
-                                <div class="flex items-start gap-3">
-                                    <div class="flex-1 space-y-1.5 break-all">
-                                        <div class="flex items-baseline gap-2">
-                                            <span class="select-none text-primary-light">$</span>
-                                            <span class="text-warm"><span class="text-warm/45">pnpm add</span> @artanis-ai/gravel</span>
-                                        </div>
-                                        <div class="flex items-baseline gap-2">
-                                            <span class="select-none text-primary-light">$</span>
-                                            <span class="text-warm"><span class="text-warm/45">pnpm</span> gravel init</span>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition mt-0.5" data-copy="pnpm add @artanis-ai/gravel&#10;pnpm gravel init" aria-label="Copy commands">
-                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                                    </button>
-                                </div>
+                            <!-- TypeScript: npx runs the package's `bin`. The wizard auto-adds
+                                 the SDK to package.json (>=0.5.0) so this single command both
+                                 lands the runtime library and runs init. -->
+                            <div class="install-pane flex items-start gap-3 px-5 py-4 font-mono text-[12px] sm:text-[13px]" data-tab="ts" data-active="false">
+                                <span class="select-none text-primary-light pt-px">$</span>
+                                <span class="flex-1 text-warm break-all"><span class="text-warm/45">npx</span> @artanis-ai/gravel init</span>
+                                <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition" data-copy="npx @artanis-ai/gravel init" aria-label="Copy command">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                </button>
                             </div>
-                            <!-- Python: uv is the modern default; pip / poetry / pipenv also work -->
-                            <div class="install-pane px-5 py-4 font-mono text-[12px] sm:text-[13px]" data-tab="py" data-active="false">
-                                <div class="flex items-start gap-3">
-                                    <div class="flex-1 space-y-1.5 break-all">
-                                        <div class="flex items-baseline gap-2">
-                                            <span class="select-none text-primary-light">$</span>
-                                            <span class="text-warm"><span class="text-warm/45">uv add</span> artanis-gravel</span>
-                                        </div>
-                                        <div class="flex items-baseline gap-2">
-                                            <span class="select-none text-primary-light">$</span>
-                                            <span class="text-warm"><span class="text-warm/45">uv run</span> gravel init</span>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition mt-0.5" data-copy="uv add artanis-gravel&#10;uv run gravel init" aria-label="Copy commands">
-                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                                    </button>
-                                </div>
+                            <!-- Python: uvx picks the script named `artanis-gravel` (alias
+                                 added in pyproject.toml). Same auto-install-the-SDK story
+                                 as the npm path. -->
+                            <div class="install-pane flex items-start gap-3 px-5 py-4 font-mono text-[12px] sm:text-[13px]" data-tab="py" data-active="false">
+                                <span class="select-none text-primary-light pt-px">$</span>
+                                <span class="flex-1 text-warm break-all"><span class="text-warm/45">uvx</span> artanis-gravel init</span>
+                                <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition" data-copy="uvx artanis-gravel init" aria-label="Copy command">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                </button>
                             </div>
                             <!-- Shell: for Docker / CI / polyglot repos that don't want to bring in npm or pip just for the CLI -->
-                            <div class="install-pane px-5 py-4 font-mono text-[12px] sm:text-[13px]" data-tab="shell" data-active="false">
-                                <div class="flex items-start gap-3">
-                                    <div class="flex-1 space-y-1.5 break-all">
-                                        <div class="flex items-baseline gap-2">
-                                            <span class="select-none text-primary-light">$</span>
-                                            <span class="text-warm"><span class="text-warm/45">curl -fsSL</span> https://raw.githubusercontent.com/artanis-ai/gravel/main/install.sh <span class="text-warm/45">| sh</span></span>
-                                        </div>
-                                        <div class="flex items-baseline gap-2">
-                                            <span class="select-none text-primary-light">$</span>
-                                            <span class="text-warm">gravel init</span>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition mt-0.5" data-copy="curl -fsSL https://raw.githubusercontent.com/artanis-ai/gravel/main/install.sh | sh&#10;gravel init" aria-label="Copy commands">
-                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                                    </button>
-                                </div>
+                            <div class="install-pane flex items-start gap-3 px-5 py-4 font-mono text-[12px] sm:text-[13px]" data-tab="shell" data-active="false">
+                                <span class="select-none text-primary-light pt-px">$</span>
+                                <span class="flex-1 text-warm break-all"><span class="text-warm/45">curl -fsSL</span> https://raw.githubusercontent.com/artanis-ai/gravel/main/install.sh <span class="text-warm/45">| sh &amp;&amp;</span> gravel init</span>
+                                <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition" data-copy="curl -fsSL https://raw.githubusercontent.com/artanis-ai/gravel/main/install.sh | sh && gravel init" aria-label="Copy command">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                </button>
                             </div>
                         </div>
 
-                        <!-- OSS callout -->
-                        <div class="mt-4 max-w-sm flex items-center justify-between gap-2 flex-wrap text-sm text-text-mid">
+                        <!-- OSS callout — match install widget width (max-w-md) and
+                             use space-between so the three items breathe across the
+                             full row rather than huddling on the left. -->
+                        <div class="mt-4 max-w-md flex items-center justify-between gap-2 flex-wrap text-sm text-text-mid">
                             <span class="inline-flex items-center gap-1.5">
                                 <svg class="h-4 w-4 shrink-0 text-forest" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
                                 Free forever

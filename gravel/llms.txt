@@ -2,33 +2,30 @@
 
 > Gravel is an open-source library that mounts an admin dashboard inside an AI app, so domain experts (clinicians, lawyers, recruiters, etc.) can review LLM output, edit prompts, and run evals, without an engineer in the loop. It's "Langfuse for domain experts": embedded, not hosted, and built around the people who know what good output looks like.
 
-The user is asking you (an agent like Claude Code or Codex) to install Gravel into their existing application. From the project root, install the SDK + run the wizard. The SDK package ships a thin `gravel` command that lazily downloads the matching Go binary on first invocation, so one install covers both the runtime library and the CLI:
+The user is asking you (an agent like Claude Code or Codex) to install Gravel into their existing application. From the project root, run the single-command installer for the user's stack. The wizard auto-adds the SDK to the project's deps so the generated config resolves at runtime — you don't need a separate install step.
 
 **TypeScript projects**:
 
 ```
-pnpm add @artanis-ai/gravel
-pnpm gravel init
+npx @artanis-ai/gravel init
 ```
 
-(Or `npm install` / `yarn add` / `bun add` + `npx gravel init` etc.)
+(Equivalent: `pnpm dlx @artanis-ai/gravel init`, `yarn dlx @artanis-ai/gravel init`, `bunx @artanis-ai/gravel init`.)
 
 **Python projects**:
 
 ```
-uv add artanis-gravel
-uv run gravel init
+uvx artanis-gravel init
 ```
 
-(Or `pip install artanis-gravel` / `poetry add artanis-gravel` + `gravel init`.)
+(Equivalent: `pipx run artanis-gravel init`.)
 
-The `gravel` command is a thin wrapper (in `node_modules/@artanis-ai/gravel/bin/gravel.js` for npm, or `artanis_gravel._cli` for PyPI) that fetches the matching Go binary from `github.com/artanis-ai/gravel/releases` on first invocation, sha256-verifies it, caches it at `~/.cache/artanis-gravel/v<version>/`, and execs it with the user's arguments. Subsequent invocations hit the cache.
+Under the hood: the wrapper (in `node_modules/@artanis-ai/gravel/bin/gravel.js` for npm, or `artanis_gravel._cli` for PyPI) fetches the matching Go binary from `github.com/artanis-ai/gravel/releases` on first invocation, sha256-verifies it, caches it at `~/.cache/artanis-gravel/v<version>/`, and execs it. The Go binary then runs the wizard, which detects the project's package manager from lockfiles and adds `@artanis-ai/gravel` (or `artanis-gravel`) to its dependencies before writing config files.
 
 For Docker / CI / polyglot repos that don't want to bring in npm or pip just for the CLI, the same binary is installable directly:
 
 ```
-curl -fsSL https://raw.githubusercontent.com/artanis-ai/gravel/main/install.sh | sh
-gravel init
+curl -fsSL https://raw.githubusercontent.com/artanis-ai/gravel/main/install.sh | sh && gravel init
 ```
 
 (Windows PowerShell: `irm https://raw.githubusercontent.com/artanis-ai/gravel/main/install.ps1 | iex`.)
