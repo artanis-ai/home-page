@@ -14,24 +14,81 @@
     -->
     <link rel="alternate" type="text/markdown" title="llms.txt (LLM-friendly install + summary)" href="/gravel/llms.txt">
 
+    <meta name="theme-color" content="#FFFBF5">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://artanis.ai/gravel/">
     <meta property="og:title" content="Gravel · Cross-team prompt updates for vertical agents">
     <meta property="og:description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts edit prompts (kept in your git) and review output without engineers in the loop. 1-minute install.">
-    <meta property="og:image" content="https://artanis.ai/img/og-image.png">
+    <meta property="og:image" content="https://artanis.ai/img/gravel-og.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Gravel by Artanis — cross-team prompt updates for vertical agents. 1-minute install, free and open source.">
     <meta property="og:site_name" content="Gravel by Artanis">
+    <meta property="og:locale" content="en_GB">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Gravel · Cross-team prompt updates for vertical agents">
     <meta name="twitter:description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts edit prompts (kept in your git) and review output without engineers in the loop. 1-minute install.">
-    <meta name="twitter:image" content="https://artanis.ai/img/og-image.png">
+    <meta name="twitter:image" content="https://artanis.ai/img/gravel-og.png">
+    <meta name="twitter:image:alt" content="Gravel by Artanis — cross-team prompt updates for vertical agents. 1-minute install, free and open source.">
 
     <link rel="icon" href="/img/favicon.ico" sizes="any">
     <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
     <link rel="icon" type="image/png" sizes="96x96" href="/img/favicon-96x96.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+
+    <!--
+      JSON-LD structured data. Tells Google + LLMs that Gravel is a free
+      open-source developer tool authored by Artanis, with a link to the
+      repo. The page-level WebPage entity points back at the same URL
+      so the canonical relationship is unambiguous.
+    -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://artanis.ai/gravel/#software",
+          "name": "Gravel",
+          "alternateName": "@artanis-ai/gravel",
+          "url": "https://artanis.ai/gravel/",
+          "image": "https://artanis.ai/img/gravel-og.png",
+          "description": "Open-source library that mounts an admin dashboard inside your AI app. Domain experts edit prompts (kept in your git) and review output without engineers in the loop.",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Linux, macOS, Windows",
+          "softwareVersion": "0.4",
+          "license": "https://www.apache.org/licenses/LICENSE-2.0",
+          "codeRepository": "https://github.com/artanis-ai/gravel",
+          "programmingLanguage": ["TypeScript", "Python", "Go"],
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "author": {
+            "@type": "Organization",
+            "@id": "https://artanis.ai/#org",
+            "name": "Artanis",
+            "url": "https://artanis.ai/"
+          }
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://artanis.ai/gravel/#webpage",
+          "url": "https://artanis.ai/gravel/",
+          "name": "Gravel · Cross-team prompt updates for vertical agents | Artanis",
+          "isPartOf": { "@id": "https://artanis.ai/#org" },
+          "primaryImageOfPage": "https://artanis.ai/img/gravel-og.png",
+          "about": { "@id": "https://artanis.ai/gravel/#software" }
+        }
+      ]
+    }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -899,7 +956,7 @@
 
             <!-- Pair 1: Prompts — VSCode vs Prompts UI -->
             <div>
-                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-3">Prompts</p>
+                <h3 class="font-display font-semibold text-2xl text-text-dark text-center mb-3">Prompts</h3>
                 <p class="mb-10 max-w-2xl mx-auto text-center text-text-mid">Gravel will find all the prompts in your codebase (yes, even variables) and serve them in a familiar Google Docs-like UI.</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
                     <div>
@@ -1005,7 +1062,7 @@
 
             <!-- Pair 2: Review — OpenAI logs vs Review queue -->
             <div>
-                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-3">Reviews</p>
+                <h3 class="font-display font-semibold text-2xl text-text-dark text-center mb-3">Reviews</h3>
                 <p class="mb-10 max-w-2xl mx-auto text-center text-text-mid">Hook into your model calls with one line of code and serve a much nicer UI straight from your app.</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
                     <div>
@@ -1216,7 +1273,7 @@
 
             <!-- Pair 3: Edits — GitHub PR vs Mallet editor -->
             <div>
-                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-3">Edits</p>
+                <h3 class="font-display font-semibold text-2xl text-text-dark text-center mb-3">Edits</h3>
                 <p class="mb-10 max-w-2xl mx-auto text-center text-text-mid">Your team submits draft changes to prompts which turn into PRs in the background. They never need to know what a PR even is.</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
                     <div>
@@ -1323,7 +1380,7 @@
 
             <!-- Pair 4: Evals — GH Actions failure vs Regression detail -->
             <div>
-                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-3">Evals</p>
+                <h3 class="font-display font-semibold text-2xl text-text-dark text-center mb-3">Evals</h3>
                 <p class="mb-10 max-w-2xl mx-auto text-center text-text-mid">When output is reviewed, or prompts change, Gravel will automatically check against all past feedback and corrections. The golden set is built as they use it!</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
                     <div>
