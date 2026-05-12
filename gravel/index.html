@@ -555,101 +555,89 @@
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-24">
 
             <!-- Problem 1: no single source of truth.
-                 Visual: pile of brand cards rejected, with GitHub elevated
-                 as "the right answer" on top. -->
+                 Visual: GitHub elevated on top (with lopsided crown), pile
+                 of rejected logos stacked vertically below. -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
-                <div class="lg:order-1 order-2">
-                    <p class="font-mono font-bold text-xs text-primary uppercase tracking-widest mb-3">01</p>
+                <div>
                     <h3 class="font-display font-semibold text-2xl sm:text-3xl text-text-dark mb-4 leading-tight">No single source of truth for prompts</h3>
                     <p class="text-text-mid leading-relaxed">
-                        Prompts should live in git, alongside the code that runs them. But git is for engineers, so prompts end up scattered across whatever felt accessible: Google Docs, Notion, Strapi, Langfuse. None of them talk to each other, none of them are git, and every one drifts out of sync.
+                        Prompts should live in git, alongside the code that runs them. But git is for engineers, so prompts end up scattered across whatever felt accessible: Google Docs, Notion, Strapi, LangChain. None of them talk to each other, none of them are git, and every one drifts out of sync.
                     </p>
                 </div>
-                <div class="lg:order-2 order-1">
-                    <div class="relative h-[340px] sm:h-[380px] flex items-center justify-center">
-                        <!-- Rejected logo pile — five cards floating with
-                             rotation and a red X overlay on each. The "no"
-                             stack sits behind the GitHub winner. -->
-                        <div class="absolute" style="transform: translate(-130px, 30px) rotate(-12deg); top: 50%; left: 50%; margin-top: -34px; margin-left: -70px;">
-                            <div class="relative w-[140px] rounded-xl bg-white px-3 py-3 shadow-lg ring-1 ring-earth-dark/10">
-                                <div class="flex items-center gap-2">
-                                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-md text-white font-bold text-sm" style="background: #4285F4">G</span>
-                                    <span class="font-semibold text-xs text-text-dark">Google Docs</span>
-                                </div>
-                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                    <svg class="w-full h-full" viewBox="0 0 140 60" preserveAspectRatio="none"><line x1="6" y1="6" x2="134" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/><line x1="134" y1="6" x2="6" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="absolute" style="transform: translate(60px, -60px) rotate(8deg); top: 50%; left: 50%; margin-top: -34px; margin-left: -70px;">
-                            <div class="relative w-[140px] rounded-xl bg-white px-3 py-3 shadow-lg ring-1 ring-earth-dark/10">
-                                <div class="flex items-center gap-2">
-                                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-text-dark text-white font-display font-bold text-sm">N</span>
-                                    <span class="font-semibold text-xs text-text-dark">Notion</span>
-                                </div>
-                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                    <svg class="w-full h-full" viewBox="0 0 140 60" preserveAspectRatio="none"><line x1="6" y1="6" x2="134" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/><line x1="134" y1="6" x2="6" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="absolute" style="transform: translate(-100px, -90px) rotate(-6deg); top: 50%; left: 50%; margin-top: -34px; margin-left: -70px;">
-                            <div class="relative w-[140px] rounded-xl bg-white px-3 py-3 shadow-lg ring-1 ring-earth-dark/10">
-                                <div class="flex items-center gap-2">
-                                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-md text-white font-bold text-sm" style="background: #4945FF">S</span>
-                                    <span class="font-semibold text-xs text-text-dark">Strapi</span>
-                                </div>
-                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                    <svg class="w-full h-full" viewBox="0 0 140 60" preserveAspectRatio="none"><line x1="6" y1="6" x2="134" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/><line x1="134" y1="6" x2="6" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="absolute" style="transform: translate(100px, 60px) rotate(14deg); top: 50%; left: 50%; margin-top: -34px; margin-left: -70px;">
-                            <div class="relative w-[140px] rounded-xl bg-white px-3 py-3 shadow-lg ring-1 ring-earth-dark/10">
-                                <div class="flex items-center gap-2">
-                                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-md text-white font-bold text-sm" style="background: #1A1A1A">
-                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="#FFC53D"><path d="M12 2L2 22h20L12 2zm0 6l6.5 13h-13L12 8z"/></svg>
-                                    </span>
-                                    <span class="font-semibold text-xs text-text-dark">Langfuse</span>
-                                </div>
-                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                    <svg class="w-full h-full" viewBox="0 0 140 60" preserveAspectRatio="none"><line x1="6" y1="6" x2="134" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/><line x1="134" y1="6" x2="6" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Winner: GitHub, elevated, larger, no strike. -->
-                        <div class="absolute" style="top: 50%; left: 50%; margin-top: -40px; margin-left: -90px;">
-                            <div class="relative w-[180px] rounded-2xl bg-text-dark px-4 py-4 shadow-2xl ring-1 ring-text-dark/30" style="box-shadow: 0 20px 50px rgba(46, 24, 16, 0.35), 0 4px 12px rgba(46, 24, 16, 0.15)">
-                                <div class="flex items-center gap-2.5">
-                                    <svg class="h-7 w-7 text-cream" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                <div>
+                    <div class="relative flex flex-col items-center justify-center min-h-[440px] py-4">
+                        <!-- Winner: GitHub, big, elevated, lopsided crown. -->
+                        <div class="relative">
+                            <span class="absolute -top-7 left-1/2 -translate-x-1/2 text-3xl select-none pointer-events-none" style="transform: translateX(-50%) rotate(-14deg); filter: drop-shadow(0 2px 4px rgba(46, 24, 16, 0.25))" aria-hidden="true">👑</span>
+                            <div class="w-[210px] rounded-2xl bg-text-dark px-5 py-4 shadow-2xl ring-1 ring-text-dark/30" style="box-shadow: 0 20px 50px rgba(46, 24, 16, 0.35), 0 4px 12px rgba(46, 24, 16, 0.15)">
+                                <div class="flex items-center gap-3">
+                                    <svg class="h-8 w-8 text-cream" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                                     <div>
-                                        <p class="font-semibold text-sm text-cream">GitHub</p>
+                                        <p class="font-semibold text-base text-cream">GitHub</p>
                                         <p class="font-mono text-[10px] text-cream/60">prompts/*.md</p>
                                     </div>
                                 </div>
                             </div>
-                            <span class="absolute -top-3 -right-3 inline-flex items-center gap-1 rounded-full bg-forest px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white shadow-md">
-                                <svg class="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                Source of truth
-                            </span>
+                        </div>
+                        <!-- Rejected pile — disjoint, overlapping cards
+                             scattered below the winner. Absolute positioning
+                             with per-card rotation and offset reads like a
+                             stack of papers tossed onto a desk. -->
+                        <div class="relative mt-6 h-[200px] w-[300px]">
+                            <div class="absolute rounded-xl bg-white px-3 py-2.5 shadow-md ring-1 ring-earth-dark/10 w-[150px]" style="top: 10px; left: 0; transform: rotate(-9deg)">
+                                <div class="flex items-center gap-2">
+                                    <img src="https://cdn.simpleicons.org/googledocs/4285F4" alt="" class="h-5 w-5" style="opacity: 0.55">
+                                    <span class="font-semibold text-xs text-text-dark/60">Google Docs</span>
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <svg class="w-full h-full" viewBox="0 0 150 44" preserveAspectRatio="none"><line x1="6" y1="6" x2="144" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/><line x1="144" y1="6" x2="6" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/></svg>
+                                </div>
+                            </div>
+                            <div class="absolute rounded-xl bg-white px-3 py-2.5 shadow-md ring-1 ring-earth-dark/10 w-[150px]" style="top: 0; left: 140px; transform: rotate(7deg)">
+                                <div class="flex items-center gap-2">
+                                    <img src="https://cdn.simpleicons.org/notion/000000" alt="" class="h-5 w-5" style="opacity: 0.55">
+                                    <span class="font-semibold text-xs text-text-dark/60">Notion</span>
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <svg class="w-full h-full" viewBox="0 0 150 44" preserveAspectRatio="none"><line x1="6" y1="6" x2="144" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/><line x1="144" y1="6" x2="6" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/></svg>
+                                </div>
+                            </div>
+                            <div class="absolute rounded-xl bg-white px-3 py-2.5 shadow-md ring-1 ring-earth-dark/10 w-[150px]" style="top: 90px; left: 30px; transform: rotate(4deg)">
+                                <div class="flex items-center gap-2">
+                                    <img src="https://cdn.simpleicons.org/strapi/4945FF" alt="" class="h-5 w-5" style="opacity: 0.55">
+                                    <span class="font-semibold text-xs text-text-dark/60">Strapi</span>
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <svg class="w-full h-full" viewBox="0 0 150 44" preserveAspectRatio="none"><line x1="6" y1="6" x2="144" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/><line x1="144" y1="6" x2="6" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/></svg>
+                                </div>
+                            </div>
+                            <div class="absolute rounded-xl bg-white px-3 py-2.5 shadow-md ring-1 ring-earth-dark/10 w-[150px]" style="top: 80px; left: 160px; transform: rotate(-6deg)">
+                                <div class="flex items-center gap-2">
+                                    <img src="https://cdn.simpleicons.org/langchain/1C3C3C" alt="" class="h-5 w-5" style="opacity: 0.55">
+                                    <span class="font-semibold text-xs text-text-dark/60">LangChain</span>
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <svg class="w-full h-full" viewBox="0 0 150 44" preserveAspectRatio="none"><line x1="6" y1="6" x2="144" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/><line x1="144" y1="6" x2="6" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/></svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Problem 2: observability tools are for engineers.
-                 Visual: Langfuse-style dark dashboard with trace list +
-                 nested-span waterfall + raw JSON dump. -->
+                 Visual: Langfuse-style dark dashboard. Padded out to match
+                 the height of the other two visuals. -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
-                <div class="lg:order-2">
-                    <p class="font-mono font-bold text-xs text-primary uppercase tracking-widest mb-3">02</p>
+                <div>
                     <h3 class="font-display font-semibold text-2xl sm:text-3xl text-text-dark mb-4 leading-tight">Observability tools are for engineers</h3>
                     <p class="text-text-mid leading-relaxed">
                         Langfuse and friends weren't built for domain experts. Nested spans, template strings full of curly brackets, raw JSON dumps. None of it makes sense to a clinician or a paralegal who just needs to know whether the model got it right.
                     </p>
                 </div>
-                <div class="lg:order-1">
-                    <div class="rounded-xl ring-1 ring-earth-dark/10 shadow-xl overflow-hidden" style="background: #0d0d0d">
-                        <div class="flex items-center gap-2 px-4 py-2.5 border-b" style="border-color: rgba(255,255,255,0.06)">
+                <div>
+                    <div class="rounded-xl ring-1 ring-earth-dark/10 shadow-xl overflow-hidden flex flex-col min-h-[440px]" style="background: #0d0d0d">
+                        <div class="flex items-center gap-2 px-4 py-2.5 border-b shrink-0" style="border-color: rgba(255,255,255,0.06)">
                             <div class="flex gap-1.5">
                                 <span class="h-2.5 w-2.5 rounded-full" style="background: rgba(255,255,255,0.18)"></span>
                                 <span class="h-2.5 w-2.5 rounded-full" style="background: rgba(255,255,255,0.18)"></span>
@@ -657,9 +645,9 @@
                             </div>
                             <span class="ml-2 text-[11px] font-mono" style="color: rgba(255,255,255,0.55)">langfuse / traces</span>
                         </div>
-                        <div class="grid grid-cols-[140px_1fr] divide-x" style="border-color: rgba(255,255,255,0.06); divide-color: rgba(255,255,255,0.06)">
+                        <div class="grid grid-cols-[140px_1fr] flex-1 min-h-0">
                             <!-- Trace list -->
-                            <div class="text-[10px] py-2 font-mono" style="color: rgba(255,255,255,0.5); border-right: 1px solid rgba(255,255,255,0.06)">
+                            <div class="text-[10px] py-2 font-mono overflow-hidden" style="color: rgba(255,255,255,0.5); border-right: 1px solid rgba(255,255,255,0.06)">
                                 <div class="px-3 py-1.5 truncate" style="background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.85)">trace_a91f · run</div>
                                 <div class="px-3 py-1.5 truncate">trace_882c · chain</div>
                                 <div class="px-3 py-1.5 truncate">trace_4d3e · run</div>
@@ -667,11 +655,14 @@
                                 <div class="px-3 py-1.5 truncate">trace_5acd · run</div>
                                 <div class="px-3 py-1.5 truncate">trace_e102 · chain</div>
                                 <div class="px-3 py-1.5 truncate">trace_22fa · run</div>
+                                <div class="px-3 py-1.5 truncate">trace_3091 · run</div>
+                                <div class="px-3 py-1.5 truncate">trace_fa8d · embed</div>
+                                <div class="px-3 py-1.5 truncate">trace_1c7e · chain</div>
                             </div>
                             <!-- Waterfall + JSON -->
                             <div class="flex flex-col min-w-0">
-                                <div class="px-3 py-2 text-[10px] font-mono" style="border-bottom: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.55)">trace_a91f · 1.84s · 5 spans</div>
-                                <!-- Waterfall -->
+                                <div class="px-3 py-2 text-[10px] font-mono shrink-0" style="border-bottom: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.55)">trace_a91f · 1.84s · 7 spans</div>
+                                <!-- Waterfall — extra spans to fill height. -->
                                 <div class="px-3 py-2 space-y-1 text-[10px] font-mono">
                                     <div class="flex items-center gap-2">
                                         <span class="w-24 truncate" style="color: rgba(255,255,255,0.55)">▾ chain.run</span>
@@ -693,17 +684,31 @@
                                         <div class="flex-1"><div class="h-2 rounded ml-[68%]" style="background: rgba(248, 113, 113, 0.55); width: 18%"></div></div>
                                         <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">0.31s</span>
                                     </div>
+                                    <div class="flex items-center gap-2 pl-9">
+                                        <span class="w-16 truncate" style="color: rgba(255,255,255,0.4)">  ▾ http</span>
+                                        <div class="flex-1"><div class="h-2 rounded ml-[71%]" style="background: rgba(248, 113, 113, 0.4); width: 12%"></div></div>
+                                        <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">0.21s</span>
+                                    </div>
                                     <div class="flex items-center gap-2 pl-3">
                                         <span class="w-24 truncate" style="color: rgba(255,255,255,0.55)">  ▾ parse</span>
                                         <div class="flex-1"><div class="h-2 rounded ml-[88%]" style="background: rgba(212, 167, 106, 0.45); width: 8%"></div></div>
                                         <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">0.14s</span>
                                     </div>
+                                    <div class="flex items-center gap-2 pl-3">
+                                        <span class="w-24 truncate" style="color: rgba(255,255,255,0.55)">  ▾ store</span>
+                                        <div class="flex-1"><div class="h-2 rounded ml-[96%]" style="background: rgba(76, 175, 124, 0.35); width: 4%"></div></div>
+                                        <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">0.07s</span>
+                                    </div>
                                 </div>
-                                <!-- JSON dump -->
-                                <div class="px-3 py-2 font-mono text-[10px] leading-snug" style="border-top: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.75)"><pre style="margin: 0; white-space: pre-wrap"><span style="color: rgba(255,255,255,0.4)">{</span>
-  <span style="color: #79c0ff">"input"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"messages"</span>: <span style="color: rgba(255,255,255,0.4)">[{</span> <span style="color: #79c0ff">"role"</span>: <span style="color: #a5d6ff">"user"</span>, <span style="color: #79c0ff">"content"</span>: <span style="color: #a5d6ff">"{{</span><span style="color: #d2a8ff">patient_note</span><span style="color: #a5d6ff">}}\n\n{{</span><span style="color: #d2a8ff">red_flags</span><span style="color: #a5d6ff">}}"</span> <span style="color: rgba(255,255,255,0.4)">}]</span>,
-  <span style="color: #79c0ff">"vars"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"patient_note"</span>: <span style="color: #a5d6ff">"..."</span>, <span style="color: #79c0ff">"red_flags"</span>: <span style="color: rgba(255,255,255,0.4)">[</span><span style="color: #a5d6ff">"fever"</span>, <span style="color: #a5d6ff">"stiff_neck"</span><span style="color: rgba(255,255,255,0.4)">]</span> <span style="color: rgba(255,255,255,0.4)">}</span>,
-  <span style="color: #79c0ff">"metadata"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"trace_id"</span>: <span style="color: #a5d6ff">"a91f-77ce"</span>, <span style="color: #79c0ff">"env"</span>: <span style="color: #a5d6ff">"prod"</span> <span style="color: rgba(255,255,255,0.4)">}</span>
+                                <!-- JSON dump — extra fields to fill space. -->
+                                <div class="px-3 py-2 font-mono text-[10px] leading-snug flex-1 overflow-hidden" style="border-top: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.75)"><pre style="margin: 0; white-space: pre-wrap"><span style="color: rgba(255,255,255,0.4)">{</span>
+  <span style="color: #79c0ff">"input"</span>: <span style="color: rgba(255,255,255,0.4)">{</span>
+    <span style="color: #79c0ff">"messages"</span>: <span style="color: rgba(255,255,255,0.4)">[{</span> <span style="color: #79c0ff">"role"</span>: <span style="color: #a5d6ff">"user"</span>, <span style="color: #79c0ff">"content"</span>: <span style="color: #a5d6ff">"{{</span><span style="color: #d2a8ff">patient_note</span><span style="color: #a5d6ff">}}\n\n{{</span><span style="color: #d2a8ff">red_flags</span><span style="color: #a5d6ff">}}"</span> <span style="color: rgba(255,255,255,0.4)">}]</span>,
+    <span style="color: #79c0ff">"vars"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"patient_note"</span>: <span style="color: #a5d6ff">"..."</span>, <span style="color: #79c0ff">"red_flags"</span>: <span style="color: rgba(255,255,255,0.4)">[</span><span style="color: #a5d6ff">"fever"</span>, <span style="color: #a5d6ff">"stiff_neck"</span><span style="color: rgba(255,255,255,0.4)">]</span> <span style="color: rgba(255,255,255,0.4)">}</span>
+  <span style="color: rgba(255,255,255,0.4)">}</span>,
+  <span style="color: #79c0ff">"output"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"role"</span>: <span style="color: #a5d6ff">"assistant"</span>, <span style="color: #79c0ff">"content"</span>: <span style="color: #a5d6ff">"..."</span> <span style="color: rgba(255,255,255,0.4)">}</span>,
+  <span style="color: #79c0ff">"usage"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"in"</span>: <span style="color: #d2a8ff">512</span>, <span style="color: #79c0ff">"out"</span>: <span style="color: #d2a8ff">128</span> <span style="color: rgba(255,255,255,0.4)">}</span>,
+  <span style="color: #79c0ff">"metadata"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"trace_id"</span>: <span style="color: #a5d6ff">"a91f-77ce"</span>, <span style="color: #79c0ff">"env"</span>: <span style="color: #a5d6ff">"prod"</span>, <span style="color: #79c0ff">"commit"</span>: <span style="color: #a5d6ff">"4bf3d77"</span> <span style="color: rgba(255,255,255,0.4)">}</span>
 <span style="color: rgba(255,255,255,0.4)">}</span></pre></div>
                             </div>
                         </div>
@@ -711,26 +716,23 @@
                 </div>
             </div>
 
-            <!-- Problem 3: prompt iteration on Slack and spreadsheets.
-                 Visual: messy Slack thread with versioned spreadsheet
-                 attachments piling up. -->
+            <!-- Problem 3: prompt iteration on Slack and spreadsheets. -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
-                <div class="lg:order-1 order-2">
-                    <p class="font-mono font-bold text-xs text-primary uppercase tracking-widest mb-3">03</p>
+                <div>
                     <h3 class="font-display font-semibold text-2xl sm:text-3xl text-text-dark mb-4 leading-tight">Prompt iteration runs on Slack and spreadsheets</h3>
                     <p class="text-text-mid leading-relaxed">
                         Without a way to evaluate their own edits, domain experts send docs and spreadsheets back and forth on Slack with contradictory prompts and conflicting feedback. The iteration loop is slow and endless, and you can never really let them own the AI.
                     </p>
                 </div>
-                <div class="lg:order-2 order-1">
-                    <div class="rounded-xl bg-white ring-1 ring-earth-dark/10 shadow-xl overflow-hidden">
+                <div>
+                    <div class="rounded-xl bg-white ring-1 ring-earth-dark/10 shadow-xl overflow-hidden flex flex-col min-h-[440px]">
                         <!-- Slack-ish chrome -->
-                        <div class="flex items-center gap-2 px-4 py-2.5 border-b border-warm">
+                        <div class="flex items-center gap-2 px-4 py-2.5 border-b border-warm shrink-0">
                             <span class="inline-flex h-4 w-4 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #611f69">#</span>
                             <span class="text-sm font-semibold text-text-dark">ai-prompts</span>
                             <span class="text-xs text-text-muted">12 members</span>
                         </div>
-                        <div class="p-4 space-y-3 text-xs">
+                        <div class="p-4 space-y-3 text-xs flex-1">
                             <div class="flex gap-2.5">
                                 <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #6BA37A">SK</span>
                                 <div class="min-w-0 flex-1">
@@ -1549,7 +1551,7 @@
 
         // Typing animation for the cycling word in the hero
         (function () {
-            const words = ['legal', 'medical', 'finance', 'recruiting', 'compliance', 'tax', 'insurance', 'research', 'education']
+            const words = ['vertical', 'legal', 'medical', 'finance', 'recruiting', 'compliance', 'tax', 'insurance', 'research', 'education']
             const el = document.getElementById('typed-word')
             if (!el) return
 
