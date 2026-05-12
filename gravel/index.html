@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gravel · AI admin for non-engineers | Artanis</title>
-    <meta name="description" content="Open-source library that mounts an admin dashboard inside your AI app. Non-engineers edit prompts (kept in your git) and review output. 1-minute install.">
+    <title>Gravel · Cross-team prompt updates for vertical agents | Artanis</title>
+    <meta name="description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts edit prompts (kept in your git) and review output without engineers in the loop. 1-minute install.">
     <link rel="canonical" href="https://artanis.ai/gravel/">
 
     <!--
@@ -17,15 +17,15 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://artanis.ai/gravel/">
-    <meta property="og:title" content="Gravel · AI admin for non-engineers">
-    <meta property="og:description" content="Open-source library that mounts an admin dashboard inside your AI app. Non-engineers edit prompts (kept in your git) and review output. 1-minute install.">
+    <meta property="og:title" content="Gravel · Cross-team prompt updates for vertical agents">
+    <meta property="og:description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts edit prompts (kept in your git) and review output without engineers in the loop. 1-minute install.">
     <meta property="og:image" content="https://artanis.ai/img/og-image.png">
     <meta property="og:site_name" content="Gravel by Artanis">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Gravel · AI admin for non-engineers">
-    <meta name="twitter:description" content="Open-source library that mounts an admin dashboard inside your AI app. Non-engineers edit prompts (kept in your git) and review output. 1-minute install.">
+    <meta name="twitter:title" content="Gravel · Cross-team prompt updates for vertical agents">
+    <meta name="twitter:description" content="Open-source library that mounts an admin dashboard inside your AI app. Domain experts edit prompts (kept in your git) and review output without engineers in the loop. 1-minute install.">
     <meta name="twitter:image" content="https://artanis.ai/img/og-image.png">
 
     <link rel="icon" href="/img/favicon.ico" sizes="any">
@@ -193,18 +193,14 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-12 items-center">
                     <!-- Left: content -->
                     <div class="text-left">
-                        <h1 class="font-display font-semibold tracking-tight text-text-dark leading-[1.05] text-5xl sm:text-6xl lg:text-7xl">
-                            AI admin for<br>
-                            <span class="text-primary"><span id="typed-word"></span><span class="typed-cursor">&nbsp;</span></span>
+                        <h1 class="font-display font-semibold tracking-tight text-text-dark leading-[1.05] text-4xl sm:text-5xl lg:text-6xl">
+                            Cross-team prompt updates<br>
+                            for <span class="text-primary"><span id="typed-word"></span><span class="typed-cursor">&nbsp;</span></span> agents
                         </h1>
-
-                        <p class="mt-7 max-w-xl text-lg sm:text-xl tracking-tight text-text-mid">
-                            Served straight from your app with prompts in your git. No more spreadsheets back and forth, no more out-of-sync docs.
-                        </p>
 
                         <!-- 1-minute install pill. The repeated feedback was "is this 5 min
                              or a day?", so put the answer obnoxiously above the command. -->
-                        <div class="mt-7 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                        <div class="mt-8 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                             <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                             1-minute install
                         </div>
@@ -538,10 +534,262 @@
         </section>
     </div>
 
-    <!-- What you see vs What they see — single consolidated section -->
-    <section id="how" class="bg-cream py-20 sm:py-28">
+    <!--
+      The Problem — three sub-issues that together form the
+      coordination problem between engineers and domain experts.
+      Audience here is CTO / staff engineer: each card frames the
+      cost in engineering hours and shipped-quality terms.
+    -->
+    <section id="problem" class="bg-warm/40 py-20 sm:py-28">
         <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center mb-16 sm:mb-20">
-            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">How it works</p>
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">The problem</p>
+            <h2 class="mt-3 font-display text-3xl sm:text-5xl font-semibold tracking-tight text-text-dark leading-tight">
+                Domain experts and engineers<br class="hidden sm:inline">
+                can't coordinate on prompts
+            </h2>
+            <p class="mt-5 text-lg text-text-mid">
+                Every tweak from legal, medical, or finance turns into a Slack thread, a docs revision, or an engineer in the loop. Your iteration loop crawls and your domain experts never really own the AI.
+            </p>
+        </div>
+
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-24">
+
+            <!-- Problem 1: no single source of truth.
+                 Visual: pile of brand cards rejected, with GitHub elevated
+                 as "the right answer" on top. -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+                <div class="lg:order-1 order-2">
+                    <p class="font-mono font-bold text-xs text-primary uppercase tracking-widest mb-3">01</p>
+                    <h3 class="font-display font-semibold text-2xl sm:text-3xl text-text-dark mb-4 leading-tight">No single source of truth for prompts</h3>
+                    <p class="text-text-mid leading-relaxed">
+                        Prompts should live in git, alongside the code that runs them. But git is for engineers, so prompts end up scattered across whatever felt accessible: Google Docs, Notion, Strapi, Langfuse. None of them talk to each other, none of them are git, and every one drifts out of sync.
+                    </p>
+                </div>
+                <div class="lg:order-2 order-1">
+                    <div class="relative h-[340px] sm:h-[380px] flex items-center justify-center">
+                        <!-- Rejected logo pile — five cards floating with
+                             rotation and a red X overlay on each. The "no"
+                             stack sits behind the GitHub winner. -->
+                        <div class="absolute" style="transform: translate(-130px, 30px) rotate(-12deg); top: 50%; left: 50%; margin-top: -34px; margin-left: -70px;">
+                            <div class="relative w-[140px] rounded-xl bg-white px-3 py-3 shadow-lg ring-1 ring-earth-dark/10">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-md text-white font-bold text-sm" style="background: #4285F4">G</span>
+                                    <span class="font-semibold text-xs text-text-dark">Google Docs</span>
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <svg class="w-full h-full" viewBox="0 0 140 60" preserveAspectRatio="none"><line x1="6" y1="6" x2="134" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/><line x1="134" y1="6" x2="6" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute" style="transform: translate(60px, -60px) rotate(8deg); top: 50%; left: 50%; margin-top: -34px; margin-left: -70px;">
+                            <div class="relative w-[140px] rounded-xl bg-white px-3 py-3 shadow-lg ring-1 ring-earth-dark/10">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-text-dark text-white font-display font-bold text-sm">N</span>
+                                    <span class="font-semibold text-xs text-text-dark">Notion</span>
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <svg class="w-full h-full" viewBox="0 0 140 60" preserveAspectRatio="none"><line x1="6" y1="6" x2="134" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/><line x1="134" y1="6" x2="6" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute" style="transform: translate(-100px, -90px) rotate(-6deg); top: 50%; left: 50%; margin-top: -34px; margin-left: -70px;">
+                            <div class="relative w-[140px] rounded-xl bg-white px-3 py-3 shadow-lg ring-1 ring-earth-dark/10">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-md text-white font-bold text-sm" style="background: #4945FF">S</span>
+                                    <span class="font-semibold text-xs text-text-dark">Strapi</span>
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <svg class="w-full h-full" viewBox="0 0 140 60" preserveAspectRatio="none"><line x1="6" y1="6" x2="134" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/><line x1="134" y1="6" x2="6" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute" style="transform: translate(100px, 60px) rotate(14deg); top: 50%; left: 50%; margin-top: -34px; margin-left: -70px;">
+                            <div class="relative w-[140px] rounded-xl bg-white px-3 py-3 shadow-lg ring-1 ring-earth-dark/10">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-md text-white font-bold text-sm" style="background: #1A1A1A">
+                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="#FFC53D"><path d="M12 2L2 22h20L12 2zm0 6l6.5 13h-13L12 8z"/></svg>
+                                    </span>
+                                    <span class="font-semibold text-xs text-text-dark">Langfuse</span>
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <svg class="w-full h-full" viewBox="0 0 140 60" preserveAspectRatio="none"><line x1="6" y1="6" x2="134" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/><line x1="134" y1="6" x2="6" y2="54" stroke="#C97064" stroke-width="2.5" stroke-linecap="round"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Winner: GitHub, elevated, larger, no strike. -->
+                        <div class="absolute" style="top: 50%; left: 50%; margin-top: -40px; margin-left: -90px;">
+                            <div class="relative w-[180px] rounded-2xl bg-text-dark px-4 py-4 shadow-2xl ring-1 ring-text-dark/30" style="box-shadow: 0 20px 50px rgba(46, 24, 16, 0.35), 0 4px 12px rgba(46, 24, 16, 0.15)">
+                                <div class="flex items-center gap-2.5">
+                                    <svg class="h-7 w-7 text-cream" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                                    <div>
+                                        <p class="font-semibold text-sm text-cream">GitHub</p>
+                                        <p class="font-mono text-[10px] text-cream/60">prompts/*.md</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="absolute -top-3 -right-3 inline-flex items-center gap-1 rounded-full bg-forest px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white shadow-md">
+                                <svg class="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                Source of truth
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem 2: observability tools are for engineers.
+                 Visual: Langfuse-style dark dashboard with trace list +
+                 nested-span waterfall + raw JSON dump. -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+                <div class="lg:order-2">
+                    <p class="font-mono font-bold text-xs text-primary uppercase tracking-widest mb-3">02</p>
+                    <h3 class="font-display font-semibold text-2xl sm:text-3xl text-text-dark mb-4 leading-tight">Observability tools are for engineers</h3>
+                    <p class="text-text-mid leading-relaxed">
+                        Langfuse and friends weren't built for domain experts. Nested spans, template strings full of curly brackets, raw JSON dumps. None of it makes sense to a clinician or a paralegal who just needs to know whether the model got it right.
+                    </p>
+                </div>
+                <div class="lg:order-1">
+                    <div class="rounded-xl ring-1 ring-earth-dark/10 shadow-xl overflow-hidden" style="background: #0d0d0d">
+                        <div class="flex items-center gap-2 px-4 py-2.5 border-b" style="border-color: rgba(255,255,255,0.06)">
+                            <div class="flex gap-1.5">
+                                <span class="h-2.5 w-2.5 rounded-full" style="background: rgba(255,255,255,0.18)"></span>
+                                <span class="h-2.5 w-2.5 rounded-full" style="background: rgba(255,255,255,0.18)"></span>
+                                <span class="h-2.5 w-2.5 rounded-full" style="background: rgba(255,255,255,0.18)"></span>
+                            </div>
+                            <span class="ml-2 text-[11px] font-mono" style="color: rgba(255,255,255,0.55)">langfuse / traces</span>
+                        </div>
+                        <div class="grid grid-cols-[140px_1fr] divide-x" style="border-color: rgba(255,255,255,0.06); divide-color: rgba(255,255,255,0.06)">
+                            <!-- Trace list -->
+                            <div class="text-[10px] py-2 font-mono" style="color: rgba(255,255,255,0.5); border-right: 1px solid rgba(255,255,255,0.06)">
+                                <div class="px-3 py-1.5 truncate" style="background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.85)">trace_a91f · run</div>
+                                <div class="px-3 py-1.5 truncate">trace_882c · chain</div>
+                                <div class="px-3 py-1.5 truncate">trace_4d3e · run</div>
+                                <div class="px-3 py-1.5 truncate">trace_77b1 · embed</div>
+                                <div class="px-3 py-1.5 truncate">trace_5acd · run</div>
+                                <div class="px-3 py-1.5 truncate">trace_e102 · chain</div>
+                                <div class="px-3 py-1.5 truncate">trace_22fa · run</div>
+                            </div>
+                            <!-- Waterfall + JSON -->
+                            <div class="flex flex-col min-w-0">
+                                <div class="px-3 py-2 text-[10px] font-mono" style="border-bottom: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.55)">trace_a91f · 1.84s · 5 spans</div>
+                                <!-- Waterfall -->
+                                <div class="px-3 py-2 space-y-1 text-[10px] font-mono">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-24 truncate" style="color: rgba(255,255,255,0.55)">▾ chain.run</span>
+                                        <div class="flex-1 h-2 rounded" style="background: rgba(76, 175, 124, 0.35)"></div>
+                                        <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">1.84s</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 pl-3">
+                                        <span class="w-24 truncate" style="color: rgba(255,255,255,0.55)">  ▾ prompt.fmt</span>
+                                        <div class="flex-1"><div class="h-2 rounded" style="background: rgba(212, 167, 106, 0.45); width: 12%"></div></div>
+                                        <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">0.02s</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 pl-3">
+                                        <span class="w-24 truncate" style="color: rgba(255,255,255,0.55)">  ▾ llm.call</span>
+                                        <div class="flex-1"><div class="h-2 rounded ml-[14%]" style="background: rgba(64, 156, 255, 0.55); width: 72%"></div></div>
+                                        <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">1.30s</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 pl-6">
+                                        <span class="w-20 truncate" style="color: rgba(255,255,255,0.45)">  ▾ retry</span>
+                                        <div class="flex-1"><div class="h-2 rounded ml-[68%]" style="background: rgba(248, 113, 113, 0.55); width: 18%"></div></div>
+                                        <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">0.31s</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 pl-3">
+                                        <span class="w-24 truncate" style="color: rgba(255,255,255,0.55)">  ▾ parse</span>
+                                        <div class="flex-1"><div class="h-2 rounded ml-[88%]" style="background: rgba(212, 167, 106, 0.45); width: 8%"></div></div>
+                                        <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">0.14s</span>
+                                    </div>
+                                </div>
+                                <!-- JSON dump -->
+                                <div class="px-3 py-2 font-mono text-[10px] leading-snug" style="border-top: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.75)"><pre style="margin: 0; white-space: pre-wrap"><span style="color: rgba(255,255,255,0.4)">{</span>
+  <span style="color: #79c0ff">"input"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"messages"</span>: <span style="color: rgba(255,255,255,0.4)">[{</span> <span style="color: #79c0ff">"role"</span>: <span style="color: #a5d6ff">"user"</span>, <span style="color: #79c0ff">"content"</span>: <span style="color: #a5d6ff">"{{</span><span style="color: #d2a8ff">patient_note</span><span style="color: #a5d6ff">}}\n\n{{</span><span style="color: #d2a8ff">red_flags</span><span style="color: #a5d6ff">}}"</span> <span style="color: rgba(255,255,255,0.4)">}]</span>,
+  <span style="color: #79c0ff">"vars"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"patient_note"</span>: <span style="color: #a5d6ff">"..."</span>, <span style="color: #79c0ff">"red_flags"</span>: <span style="color: rgba(255,255,255,0.4)">[</span><span style="color: #a5d6ff">"fever"</span>, <span style="color: #a5d6ff">"stiff_neck"</span><span style="color: rgba(255,255,255,0.4)">]</span> <span style="color: rgba(255,255,255,0.4)">}</span>,
+  <span style="color: #79c0ff">"metadata"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"trace_id"</span>: <span style="color: #a5d6ff">"a91f-77ce"</span>, <span style="color: #79c0ff">"env"</span>: <span style="color: #a5d6ff">"prod"</span> <span style="color: rgba(255,255,255,0.4)">}</span>
+<span style="color: rgba(255,255,255,0.4)">}</span></pre></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem 3: prompt iteration on Slack and spreadsheets.
+                 Visual: messy Slack thread with versioned spreadsheet
+                 attachments piling up. -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+                <div class="lg:order-1 order-2">
+                    <p class="font-mono font-bold text-xs text-primary uppercase tracking-widest mb-3">03</p>
+                    <h3 class="font-display font-semibold text-2xl sm:text-3xl text-text-dark mb-4 leading-tight">Prompt iteration runs on Slack and spreadsheets</h3>
+                    <p class="text-text-mid leading-relaxed">
+                        Without a way to evaluate their own edits, domain experts send docs and spreadsheets back and forth on Slack with contradictory prompts and conflicting feedback. The iteration loop is slow and endless, and you can never really let them own the AI.
+                    </p>
+                </div>
+                <div class="lg:order-2 order-1">
+                    <div class="rounded-xl bg-white ring-1 ring-earth-dark/10 shadow-xl overflow-hidden">
+                        <!-- Slack-ish chrome -->
+                        <div class="flex items-center gap-2 px-4 py-2.5 border-b border-warm">
+                            <span class="inline-flex h-4 w-4 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #611f69">#</span>
+                            <span class="text-sm font-semibold text-text-dark">ai-prompts</span>
+                            <span class="text-xs text-text-muted">12 members</span>
+                        </div>
+                        <div class="p-4 space-y-3 text-xs">
+                            <div class="flex gap-2.5">
+                                <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #6BA37A">SK</span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[11px]"><span class="font-semibold text-text-dark">Sarah K</span> <span class="text-text-muted">9:42</span></p>
+                                    <p class="text-text-mid">attached new prompt for triage, please ship today 🙏</p>
+                                    <div class="mt-1.5 inline-flex items-center gap-2 rounded-md border border-warm bg-warm/40 px-2 py-1.5">
+                                        <svg class="h-4 w-4 shrink-0" style="color: #1f7244" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16c0 1.1.9 2 2 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+                                        <span class="font-mono text-[10px] text-text-dark truncate">triage_prompt_v3_FINAL.xlsx</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2.5">
+                                <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #4945FF">JM</span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[11px]"><span class="font-semibold text-text-dark">James M</span> <span class="text-text-muted">10:08</span></p>
+                                    <p class="text-text-mid">wait, this contradicts what we said last week about over-65s</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2.5">
+                                <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #6BA37A">SK</span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[11px]"><span class="font-semibold text-text-dark">Sarah K</span> <span class="text-text-muted">10:31</span></p>
+                                    <p class="text-text-mid">use this one instead, ignore the other</p>
+                                    <div class="mt-1.5 inline-flex items-center gap-2 rounded-md border border-warm bg-warm/40 px-2 py-1.5">
+                                        <svg class="h-4 w-4 shrink-0" style="color: #1f7244" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16c0 1.1.9 2 2 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+                                        <span class="font-mono text-[10px] text-text-dark truncate">triage_prompt_v3_FINAL_v2.xlsx</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2.5">
+                                <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #C97064">RT</span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[11px]"><span class="font-semibold text-text-dark">Rachel T</span> <span class="text-text-muted">11:04</span></p>
+                                    <p class="text-text-mid">are we using v3 or v3_v2? I'm reviewing the doc now</p>
+                                    <div class="mt-1.5 inline-flex items-center gap-2 rounded-md border border-warm bg-warm/40 px-2 py-1.5">
+                                        <svg class="h-4 w-4 shrink-0" style="color: #2563eb" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16c0 1.1.9 2 2 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+                                        <span class="font-mono text-[10px] text-text-dark truncate">triage-feedback-Rachel.docx</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2.5">
+                                <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #6B5744">eng</span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[11px]"><span class="font-semibold text-text-dark">You</span> <span class="text-text-muted">11:47</span></p>
+                                    <p class="text-text-mid italic" style="color: #9B4340">…still merging conflicts. Will push something tomorrow.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- What you see vs What they see — single consolidated section -->
+    <section id="solution" class="bg-cream py-20 sm:py-28">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center mb-16 sm:mb-20">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">The solution</p>
             <h2 class="mt-3 font-display text-3xl sm:text-5xl font-semibold tracking-tight text-text-dark leading-tight">
                 What <span class="text-text-muted">you</span> see vs<br class="hidden sm:inline">
                 what <span class="text-primary">they</span> see
@@ -659,9 +907,9 @@
                 <p class="mt-10 max-w-2xl mx-auto text-center text-text-mid">Prompts <em>should</em> live in git. Prompt management tools try to reinvent the wheel with decoupled versioning and collaboration. But git is for engineers. Gravel will find all the prompts in your codebase (yes, even variables) and serve them in a familiar Google Docs-like UI.</p>
             </div>
 
-            <!-- Pair 2: Tracing — OpenAI logs vs Review queue -->
+            <!-- Pair 2: Review — OpenAI logs vs Review queue -->
             <div>
-                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Tracing</p>
+                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Review</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
                     <div>
                         <p class="text-xs font-mono font-bold text-text-muted uppercase tracking-widest mb-3 text-center">You see</p>
@@ -1301,7 +1549,7 @@
 
         // Typing animation for the cycling word in the hero
         (function () {
-            const words = ['non-engineers', 'lawyers', 'clinicians', 'teachers', 'recruiters', 'accountants', 'analysts', 'underwriters', 'researchers']
+            const words = ['legal', 'medical', 'finance', 'recruiting', 'compliance', 'tax', 'insurance', 'research', 'education']
             const el = document.getElementById('typed-word')
             if (!el) return
 
