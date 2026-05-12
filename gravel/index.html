@@ -111,6 +111,22 @@
            render correctly). */
         .dash-line-clamp-4 { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 
+        /* Slack-style overlay scrollbar for the chat mock — thin, subtle
+           until hover. Matches a real Slack channel pane. */
+        .slack-scroll::-webkit-scrollbar { width: 10px; }
+        .slack-scroll::-webkit-scrollbar-track { background: transparent; }
+        .slack-scroll::-webkit-scrollbar-thumb {
+            background: rgba(29, 28, 29, 0.22);
+            border-radius: 5px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+        .slack-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(29, 28, 29, 0.4);
+            background-clip: padding-box;
+        }
+        .slack-scroll { scrollbar-width: thin; scrollbar-color: rgba(29, 28, 29, 0.22) transparent; }
+
         /* Hero dashboard list/detail toggle inside a pane. Clicking a
            card / row in the list flips the same pane to detail mode
            (matches the real dashboard's full-page swap). */
@@ -194,8 +210,9 @@
                     <!-- Left: content -->
                     <div class="text-left">
                         <h1 class="font-display font-semibold tracking-tight text-text-dark leading-[1.05] text-4xl sm:text-5xl lg:text-6xl">
-                            Cross-team prompt updates<br>
-                            for <span class="text-primary"><span id="typed-word"></span><span class="typed-cursor">&nbsp;</span></span> agents
+                            Cross-team prompt<br>
+                            updates for<br>
+                            <span class="text-primary"><span id="typed-word"></span><span class="typed-cursor">&nbsp;</span></span> agents
                         </h1>
 
                         <!-- 1-minute install pill. The repeated feedback was "is this 5 min
@@ -298,7 +315,7 @@
                                     <span class="h-3 w-3 rounded-full bg-accent/60"></span>
                                     <span class="h-3 w-3 rounded-full bg-forest/50"></span>
                                 </div>
-                                <div class="ml-3 flex-1 truncate rounded-md bg-cream px-3 py-1 text-xs text-text-muted font-mono"><span>your-app.com/admin/ai/</span><span id="dash-url-slug">prompts</span></div>
+                                <div class="ml-3 flex-1 truncate rounded-md bg-cream px-3 py-1 text-xs font-mono"><span class="font-bold text-primary">your-app.com</span><span class="text-text-muted">/admin/ai/</span><span class="text-text-muted" id="dash-url-slug">prompts</span></div>
                             </div>
 
                             <!-- App chrome. Mirrors packages/dashboard/src/components/Layout.tsx
@@ -568,12 +585,9 @@
         <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center mb-16 sm:mb-20">
             <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">The problem</p>
             <h2 class="mt-3 font-display text-3xl sm:text-5xl font-semibold tracking-tight text-text-dark leading-tight">
-                Domain experts and engineers<br class="hidden sm:inline">
+                <span class="text-text-muted">Engineers</span> and <span class="text-primary">domain experts</span><br class="hidden sm:inline">
                 can't coordinate on prompts
             </h2>
-            <p class="mt-5 text-lg text-text-mid">
-                Every tweak from legal, medical, or finance turns into a Slack thread, a docs revision, or an engineer in the loop. Your iteration loop crawls and your domain experts never really own the AI.
-            </p>
         </div>
 
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-24">
@@ -585,65 +599,53 @@
                 <div>
                     <h3 class="font-display font-semibold text-2xl sm:text-3xl text-text-dark mb-4 leading-tight">No single source of truth for prompts</h3>
                     <p class="text-text-mid leading-relaxed">
-                        Prompts should live in git, alongside the code that runs them. But git is for engineers, so prompts end up scattered across whatever felt accessible: Google Docs, Notion, Strapi, LangChain. None of them talk to each other, none of them are git, and every one drifts out of sync.
+                        Prompts should live in git, alongside the code that runs them. But git is for engineers, so prompts end up scattered across whatever felt accessible and they inevitably drift out of sync.
                     </p>
                 </div>
                 <div>
                     <div class="relative flex flex-col items-center justify-center min-h-[440px] py-4">
-                        <!-- Winner: GitHub, big, elevated, lopsided crown. -->
-                        <div class="relative">
-                            <span class="absolute -top-7 left-1/2 -translate-x-1/2 text-3xl select-none pointer-events-none" style="transform: translateX(-50%) rotate(-14deg); filter: drop-shadow(0 2px 4px rgba(46, 24, 16, 0.25))" aria-hidden="true">👑</span>
-                            <div class="w-[210px] rounded-2xl bg-text-dark px-5 py-4 shadow-2xl ring-1 ring-text-dark/30" style="box-shadow: 0 20px 50px rgba(46, 24, 16, 0.35), 0 4px 12px rgba(46, 24, 16, 0.15)">
-                                <div class="flex items-center gap-3">
-                                    <svg class="h-8 w-8 text-cream" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                                    <div>
-                                        <p class="font-semibold text-base text-cream">GitHub</p>
-                                        <p class="font-mono text-[10px] text-cream/60">prompts/*.md</p>
-                                    </div>
-                                </div>
+                        <!-- Winner: GitHub app icon, big, elevated, lopsided crown. -->
+                        <div class="relative inline-flex flex-col items-center">
+                            <span class="absolute -top-7 left-1/2 -translate-x-1/2 text-3xl select-none pointer-events-none" style="transform: translateX(-50%) rotate(14deg); filter: drop-shadow(0 2px 4px rgba(46, 24, 16, 0.25))" aria-hidden="true">👑</span>
+                            <div class="h-[88px] w-[88px] rounded-2xl bg-text-dark flex items-center justify-center ring-1 ring-text-dark/30" style="box-shadow: 0 20px 50px rgba(46, 24, 16, 0.35), 0 4px 12px rgba(46, 24, 16, 0.15)">
+                                <svg class="h-12 w-12 text-cream" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                             </div>
+                            <p class="mt-2 font-semibold text-sm text-text-dark">GitHub</p>
                         </div>
-                        <!-- Rejected pile — disjoint, overlapping cards
-                             scattered below the winner. Absolute positioning
-                             with per-card rotation and offset reads like a
-                             stack of papers tossed onto a desk. -->
-                        <div class="relative mt-6 h-[200px] w-[300px]">
-                            <div class="absolute rounded-xl bg-white px-3 py-2.5 shadow-md ring-1 ring-earth-dark/10 w-[150px]" style="top: 10px; left: 0; transform: rotate(-9deg)">
-                                <div class="flex items-center gap-2">
-                                    <img src="https://cdn.simpleicons.org/googledocs/4285F4" alt="" class="h-5 w-5" style="opacity: 0.55">
-                                    <span class="font-semibold text-xs text-text-dark/60">Google Docs</span>
+                        <!-- Rejected pile — overlapping app icons with names
+                             below, like a cluttered home screen. One bold X
+                             across the stack reads as "all rejected" without
+                             defacing each one individually. -->
+                        <div class="relative mt-8 h-[170px] w-[240px]">
+                            <div class="absolute flex flex-col items-center" style="top: 0; left: 18px; transform: rotate(-12deg)">
+                                <div class="h-14 w-14 rounded-2xl bg-white flex items-center justify-center ring-1 ring-earth-dark/10" style="box-shadow: 0 6px 14px rgba(46, 24, 16, 0.15)">
+                                    <img src="https://cdn.simpleicons.org/googledocs/4285F4" alt="" class="h-8 w-8" style="opacity: 0.7">
                                 </div>
-                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                    <svg class="w-full h-full" viewBox="0 0 150 44" preserveAspectRatio="none"><line x1="6" y1="6" x2="144" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/><line x1="144" y1="6" x2="6" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/></svg>
-                                </div>
+                                <p class="mt-1.5 font-medium text-[10px] text-text-dark/65">Google Docs</p>
                             </div>
-                            <div class="absolute rounded-xl bg-white px-3 py-2.5 shadow-md ring-1 ring-earth-dark/10 w-[150px]" style="top: 0; left: 140px; transform: rotate(7deg)">
-                                <div class="flex items-center gap-2">
-                                    <img src="https://cdn.simpleicons.org/notion/000000" alt="" class="h-5 w-5" style="opacity: 0.55">
-                                    <span class="font-semibold text-xs text-text-dark/60">Notion</span>
+                            <div class="absolute flex flex-col items-center" style="top: 8px; left: 134px; transform: rotate(9deg)">
+                                <div class="h-14 w-14 rounded-2xl bg-white flex items-center justify-center ring-1 ring-earth-dark/10" style="box-shadow: 0 6px 14px rgba(46, 24, 16, 0.15)">
+                                    <img src="https://cdn.simpleicons.org/notion/000000" alt="" class="h-8 w-8" style="opacity: 0.7">
                                 </div>
-                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                    <svg class="w-full h-full" viewBox="0 0 150 44" preserveAspectRatio="none"><line x1="6" y1="6" x2="144" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/><line x1="144" y1="6" x2="6" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/></svg>
-                                </div>
+                                <p class="mt-1.5 font-medium text-[10px] text-text-dark/65">Notion</p>
                             </div>
-                            <div class="absolute rounded-xl bg-white px-3 py-2.5 shadow-md ring-1 ring-earth-dark/10 w-[150px]" style="top: 90px; left: 30px; transform: rotate(4deg)">
-                                <div class="flex items-center gap-2">
-                                    <img src="https://cdn.simpleicons.org/strapi/4945FF" alt="" class="h-5 w-5" style="opacity: 0.55">
-                                    <span class="font-semibold text-xs text-text-dark/60">Strapi</span>
+                            <div class="absolute flex flex-col items-center" style="top: 78px; left: 30px; transform: rotate(-5deg)">
+                                <div class="h-14 w-14 rounded-2xl bg-white flex items-center justify-center ring-1 ring-earth-dark/10" style="box-shadow: 0 6px 14px rgba(46, 24, 16, 0.15)">
+                                    <img src="https://cdn.simpleicons.org/strapi/4945FF" alt="" class="h-8 w-8" style="opacity: 0.7">
                                 </div>
-                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                    <svg class="w-full h-full" viewBox="0 0 150 44" preserveAspectRatio="none"><line x1="6" y1="6" x2="144" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/><line x1="144" y1="6" x2="6" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/></svg>
-                                </div>
+                                <p class="mt-1.5 font-medium text-[10px] text-text-dark/65">Strapi</p>
                             </div>
-                            <div class="absolute rounded-xl bg-white px-3 py-2.5 shadow-md ring-1 ring-earth-dark/10 w-[150px]" style="top: 80px; left: 160px; transform: rotate(-6deg)">
-                                <div class="flex items-center gap-2">
-                                    <img src="https://cdn.simpleicons.org/langchain/1C3C3C" alt="" class="h-5 w-5" style="opacity: 0.55">
-                                    <span class="font-semibold text-xs text-text-dark/60">LangChain</span>
+                            <div class="absolute flex flex-col items-center" style="top: 86px; left: 148px; transform: rotate(11deg)">
+                                <div class="h-14 w-14 rounded-2xl bg-white flex items-center justify-center ring-1 ring-earth-dark/10" style="box-shadow: 0 6px 14px rgba(46, 24, 16, 0.15)">
+                                    <img src="https://cdn.simpleicons.org/langchain/1C3C3C" alt="" class="h-8 w-8" style="opacity: 0.7">
                                 </div>
-                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                    <svg class="w-full h-full" viewBox="0 0 150 44" preserveAspectRatio="none"><line x1="6" y1="6" x2="144" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/><line x1="144" y1="6" x2="6" y2="38" stroke="#C97064" stroke-width="2" stroke-linecap="round"/></svg>
-                                </div>
+                                <p class="mt-1.5 font-medium text-[10px] text-text-dark/65">LangChain</p>
                             </div>
+                            <!-- One bold X drawn across the whole pile. -->
+                            <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 240 170" preserveAspectRatio="none" aria-hidden="true">
+                                <line x1="20" y1="14" x2="220" y2="156" stroke="#C97064" stroke-width="5" stroke-linecap="round" opacity="0.9"/>
+                                <line x1="220" y1="14" x2="20" y2="156" stroke="#C97064" stroke-width="5" stroke-linecap="round" opacity="0.9"/>
+                            </svg>
                         </div>
                     </div>
                 </div>
@@ -656,12 +658,12 @@
                 <div>
                     <h3 class="font-display font-semibold text-2xl sm:text-3xl text-text-dark mb-4 leading-tight">Observability tools are for engineers</h3>
                     <p class="text-text-mid leading-relaxed">
-                        Langfuse and friends weren't built for domain experts. Nested spans, template strings full of curly brackets, raw JSON dumps. None of it makes sense to a clinician or a paralegal who just needs to know whether the model got it right.
+                        Langfuse and friends weren't built for non-technical domain experts. Nested spans, template strings full of curly brackets, and raw JSON dumps don't make sense to a clinician or a paralegal who just needs to know whether the model got it right.
                     </p>
                 </div>
                 <div>
-                    <div class="rounded-xl ring-1 ring-earth-dark/10 shadow-xl overflow-hidden flex flex-col min-h-[440px]" style="background: #0d0d0d">
-                        <div class="flex items-center gap-2 px-4 py-2.5 border-b shrink-0" style="border-color: rgba(255,255,255,0.06)">
+                    <div class="rounded-xl ring-1 ring-earth-dark/10 shadow-xl overflow-hidden flex flex-col h-[300px]" style="background: #0d0d0d">
+                        <div class="flex items-center gap-2 px-4 py-2 border-b shrink-0" style="border-color: rgba(255,255,255,0.06)">
                             <div class="flex gap-1.5">
                                 <span class="h-2.5 w-2.5 rounded-full" style="background: rgba(255,255,255,0.18)"></span>
                                 <span class="h-2.5 w-2.5 rounded-full" style="background: rgba(255,255,255,0.18)"></span>
@@ -669,25 +671,22 @@
                             </div>
                             <span class="ml-2 text-[11px] font-mono" style="color: rgba(255,255,255,0.55)">langfuse / traces</span>
                         </div>
-                        <div class="grid grid-cols-[140px_1fr] flex-1 min-h-0">
+                        <div class="grid grid-cols-[128px_1fr] flex-1 min-h-0">
                             <!-- Trace list -->
-                            <div class="text-[10px] py-2 font-mono overflow-hidden" style="color: rgba(255,255,255,0.5); border-right: 1px solid rgba(255,255,255,0.06)">
-                                <div class="px-3 py-1.5 truncate" style="background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.85)">trace_a91f · run</div>
-                                <div class="px-3 py-1.5 truncate">trace_882c · chain</div>
-                                <div class="px-3 py-1.5 truncate">trace_4d3e · run</div>
-                                <div class="px-3 py-1.5 truncate">trace_77b1 · embed</div>
-                                <div class="px-3 py-1.5 truncate">trace_5acd · run</div>
-                                <div class="px-3 py-1.5 truncate">trace_e102 · chain</div>
-                                <div class="px-3 py-1.5 truncate">trace_22fa · run</div>
-                                <div class="px-3 py-1.5 truncate">trace_3091 · run</div>
-                                <div class="px-3 py-1.5 truncate">trace_fa8d · embed</div>
-                                <div class="px-3 py-1.5 truncate">trace_1c7e · chain</div>
+                            <div class="text-[10px] py-1.5 font-mono overflow-hidden" style="color: rgba(255,255,255,0.5); border-right: 1px solid rgba(255,255,255,0.06)">
+                                <div class="px-3 py-1 truncate" style="background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.85)">trace_a91f · run</div>
+                                <div class="px-3 py-1 truncate">trace_882c · chain</div>
+                                <div class="px-3 py-1 truncate">trace_4d3e · run</div>
+                                <div class="px-3 py-1 truncate">trace_77b1 · embed</div>
+                                <div class="px-3 py-1 truncate">trace_5acd · run</div>
+                                <div class="px-3 py-1 truncate">trace_e102 · chain</div>
+                                <div class="px-3 py-1 truncate">trace_22fa · run</div>
                             </div>
                             <!-- Waterfall + JSON -->
                             <div class="flex flex-col min-w-0">
-                                <div class="px-3 py-2 text-[10px] font-mono shrink-0" style="border-bottom: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.55)">trace_a91f · 1.84s · 7 spans</div>
-                                <!-- Waterfall — extra spans to fill height. -->
-                                <div class="px-3 py-2 space-y-1 text-[10px] font-mono">
+                                <div class="px-3 py-1.5 text-[10px] font-mono shrink-0" style="border-bottom: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.55)">trace_a91f · 1.84s · 5 spans</div>
+                                <!-- Waterfall -->
+                                <div class="px-3 py-1.5 space-y-1 text-[10px] font-mono">
                                     <div class="flex items-center gap-2">
                                         <span class="w-24 truncate" style="color: rgba(255,255,255,0.55)">▾ chain.run</span>
                                         <div class="flex-1 h-2 rounded" style="background: rgba(76, 175, 124, 0.35)"></div>
@@ -708,31 +707,18 @@
                                         <div class="flex-1"><div class="h-2 rounded ml-[68%]" style="background: rgba(248, 113, 113, 0.55); width: 18%"></div></div>
                                         <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">0.31s</span>
                                     </div>
-                                    <div class="flex items-center gap-2 pl-9">
-                                        <span class="w-16 truncate" style="color: rgba(255,255,255,0.4)">  ▾ http</span>
-                                        <div class="flex-1"><div class="h-2 rounded ml-[71%]" style="background: rgba(248, 113, 113, 0.4); width: 12%"></div></div>
-                                        <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">0.21s</span>
-                                    </div>
                                     <div class="flex items-center gap-2 pl-3">
                                         <span class="w-24 truncate" style="color: rgba(255,255,255,0.55)">  ▾ parse</span>
                                         <div class="flex-1"><div class="h-2 rounded ml-[88%]" style="background: rgba(212, 167, 106, 0.45); width: 8%"></div></div>
                                         <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">0.14s</span>
                                     </div>
-                                    <div class="flex items-center gap-2 pl-3">
-                                        <span class="w-24 truncate" style="color: rgba(255,255,255,0.55)">  ▾ store</span>
-                                        <div class="flex-1"><div class="h-2 rounded ml-[96%]" style="background: rgba(76, 175, 124, 0.35); width: 4%"></div></div>
-                                        <span class="text-right w-12" style="color: rgba(255,255,255,0.45)">0.07s</span>
-                                    </div>
                                 </div>
-                                <!-- JSON dump — extra fields to fill space. -->
-                                <div class="px-3 py-2 font-mono text-[10px] leading-snug flex-1 overflow-hidden" style="border-top: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.75)"><pre style="margin: 0; white-space: pre-wrap"><span style="color: rgba(255,255,255,0.4)">{</span>
-  <span style="color: #79c0ff">"input"</span>: <span style="color: rgba(255,255,255,0.4)">{</span>
-    <span style="color: #79c0ff">"messages"</span>: <span style="color: rgba(255,255,255,0.4)">[{</span> <span style="color: #79c0ff">"role"</span>: <span style="color: #a5d6ff">"user"</span>, <span style="color: #79c0ff">"content"</span>: <span style="color: #a5d6ff">"{{</span><span style="color: #d2a8ff">patient_note</span><span style="color: #a5d6ff">}}\n\n{{</span><span style="color: #d2a8ff">red_flags</span><span style="color: #a5d6ff">}}"</span> <span style="color: rgba(255,255,255,0.4)">}]</span>,
-    <span style="color: #79c0ff">"vars"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"patient_note"</span>: <span style="color: #a5d6ff">"..."</span>, <span style="color: #79c0ff">"red_flags"</span>: <span style="color: rgba(255,255,255,0.4)">[</span><span style="color: #a5d6ff">"fever"</span>, <span style="color: #a5d6ff">"stiff_neck"</span><span style="color: rgba(255,255,255,0.4)">]</span> <span style="color: rgba(255,255,255,0.4)">}</span>
-  <span style="color: rgba(255,255,255,0.4)">}</span>,
-  <span style="color: #79c0ff">"output"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"role"</span>: <span style="color: #a5d6ff">"assistant"</span>, <span style="color: #79c0ff">"content"</span>: <span style="color: #a5d6ff">"..."</span> <span style="color: rgba(255,255,255,0.4)">}</span>,
+                                <!-- JSON dump -->
+                                <div class="px-3 py-1.5 font-mono text-[10px] leading-snug flex-1 overflow-hidden" style="border-top: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.75)"><pre style="margin: 0; white-space: pre-wrap"><span style="color: rgba(255,255,255,0.4)">{</span>
+  <span style="color: #79c0ff">"input"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"messages"</span>: <span style="color: rgba(255,255,255,0.4)">[{</span> <span style="color: #79c0ff">"role"</span>: <span style="color: #a5d6ff">"user"</span>, <span style="color: #79c0ff">"content"</span>: <span style="color: #a5d6ff">"{{</span><span style="color: #d2a8ff">patient_note</span><span style="color: #a5d6ff">}}\n\n{{</span><span style="color: #d2a8ff">red_flags</span><span style="color: #a5d6ff">}}"</span> <span style="color: rgba(255,255,255,0.4)">}]</span>,
+    <span style="color: #79c0ff">"vars"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"patient_note"</span>: <span style="color: #a5d6ff">"..."</span>, <span style="color: #79c0ff">"red_flags"</span>: <span style="color: rgba(255,255,255,0.4)">[</span><span style="color: #a5d6ff">"fever"</span>, <span style="color: #a5d6ff">"stiff_neck"</span><span style="color: rgba(255,255,255,0.4)">]</span> <span style="color: rgba(255,255,255,0.4)">}</span> <span style="color: rgba(255,255,255,0.4)">}</span>,
   <span style="color: #79c0ff">"usage"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"in"</span>: <span style="color: #d2a8ff">512</span>, <span style="color: #79c0ff">"out"</span>: <span style="color: #d2a8ff">128</span> <span style="color: rgba(255,255,255,0.4)">}</span>,
-  <span style="color: #79c0ff">"metadata"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"trace_id"</span>: <span style="color: #a5d6ff">"a91f-77ce"</span>, <span style="color: #79c0ff">"env"</span>: <span style="color: #a5d6ff">"prod"</span>, <span style="color: #79c0ff">"commit"</span>: <span style="color: #a5d6ff">"4bf3d77"</span> <span style="color: rgba(255,255,255,0.4)">}</span>
+  <span style="color: #79c0ff">"metadata"</span>: <span style="color: rgba(255,255,255,0.4)">{</span> <span style="color: #79c0ff">"trace_id"</span>: <span style="color: #a5d6ff">"a91f-77ce"</span>, <span style="color: #79c0ff">"env"</span>: <span style="color: #a5d6ff">"prod"</span> <span style="color: rgba(255,255,255,0.4)">}</span>
 <span style="color: rgba(255,255,255,0.4)">}</span></pre></div>
                             </div>
                         </div>
@@ -745,65 +731,152 @@
                 <div>
                     <h3 class="font-display font-semibold text-2xl sm:text-3xl text-text-dark mb-4 leading-tight">Prompt iteration runs on Slack and spreadsheets</h3>
                     <p class="text-text-mid leading-relaxed">
-                        Without a way to evaluate their own edits, domain experts send docs and spreadsheets back and forth on Slack with contradictory prompts and conflicting feedback. The iteration loop is slow and endless, and you can never really let them own the AI.
+                        Without a way to evaluate their own edits, domain experts send docs and spreadsheets back and forth on Slack with contradictory prompts and conflicting feedback. The iteration loop is slow and endless, and you can never really let them fully own the prompts.
                     </p>
                 </div>
                 <div>
-                    <div class="rounded-xl bg-white ring-1 ring-earth-dark/10 shadow-xl overflow-hidden flex flex-col min-h-[440px]">
-                        <!-- Slack-ish chrome -->
-                        <div class="flex items-center gap-2 px-4 py-2.5 border-b border-warm shrink-0">
-                            <span class="inline-flex h-4 w-4 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #611f69">#</span>
-                            <span class="text-sm font-semibold text-text-dark">ai-prompts</span>
-                            <span class="text-xs text-text-muted">12 members</span>
+                    <!-- Slack channel mock — aubergine sidebar + light main
+                         pane. Sidebar with workspace + channel list is the
+                         instant "this is Slack" recognition cue. Height
+                         locked to match the Langfuse mock above; the inner
+                         message list scrolls inside. -->
+                    <div class="rounded-xl ring-1 ring-earth-dark/10 shadow-xl overflow-hidden flex h-[300px]" style="font-family: 'Lato', 'Helvetica Neue', system-ui, -apple-system, sans-serif">
+                        <!-- Aubergine sidebar -->
+                        <aside class="w-[148px] shrink-0 flex flex-col text-[11px]" style="background: #3F0E40; color: rgba(255,255,255,0.8)">
+                            <div class="flex items-center justify-between px-2.5 py-2 border-b" style="border-color: rgba(255,255,255,0.08)">
+                                <span class="font-bold text-white truncate text-[12px]">Acme Health</span>
+                                <svg class="h-3 w-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color: rgba(255,255,255,0.7)"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                            <div class="flex-1 px-1.5 py-2 space-y-2.5">
+                                <div>
+                                    <p class="px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider" style="color: rgba(255,255,255,0.5)">Channels</p>
+                                    <div class="mt-0.5 space-y-px">
+                                        <a class="flex items-center gap-1 rounded px-1.5 py-0.5 font-medium text-white" style="background: #1164a3"><span class="opacity-70">#</span>ai-prompts</a>
+                                        <a class="flex items-center gap-1 rounded px-1.5 py-0.5"><span class="opacity-50">#</span>general</a>
+                                        <a class="flex items-center gap-1 rounded px-1.5 py-0.5"><span class="opacity-50">#</span>engineering</a>
+                                        <a class="flex items-center gap-1 rounded px-1.5 py-0.5 font-semibold text-white"><span class="opacity-70">#</span>launches<span class="ml-auto rounded-full text-[8px] font-bold px-1 leading-none py-0.5" style="background: #ffffff; color: #3F0E40">3</span></a>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider" style="color: rgba(255,255,255,0.5)">Direct messages</p>
+                                    <div class="mt-0.5 space-y-px">
+                                        <a class="flex items-center gap-1.5 rounded px-1.5 py-0.5"><span class="inline-block h-1.5 w-1.5 rounded-full" style="background: #2bac76"></span>Sarah K</a>
+                                        <a class="flex items-center gap-1.5 rounded px-1.5 py-0.5"><span class="inline-block h-1.5 w-1.5 rounded-full" style="background: transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45)"></span>James M</a>
+                                        <a class="flex items-center gap-1.5 rounded px-1.5 py-0.5"><span class="inline-block h-1.5 w-1.5 rounded-full" style="background: #2bac76"></span>Rachel T</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </aside>
+
+                        <!-- Main pane -->
+                        <div class="flex-1 flex flex-col bg-white min-w-0">
+                        <!-- Channel header bar -->
+                        <div class="flex items-center gap-3 px-4 py-2 border-b shrink-0" style="border-color: #e8e8e8">
+                            <div class="flex items-center gap-1 flex-1 min-w-0">
+                                <span class="text-[15px] font-bold leading-none" style="color: #1d1c1d">#</span>
+                                <span class="text-[14px] font-bold truncate" style="color: #1d1c1d">ai-prompts</span>
+                                <svg class="h-3 w-3 ml-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color: #616061"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                            <button class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium" style="color: #616061; background: #f8f8f8">
+                                <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/></svg>
+                                <span>12</span>
+                            </button>
+                            <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: #616061"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.5-4.5"/></svg>
                         </div>
-                        <div class="p-4 space-y-3 text-xs flex-1">
-                            <div class="flex gap-2.5">
-                                <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #6BA37A">SK</span>
+
+                        <!-- Messages — scrolls inside the pane,
+                             defaults to bottom (see hero JS). -->
+                        <div id="slack-messages" class="slack-scroll px-3 py-2 space-y-1.5 flex-1 overflow-y-auto text-[12px]" style="color: #1d1c1d">
+                            <!-- Sarah · first attached spreadsheet -->
+                            <div class="flex gap-2">
+                                <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #6BA37A">SK</span>
                                 <div class="min-w-0 flex-1">
-                                    <p class="text-[11px]"><span class="font-semibold text-text-dark">Sarah K</span> <span class="text-text-muted">9:42</span></p>
-                                    <p class="text-text-mid">attached new prompt for triage, please ship today 🙏</p>
-                                    <div class="mt-1.5 inline-flex items-center gap-2 rounded-md border border-warm bg-warm/40 px-2 py-1.5">
-                                        <svg class="h-4 w-4 shrink-0" style="color: #1f7244" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16c0 1.1.9 2 2 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
-                                        <span class="font-mono text-[10px] text-text-dark truncate">triage_prompt_v3_FINAL.xlsx</span>
+                                    <p class="leading-tight"><span class="font-bold">Sarah K</span> <span class="ml-0.5 text-[11px] font-medium" style="color: #616061">9:42 AM</span></p>
+                                    <p class="mt-0.5">attached new prompt for triage, please ship today 🙏</p>
+                                    <!-- Prompt-as-doc: a Word file (Slack
+                                         renders Office files with a coloured
+                                         left-rail and a bold filename link). -->
+                                    <div class="mt-1 flex items-stretch w-[260px] overflow-hidden rounded-md border" style="border-color: #e1e1e1; background: #ffffff">
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center" style="background: #185abd">
+                                            <span class="text-white font-extrabold text-[12px]">W</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0 px-2 py-1 leading-tight">
+                                            <p class="truncate font-bold text-[11px]" style="color: #1264a3">triage_prompt_v3_FINAL.docx</p>
+                                            <p class="text-[10px]" style="color: #616061">Word Document · 24 KB</p>
+                                        </div>
+                                    </div>
+                                    <!-- Reactions -->
+                                    <div class="mt-1.5 flex items-center gap-1">
+                                        <span class="inline-flex items-center gap-1 rounded-full border px-1.5 py-px text-[11px]" style="border-color: #1d9bd1; background: #e8f5fa; color: #1264a3"><span class="text-[12px]">👍</span><span class="font-bold leading-none">2</span></span>
+                                        <span class="inline-flex items-center gap-1 rounded-full border px-1.5 py-px text-[11px]" style="border-color: #e1e1e1; background: #f8f8f8; color: #616061"><span class="text-[12px]">🚀</span><span class="font-bold leading-none">1</span></span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex gap-2.5">
-                                <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #4945FF">JM</span>
+
+                            <!-- James · contradicts -->
+                            <div class="flex gap-2">
+                                <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #4945FF">JM</span>
                                 <div class="min-w-0 flex-1">
-                                    <p class="text-[11px]"><span class="font-semibold text-text-dark">James M</span> <span class="text-text-muted">10:08</span></p>
-                                    <p class="text-text-mid">wait, this contradicts what we said last week about over-65s</p>
+                                    <p class="leading-tight"><span class="font-bold">James M</span> <span class="ml-0.5 text-[11px] font-medium" style="color: #616061">10:08 AM</span></p>
+                                    <p class="mt-0.5">wait, this contradicts what we said last week about over-65s 😕</p>
                                 </div>
                             </div>
-                            <div class="flex gap-2.5">
-                                <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #6BA37A">SK</span>
+
+                            <!-- Sarah · second spreadsheet + thread -->
+                            <div class="flex gap-2">
+                                <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #6BA37A">SK</span>
                                 <div class="min-w-0 flex-1">
-                                    <p class="text-[11px]"><span class="font-semibold text-text-dark">Sarah K</span> <span class="text-text-muted">10:31</span></p>
-                                    <p class="text-text-mid">use this one instead, ignore the other</p>
-                                    <div class="mt-1.5 inline-flex items-center gap-2 rounded-md border border-warm bg-warm/40 px-2 py-1.5">
-                                        <svg class="h-4 w-4 shrink-0" style="color: #1f7244" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16c0 1.1.9 2 2 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
-                                        <span class="font-mono text-[10px] text-text-dark truncate">triage_prompt_v3_FINAL_v2.xlsx</span>
+                                    <p class="leading-tight"><span class="font-bold">Sarah K</span> <span class="ml-0.5 text-[11px] font-medium" style="color: #616061">10:31 AM</span></p>
+                                    <p class="mt-0.5">use this one instead, ignore the other</p>
+                                    <div class="mt-1 flex items-stretch w-[260px] overflow-hidden rounded-md border" style="border-color: #e1e1e1; background: #ffffff">
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center" style="background: #185abd">
+                                            <span class="text-white font-extrabold text-[12px]">W</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0 px-2 py-1 leading-tight">
+                                            <p class="truncate font-bold text-[11px]" style="color: #1264a3">triage_prompt_v3_FINAL_v2.docx</p>
+                                            <p class="text-[10px]" style="color: #616061">Word Document · 26 KB</p>
+                                        </div>
+                                    </div>
+                                    <!-- Slack thread reply pill. -->
+                                    <button class="mt-1 inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-[11px] hover:bg-slate-50 transition cursor-pointer" style="color: #1264a3">
+                                        <span class="inline-flex -space-x-1">
+                                            <span class="inline-block h-4 w-4 rounded ring-2 ring-white" style="background: #C97064"></span>
+                                            <span class="inline-block h-4 w-4 rounded ring-2 ring-white" style="background: #4945FF"></span>
+                                        </span>
+                                        <span class="font-bold">2 replies</span>
+                                        <span class="font-medium" style="color: #616061">Last reply 14 minutes ago</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Rachel · Word doc feedback -->
+                            <div class="flex gap-2">
+                                <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #C97064">RT</span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="leading-tight"><span class="font-bold">Rachel T</span> <span class="ml-0.5 text-[11px] font-medium" style="color: #616061">11:04 AM</span></p>
+                                    <p class="mt-0.5">are we using v3 or v3_v2? I'm reviewing the doc now</p>
+                                    <div class="mt-1 flex items-stretch w-[260px] overflow-hidden rounded-md border" style="border-color: #e1e1e1; background: #ffffff">
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center" style="background: #1d6f42">
+                                            <span class="text-white font-extrabold text-[12px]">X</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0 px-2 py-1 leading-tight">
+                                            <p class="truncate font-bold text-[11px]" style="color: #1264a3">triage-feedback-Rachel.xlsx</p>
+                                            <p class="text-[10px]" style="color: #616061">Excel Spreadsheet · 18 KB</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex gap-2.5">
-                                <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #C97064">RT</span>
+
+                            <!-- You · stuck merging -->
+                            <div class="flex gap-2">
+                                <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #6B5744">YA</span>
                                 <div class="min-w-0 flex-1">
-                                    <p class="text-[11px]"><span class="font-semibold text-text-dark">Rachel T</span> <span class="text-text-muted">11:04</span></p>
-                                    <p class="text-text-mid">are we using v3 or v3_v2? I'm reviewing the doc now</p>
-                                    <div class="mt-1.5 inline-flex items-center gap-2 rounded-md border border-warm bg-warm/40 px-2 py-1.5">
-                                        <svg class="h-4 w-4 shrink-0" style="color: #2563eb" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16c0 1.1.9 2 2 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
-                                        <span class="font-mono text-[10px] text-text-dark truncate">triage-feedback-Rachel.docx</span>
-                                    </div>
+                                    <p class="leading-tight"><span class="font-bold">You</span> <span class="ml-0.5 text-[11px] font-medium" style="color: #616061">11:47 AM</span></p>
+                                    <p class="mt-0.5 italic" style="color: #616061">…still merging conflicts. Will push something tomorrow.</p>
                                 </div>
                             </div>
-                            <div class="flex gap-2.5">
-                                <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-white text-[10px] font-bold" style="background: #6B5744">eng</span>
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-[11px]"><span class="font-semibold text-text-dark">You</span> <span class="text-text-muted">11:47</span></p>
-                                    <p class="text-text-mid italic" style="color: #9B4340">…still merging conflicts. Will push something tomorrow.</p>
-                                </div>
-                            </div>
+                        </div>
+
                         </div>
                     </div>
                 </div>
@@ -820,16 +893,14 @@
                 What <span class="text-text-muted">you</span> see vs<br class="hidden sm:inline">
                 what <span class="text-primary">they</span> see
             </h2>
-            <p class="mt-5 text-lg text-text-mid">
-                Gravel embeds a new internal route into your app, no provisioning required. Non-technical members of your team can review AI outputs, edit prompts, and run evals. And us engineers can get back to engineering.
-            </p>
         </div>
 
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-20 sm:space-y-24">
 
             <!-- Pair 1: Prompts — VSCode vs Prompts UI -->
             <div>
-                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Prompts</p>
+                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-3">Prompts</p>
+                <p class="mb-10 max-w-2xl mx-auto text-center text-text-mid">Gravel will find all the prompts in your codebase (yes, even variables) and serve them in a familiar Google Docs-like UI.</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
                     <div>
                         <p class="text-xs font-mono font-bold text-text-muted uppercase tracking-widest mb-3 text-center">You see</p>
@@ -930,12 +1001,12 @@
                         </div>
                     </div>
                 </div>
-                <p class="mt-10 max-w-2xl mx-auto text-center text-text-mid">Prompts <em>should</em> live in git. Prompt management tools try to reinvent the wheel with decoupled versioning and collaboration. But git is for engineers. Gravel will find all the prompts in your codebase (yes, even variables) and serve them in a familiar Google Docs-like UI.</p>
             </div>
 
             <!-- Pair 2: Review — OpenAI logs vs Review queue -->
             <div>
-                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Review</p>
+                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-3">Reviews</p>
+                <p class="mb-10 max-w-2xl mx-auto text-center text-text-mid">Hook into your model calls with one line of code and serve a much nicer UI straight from your app.</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
                     <div>
                         <p class="text-xs font-mono font-bold text-text-muted uppercase tracking-widest mb-3 text-center">You see</p>
@@ -1129,11 +1200,11 @@
                                 </div>
                             </div>
                             <div class="px-4 py-3 border-t border-warm flex items-center justify-center gap-3 shrink-0">
-                                <button class="inline-flex items-center gap-1.5 rounded-lg bg-forest text-white px-4 py-2 text-sm font-semibold shadow-sm hover:bg-forest-light transition">
+                                <button tabindex="-1" class="inline-flex items-center gap-1.5 rounded-lg bg-forest text-white px-4 py-2 text-sm font-semibold shadow-sm cursor-default">
                                     <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.733a4 4 0 00-.8 2.6z"/></svg>
                                     Looks good
                                 </button>
-                                <button class="inline-flex items-center gap-1.5 rounded-lg text-white px-4 py-2 text-sm font-semibold shadow-sm transition" style="background: #C97064" onmouseover="this.style.background='#B05B4F'" onmouseout="this.style.background='#C97064'">
+                                <button tabindex="-1" class="inline-flex items-center gap-1.5 rounded-lg text-white px-4 py-2 text-sm font-semibold shadow-sm cursor-default" style="background: #C97064">
                                     <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M18 9.5a1.5 1.5 0 11-3 0v-6a1.5 1.5 0 013 0v6zM14 9.667v-5.43a2 2 0 00-1.105-1.79l-.05-.025A4 4 0 0011.057 2H5.64a2 2 0 00-1.962 1.608l-1.2 6A2 2 0 004.44 12H8v4a2 2 0 002 2 1 1 0 001-1v-.667a4 4 0 01.8-2.4l1.4-1.866a4 4 0 00.8-2.4z"/></svg>
                                     Needs work
                                 </button>
@@ -1141,12 +1212,12 @@
                         </div>
                     </div>
                 </div>
-                <p class="mt-10 max-w-2xl mx-auto text-center text-text-mid">Observability tools were made for engineers. You won't convince anyone to sift through your OpenAI logs. Hook into your model calls with one line of code and serve a much nicer UI straight from your app.</p>
             </div>
 
             <!-- Pair 3: Edits — GitHub PR vs Mallet editor -->
             <div>
-                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Edits</p>
+                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-3">Edits</p>
+                <p class="mb-10 max-w-2xl mx-auto text-center text-text-mid">Your team submits draft changes to prompts which turn into PRs in the background. They never need to know what a PR even is.</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
                     <div>
                         <p class="text-xs font-mono font-bold text-text-muted uppercase tracking-widest mb-3 text-center">You see</p>
@@ -1220,7 +1291,7 @@
                                     <span title="Alice" class="h-6 w-6 rounded-full text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white" style="background: #D63384">A</span>
                                     <span title="Bob" class="h-6 w-6 rounded-full text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white" style="background: #2563EB">B</span>
                                 </div>
-                                <button class="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white whitespace-nowrap shrink-0 inline-flex items-center gap-1">
+                                <button tabindex="-1" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white whitespace-nowrap shrink-0 inline-flex items-center gap-1 cursor-default">
                                     <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 3.25a2.25 2.25 0 113 2.122v5.256a2.251 2.251 0 11-1.5 0V5.372A2.25 2.25 0 011.5 3.25zM11 2.5h-1V4h1a1 1 0 011 1v5.628a2.251 2.251 0 101.5 0V5A2.5 2.5 0 0011 2.5zm1 10.25a.75.75 0 111.5 0 .75.75 0 01-1.5 0zM3.75 12a.75.75 0 100 1.5.75.75 0 000-1.5zm0-9.5a.75.75 0 100 1.5.75.75 0 000-1.5z"/></svg>
                                     Submit
                                 </button>
@@ -1248,12 +1319,12 @@
                         </div>
                     </div>
                 </div>
-                <p class="mt-10 max-w-2xl mx-auto text-center text-text-mid">Your team can submit draft changes to prompts but you remain in control. The source of truth is your codebase, so those submissions turn into PRs in the background, and they never need to know what a PR even is.</p>
             </div>
 
             <!-- Pair 4: Evals — GH Actions failure vs Regression detail -->
             <div>
-                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-8">Evals</p>
+                <p class="font-display font-semibold text-2xl text-text-dark text-center mb-3">Evals</p>
+                <p class="mb-10 max-w-2xl mx-auto text-center text-text-mid">When output is reviewed, or prompts change, Gravel will automatically check against all past feedback and corrections. The golden set is built as they use it!</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
                     <div>
                         <p class="text-xs font-mono font-bold text-text-muted uppercase tracking-widest mb-3 text-center">You see</p>
@@ -1341,7 +1412,7 @@
                                 </div>
                             </div>
                             <div class="px-4 py-3 border-t border-warm flex items-center justify-center shrink-0">
-                                <button class="inline-flex items-center gap-1.5 rounded-lg bg-primary text-white px-4 py-2 text-sm font-semibold shadow-sm hover:bg-primary-dark transition">
+                                <button tabindex="-1" class="inline-flex items-center gap-1.5 rounded-lg bg-primary text-white px-4 py-2 text-sm font-semibold shadow-sm cursor-default">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
                                     Update prompt
                                 </button>
@@ -1349,7 +1420,6 @@
                         </div>
                     </div>
                 </div>
-                <p class="mt-10 max-w-2xl mx-auto text-center text-text-mid">Let's face it: two people can disagree on how the AI should behave. The same person can disagree on a different day. When output is reviewed, or prompts change, Gravel will automatically check against all past feedback and corrections. The golden set is built as they use it!</p>
             </div>
 
         </div>
@@ -1412,13 +1482,6 @@
             <div class="divide-y divide-warm">
                 <details class="group py-5" name="faq">
                     <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
-                        <span>Who built this?</span>
-                        <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
-                    </summary>
-                    <p class="mt-3 text-text-mid">The founders of <a href="https://artanis.ai/team" class="text-primary hover:text-primary-dark transition">Artanis</a> to better support their customers. Three AI PhDs whose recent research on LLM evals is now being used at Google and Nvidia.</p>
-                </details>
-                <details class="group py-5" name="faq">
-                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
                         <span>Is it really free?</span>
                         <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
                     </summary>
@@ -1426,17 +1489,24 @@
                 </details>
                 <details class="group py-5" name="faq">
                     <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
-                        <span>How do I get support?</span>
-                        <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
-                    </summary>
-                    <p class="mt-3 text-text-mid">We will answer you in three places: GitHub issues, <a href="mailto:team@artanis.ai" class="text-primary hover:text-primary-dark transition">team@artanis.ai</a>, or our Slack. Feel free to <a href="https://calendar.notion.so/meet/yousef/sam" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark transition">hop on a call</a> with us if you have any questions!</p>
-                </details>
-                <details class="group py-5" name="faq">
-                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
                         <span>How is this different from Langfuse / LangSmith?</span>
                         <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
                     </summary>
                     <p class="mt-3 text-text-mid">Those are built for engineers. Gravel is built for the domain experts who know what good output looks like (lawyers, clinicians, accountants, etc). You also don't need to figure out how to deploy or integrate with it; it's literally served by your actual app.</p>
+                </details>
+                <details class="group py-5" name="faq">
+                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
+                        <span>Who built this?</span>
+                        <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </summary>
+                    <p class="mt-3 text-text-mid">The founders of <a href="https://artanis.ai/team" class="text-primary hover:text-primary-dark transition">Artanis</a> to better support their customers. Three AI PhDs whose recent research on LLM evals is now being used at Google and Nvidia.</p>
+                </details>
+                <details class="group py-5" name="faq">
+                    <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
+                        <span>How do I get support?</span>
+                        <svg class="h-5 w-5 shrink-0 text-text-mid transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </summary>
+                    <p class="mt-3 text-text-mid">We will answer you in three places: GitHub issues, <a href="mailto:team@artanis.ai" class="text-primary hover:text-primary-dark transition">team@artanis.ai</a>, or our Slack. Feel free to <a href="https://calendar.notion.so/meet/yousef/sam" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark transition">hop on a call</a> with us if you have any questions!</p>
                 </details>
                 <details class="group py-5" name="faq">
                     <summary class="flex cursor-pointer items-center justify-between gap-3 list-none font-display text-lg font-semibold text-text-dark">
@@ -1558,6 +1628,13 @@
                     syncSlug()
                 })
             })
+        })();
+
+        // Slack mock — scroll the message list to the bottom on load
+        // so the latest "still merging conflicts" message is visible.
+        (function () {
+            const el = document.getElementById('slack-messages')
+            if (el) el.scrollTop = el.scrollHeight
         })();
 
         // Hero copy-to-clipboard buttons
