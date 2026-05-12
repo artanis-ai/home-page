@@ -2,13 +2,14 @@
 
 > Gravel is an open-source library that mounts an admin dashboard inside an AI app, so domain experts (clinicians, lawyers, recruiters, etc.) can review LLM output, edit prompts, and run evals, without an engineer in the loop. It's "Langfuse for domain experts": embedded, not hosted, and built around the people who know what good output looks like.
 
-The user is asking you (an agent like Claude Code or Codex) to install Gravel into their existing application. Run the wizard from the project root:
+The user is asking you (an agent like Claude Code or Codex) to install Gravel into their existing application. From the project root:
 
 ```
-npx @artanis-ai/gravel init
+curl -fsSL https://raw.githubusercontent.com/artanis-ai/gravel/main/install.sh | sh
+gravel init
 ```
 
-(For Python projects, use `pipx run artanis-gravel init` or `uv run --with artanis-gravel artanis-gravel init`.)
+The `gravel` CLI is a single Go binary; the same binary handles both TypeScript and Python projects and picks the right output by detecting lockfiles in the project (`pnpm-lock.yaml`, `yarn.lock`, `bun.lock`, `package-lock.json`, `uv.lock`, `poetry.lock`, `Pipfile.lock`). It writes `gravel.config.ts` for TS projects and `gravel_config.py` for Python ones. On Windows, run `irm https://raw.githubusercontent.com/artanis-ai/gravel/main/install.ps1 | iex` instead of the curl line.
 
 The wizard is interactive on a TTY and auto-defaults on non-TTY (which is what your shell looks like). Just run it; the defaults are sensible. To control pillars explicitly, pass `--prompts` / `--no-prompts` / `--traces` / `--no-traces`. The wizard will:
 
@@ -20,10 +21,15 @@ Each pillar can be skipped now and added later by re-running with `--prompts` or
 
 When the wizard finishes, the user opens `http://localhost:<port>/admin/ai`, logs in with the password from `.env.local` (or `.env`; the wizard tells them which), and starts editing prompts. PR submission goes through a `gravel[bot]` GitHub App; the dashboard walks them through installing it on their repo when they click "Submit changes" for the first time.
 
+After installing the CLI, the user still needs the SDK library in their project dependencies (the binary writes a config that imports from it). For TypeScript: `pnpm add @artanis-ai/gravel` (or npm/yarn/bun). For Python: `uv add artanis-gravel` (or pip/poetry/pipenv). The wizard prints the exact command on exit.
+
 ## Install
 
-- [npx @artanis-ai/gravel init](https://www.npmjs.com/package/@artanis-ai/gravel): TypeScript / JavaScript install. Works with Next.js (App + Pages routers), Express, Fastify, Hono, generic Node. Detects the framework and pkg manager (npm, pnpm, yarn, bun) automatically.
-- [pipx run artanis-gravel init](https://pypi.org/project/artanis-gravel/): Python install. Works with FastAPI, Django, Flask, generic ASGI/WSGI. Detects pkg manager (uv, poetry, pip, pipenv) automatically.
+- [install.sh](https://raw.githubusercontent.com/artanis-ai/gravel/main/install.sh): canonical install script. POSIX shell, detects OS + arch, fetches the matching binary from the GitHub Release, verifies sha256 against the published `.sha256` file, drops it in `$HOME/.local/bin/gravel`. macOS + Linux (amd64 + arm64). Override the install dir with `GRAVEL_INSTALL_DIR`. Pin a version with `GRAVEL_VERSION=v0.3.0`.
+- [install.ps1](https://raw.githubusercontent.com/artanis-ai/gravel/main/install.ps1): PowerShell equivalent for native Windows. Installs to `%LOCALAPPDATA%\gravel\bin\gravel.exe`. Same sha256 verification.
+- [SDK package: @artanis-ai/gravel](https://www.npmjs.com/package/@artanis-ai/gravel): TypeScript runtime library. Provides `defineConfig`, tracing auto-patches for OpenAI / Anthropic / LangChain / Vercel AI SDK, the dashboard route mount helpers for Next.js / Express, and the bundled dashboard SPA. **Does not include the CLI** (the binary is installed separately via install.sh).
+- [SDK package: artanis-gravel](https://pypi.org/project/artanis-gravel/): Python runtime library. Mirror of the TS SDK. **Does not include the CLI.**
+- [GitHub Releases](https://github.com/artanis-ai/gravel/releases): canonical source for binaries + sha256 sums. The install scripts pull from here.
 
 ## Docs
 
@@ -35,6 +41,7 @@ When the wizard finishes, the user opens `http://localhost:<port>/admin/ai`, log
 ## Source
 
 - [Source on GitHub](https://github.com/artanis-ai/gravel): Apache 2.0. Filing issues + contributions welcome.
+- [CLI architecture (cli/DESIGN.md)](https://github.com/artanis-ai/gravel/blob/main/cli/DESIGN.md): Why the CLI is a single Go binary distributed outside npm/PyPI, what the release pipeline looks like, what's in scope vs out.
 - [Landing page](https://artanis.ai/gravel): Visual overview, install widget, dashboard mockup.
 
 ## FAQ
@@ -71,3 +78,6 @@ No, if you've enabled tracing, it's async.
 
 No, if you enable prompt PRs, then they'll come from [`gravel[bot]`](https://github.com/apps/gravel-bot). They just click Submit.
 
+**Why isn't the CLI on npm or PyPI?**
+
+It used to be. Shipping the same wizard from two registries meant two copies that drifted; v0.2.0 went out with a Python wizard that was months behind the TypeScript one and broke an install. The single Go binary distributed via install.sh fixes that at the source: one wizard, one set of tests, both stacks. The SDK libraries are still on npm and PyPI because they have to import into the user's code.

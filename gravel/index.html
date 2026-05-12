@@ -212,35 +212,60 @@
                           (and a longer companion at /llms-full.txt if the site adds one). It
                           tells you which command to run, what each pillar of the wizard does,
                           and which prompts you should NOT try to skip.
+
+                          The CLI is a single Go binary (see github.com/artanis-ai/gravel/cli),
+                          distributed via install.sh from signed GitHub Release assets. Same
+                          binary detects + drives TypeScript and Python projects, so the install
+                          tabs are split by OS, not language.
                         -->
-                        <div class="mt-3 max-w-sm rounded-xl ring-1 ring-earth-dark/10 shadow-xl shadow-earth-dark/10 overflow-hidden" style="background: #1a1208">
+                        <div class="mt-3 max-w-md rounded-xl ring-1 ring-earth-dark/10 shadow-xl shadow-earth-dark/10 overflow-hidden" style="background: #1a1208">
                             <div class="flex items-center border-b" style="border-color: rgba(245, 237, 227, 0.10)">
-                                <button type="button" class="install-tab cursor-pointer px-5 py-3 text-sm font-medium transition" data-tab="ts" data-active="true">TypeScript</button>
-                                <button type="button" class="install-tab cursor-pointer px-5 py-3 text-sm font-medium transition" data-tab="py" data-active="false">Python</button>
-                                <button type="button" class="install-tab cursor-pointer px-5 py-3 text-sm font-medium transition" data-tab="agent" data-active="false">Agents</button>
+                                <button type="button" class="install-tab cursor-pointer px-4 py-3 text-sm font-medium transition" data-tab="unix" data-active="true">macOS / Linux</button>
+                                <button type="button" class="install-tab cursor-pointer px-4 py-3 text-sm font-medium transition" data-tab="windows" data-active="false">Windows</button>
+                                <button type="button" class="install-tab cursor-pointer px-4 py-3 text-sm font-medium transition" data-tab="agent" data-active="false">Agents</button>
                             </div>
-                            <div class="install-pane flex items-center gap-3 px-5 py-4 font-mono text-[13px] sm:text-sm" data-tab="ts" data-active="true">
-                                <span class="select-none text-primary-light">$</span>
-                                <span class="flex-1 text-warm"><span class="text-warm/45">npx</span> @artanis-ai/gravel init</span>
-                                <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition" data-copy="npx @artanis-ai/gravel init" aria-label="Copy command">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                                </button>
+                            <div class="install-pane px-5 py-4 font-mono text-[12px] sm:text-[13px]" data-tab="unix" data-active="true">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-1 space-y-1.5 break-all">
+                                        <div class="flex items-baseline gap-2">
+                                            <span class="select-none text-primary-light">$</span>
+                                            <span class="text-warm"><span class="text-warm/45">curl -fsSL</span> https://raw.githubusercontent.com/artanis-ai/gravel/main/install.sh <span class="text-warm/45">| sh</span></span>
+                                        </div>
+                                        <div class="flex items-baseline gap-2">
+                                            <span class="select-none text-primary-light">$</span>
+                                            <span class="text-warm">gravel init</span>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition mt-0.5" data-copy="curl -fsSL https://raw.githubusercontent.com/artanis-ai/gravel/main/install.sh | sh&#10;gravel init" aria-label="Copy commands">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="install-pane flex items-center gap-3 px-5 py-4 font-mono text-[13px] sm:text-sm" data-tab="py" data-active="false">
-                                <span class="select-none text-primary-light">$</span>
-                                <span class="flex-1 text-warm"><span class="text-warm/45">pipx run</span> artanis-gravel init</span>
-                                <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition" data-copy="pipx run artanis-gravel init" aria-label="Copy command">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                                </button>
+                            <div class="install-pane px-5 py-4 font-mono text-[12px] sm:text-[13px]" data-tab="windows" data-active="false">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-1 space-y-1.5 break-all">
+                                        <div class="flex items-baseline gap-2">
+                                            <span class="select-none text-primary-light">&gt;</span>
+                                            <span class="text-warm"><span class="text-warm/45">irm</span> https://raw.githubusercontent.com/artanis-ai/gravel/main/install.ps1 <span class="text-warm/45">| iex</span></span>
+                                        </div>
+                                        <div class="flex items-baseline gap-2">
+                                            <span class="select-none text-primary-light">&gt;</span>
+                                            <span class="text-warm">gravel init</span>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition mt-0.5" data-copy="irm https://raw.githubusercontent.com/artanis-ai/gravel/main/install.ps1 | iex&#10;gravel init" aria-label="Copy commands">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                    </button>
+                                </div>
                             </div>
                             <!--
                               Agents tab: paste the line below to your coding agent (Claude
-                              Code, Codex, Cursor, etc.) — the URL points at /llms.txt which
+                              Code, Codex, Cursor, etc.). The URL points at /llms.txt which
                               the agent will fetch and use to drive the install correctly.
                             -->
-                            <div class="install-pane flex items-center gap-3 px-5 py-4 font-mono text-[13px] sm:text-sm" data-tab="agent" data-active="false">
+                            <div class="install-pane flex items-center gap-3 px-5 py-4 font-mono text-[12px] sm:text-[13px]" data-tab="agent" data-active="false">
                                 <span class="select-none text-primary-light">›</span>
-                                <span class="flex-1 text-warm">Install <span class="text-warm/65">https://artanis.ai/gravel/llms.txt</span></span>
+                                <span class="flex-1 text-warm break-all">Install <span class="text-warm/65">https://artanis.ai/gravel/llms.txt</span></span>
                                 <button type="button" class="copy-btn cursor-pointer text-warm/45 hover:text-warm transition" data-copy="Install https://artanis.ai/gravel/llms.txt" aria-label="Copy instruction">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                                 </button>
