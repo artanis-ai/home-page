@@ -48,12 +48,9 @@ When the wizard finishes, the user opens `http://localhost:<port>/admin/ai`, log
 - [install.ps1](https://raw.githubusercontent.com/artanis-ai/gravel/main/install.ps1): direct binary install for native Windows.
 - [GitHub Releases](https://github.com/artanis-ai/gravel/releases): canonical source for binaries + sha256 sums. All three install paths pull from here. Pin a version with `GRAVEL_VERSION=v0.4.0`; mirror the assets internally via `GRAVEL_RELEASES_BASE_URL`.
 
-## Docs
+## Architecture
 
-- [Quickstart](https://gravel.artanis.ai/docs/quickstart): The one-minute version. Install, mount, log in, see your first prompt.
-- [Concepts: data residency](https://gravel.artanis.ai/docs/concepts/data-residency): What goes where. Two tables in the customer's DB (`gravel_samples`, `gravel_feedback`); trace-eval calls cross the trust boundary; everything else stays local.
-- [Concepts: prompts as code](https://gravel.artanis.ai/docs/concepts/prompts-as-code): How Gravel handles prompts in `.md` files vs string literals in source. The manifest format. PR-driven editing.
-- [Reference: gravel.config.ts](https://gravel.artanis.ai/docs/reference/config): All config fields. `auth.getUser` for plugging into the host's existing auth. `database` is optional; omitting it gives you prompts-only mode.
+Two tables in the customer's DB (`gravel_samples`, `gravel_feedback`); the manifest at `.gravel/manifest.json` is the source of truth for prompts; trace-eval calls cross the trust boundary to the Artanis judge service for paid scoring; everything else stays local. Prompts live where they live in the host repo (`.md` / `.txt` files OR string literals discovered by deep-scan); edits become PRs via the `gravel[bot]` GitHub App. The full data-plane / control-plane split is described in [ARCHITECTURE.md](https://github.com/artanis-ai/gravel/blob/main/ARCHITECTURE.md).
 
 ## Source
 
