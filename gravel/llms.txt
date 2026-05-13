@@ -50,7 +50,7 @@ When the wizard finishes, the user opens `http://localhost:<port>/admin/ai`, log
 
 ## Architecture
 
-Two tables in the customer's DB (`gravel_samples`, `gravel_feedback`); the manifest at `.gravel/manifest.json` is the source of truth for prompts; trace-eval calls cross the trust boundary to the Artanis judge service for paid scoring; everything else stays local. Prompts live where they live in the host repo (`.md` / `.txt` files OR string literals discovered by deep-scan); edits become PRs via the `gravel[bot]` GitHub App. The full data-plane / control-plane split is described in [ARCHITECTURE.md](https://github.com/artanis-ai/gravel/blob/main/ARCHITECTURE.md).
+Two tables go into the user's existing database (`gravel_samples`, `gravel_feedback`); the manifest at `.gravel/manifest.json` (inside their repo) is the source of truth for prompts. Trace-eval calls cross the trust boundary to the Artanis judge service for paid scoring; everything else stays local. Prompts live where they live in the user's repo (`.md` / `.txt` files OR string literals the deep-scan finds); edits become PRs via the `gravel[bot]` GitHub App. The full data-plane / control-plane split is described in [ARCHITECTURE.md](https://github.com/artanis-ai/gravel/blob/main/ARCHITECTURE.md).
 
 ## Source
 
