@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!--
+  Iteration harness for /img/gravel-og.png. Shows the current PNG plus
+  the raw og.html source rendered live, in three preview frames (Slack,
+  X/Twitter, iMessage) so it's easy to spot what reads vs what doesn't.
+  Reload after rerunning `node scripts/build-gravel-og.mjs`.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Gravel OG preview</title>
+<style>
+  body {
+    font: 14px/1.4 -apple-system, system-ui, sans-serif;
+    background: #f6f8fa;
+    color: #1f2328;
+    margin: 0;
+    padding: 32px;
+  }
+  h1 { font-size: 20px; margin: 0 0 24px; }
+  h2 { font-size: 14px; color: #57606a; text-transform: uppercase; letter-spacing: 0.06em; margin: 24px 0 8px; font-weight: 600; }
+  .row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 1400px; }
+  .stack { display: flex; flex-direction: column; gap: 24px; }
+  .frame {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    max-width: 600px;
+  }
+  .frame img.og {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #d0d7de;
+  }
+  /* Slack-style preview frame */
+  .slack { background: white; border-left: 4px solid #d0d7de; padding: 12px 16px; border-radius: 4px; }
+  .slack .title { color: #1d1c1d; font-weight: 700; margin-bottom: 4px; }
+  .slack .desc { color: #616061; font-size: 13px; margin-bottom: 8px; }
+  .slack .url { color: #616061; font-size: 12px; }
+  .slack img { width: 100%; max-width: 480px; border-radius: 8px; margin-top: 8px; border: 1px solid #d0d7de; }
+  /* Twitter-style preview frame */
+  .twitter { border: 1px solid #cfd9de; border-radius: 16px; overflow: hidden; }
+  .twitter img { width: 100%; display: block; }
+  .twitter .meta { padding: 10px 14px; }
+  .twitter .domain { color: #536471; font-size: 13px; }
+  .twitter .title { color: #0f1419; font-weight: 500; font-size: 15px; margin-top: 2px; }
+  .twitter .desc { color: #536471; font-size: 13px; margin-top: 2px; }
+  /* iMessage style preview frame */
+  .imessage { background: #e4e4e9; border-radius: 18px; padding: 6px; max-width: 360px; }
+  .imessage img { width: 100%; display: block; border-radius: 14px 14px 0 0; }
+  .imessage .meta { padding: 8px 12px 10px; background: #f2f2f7; border-radius: 0 0 14px 14px; }
+  .imessage .title { color: #1c1c1e; font-weight: 600; font-size: 13px; }
+  .imessage .desc { color: #6c6c70; font-size: 12px; margin-top: 2px; }
+  .imessage .url { color: #6c6c70; font-size: 11px; margin-top: 4px; }
+  iframe.source {
+    width: 1200px;
+    height: 630px;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    background: white;
+    transform: scale(0.5);
+    transform-origin: top left;
+    margin-bottom: -315px; /* compensate for scale */
+    margin-right: -600px;
+  }
+  .scaled-wrap { width: 600px; height: 315px; overflow: hidden; }
+  details { background: #fff; padding: 8px 12px; border-radius: 6px; margin-bottom: 16px; }
+  code { background: #f0f3f6; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>Gravel social-card preview</h1>
+<details>
+  <summary>How to iterate</summary>
+  <p>Edit <code>gravel/og.html</code>. Rerun <code>node scripts/build-gravel-og.mjs</code>. Hard-reload this page (Cmd-Shift-R) to see the rebuilt PNG. The "Live HTML source" panel on the right shows what the renderer is looking at, scaled down — so layout issues are visible without re-rendering.</p>
+</details>
+
+<div class="row">
+
+<div class="stack">
+  <h2>Generated PNG (img/gravel-og.png)</h2>
+  <div class="frame">
+    <img class="og" src="/img/gravel-og.png" alt="Gravel OG image">
+  </div>
+
+  <h2>Slack unfurl</h2>
+  <div class="frame">
+    <div class="slack">
+      <div class="title">Gravel · Cross-team prompt updates for vertical agents</div>
+      <div class="desc">Open-source library that mounts an admin dashboard inside your AI app. Domain experts edit prompts (kept in your git) and review output without engineers in the loop.</div>
+      <div class="url">artanis.ai</div>
+      <img src="/img/gravel-og.png" alt="">
+    </div>
+  </div>
+</div>
+
+<div class="stack">
+  <h2>Live HTML source (scaled 50%)</h2>
+  <div class="scaled-wrap">
+    <iframe class="source" src="/gravel/og.html"></iframe>
+  </div>
+
+  <h2>X / Twitter card</h2>
+  <div class="frame">
+    <div class="twitter">
+      <img src="/img/gravel-og.png" alt="">
+      <div class="meta">
+        <div class="domain">artanis.ai</div>
+        <div class="title">Gravel · Cross-team prompt updates for vertical agents</div>
+        <div class="desc">Open-source library that mounts an admin dashboard inside your AI app.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>iMessage</h2>
+  <div class="imessage">
+    <img src="/img/gravel-og.png" alt="">
+    <div class="meta">
+      <div class="title">Gravel · Cross-team prompt updates for vertical agents</div>
+      <div class="desc">Open-source library that mounts an admin dashboard inside your AI app.</div>
+      <div class="url">artanis.ai</div>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
