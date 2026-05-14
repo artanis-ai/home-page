@@ -2,23 +2,23 @@
 
 > Gravel is an open-source library that mounts an admin dashboard inside an AI app, so domain experts (clinicians, lawyers, recruiters, etc.) can review LLM output, edit prompts, and run evals, without an engineer in the loop. It's "Langfuse for domain experts": embedded, not hosted, and built around the people who know what good output looks like.
 
-The user is asking you (an agent like Claude Code or Codex) to install Gravel into their existing application. From the project root, run the single-command installer for the user's stack. The wizard auto-adds the SDK to the project's deps so the generated config resolves at runtime — you don't need a separate install step.
+The user is asking you (an agent like Claude Code or Codex) to install Gravel into their existing application. From the project root, run the single-command installer for the user's stack. **Pass `--yes` so the wizard runs fully non-interactively** — agent shells aren't a TTY and the wizard's interactive prompts (mount path, deep-scan accept/deny, "did I find everything?") will block waiting for input that never arrives. The wizard auto-adds the SDK to the project's deps so the generated config resolves at runtime — you don't need a separate install step.
 
 **TypeScript projects**:
 
 ```
-npx @artanis-ai/gravel init
+npx -y @artanis-ai/gravel init --yes
 ```
 
-(Equivalent: `pnpm dlx @artanis-ai/gravel init`, `yarn dlx @artanis-ai/gravel init`, `bunx @artanis-ai/gravel init`.)
+(Equivalent: `pnpm dlx @artanis-ai/gravel init --yes`, `yarn dlx @artanis-ai/gravel init --yes`, `bunx @artanis-ai/gravel init --yes`.)
 
 **Python projects**:
 
 ```
-uvx artanis-gravel init
+uvx artanis-gravel init --yes
 ```
 
-(Equivalent: `pipx run artanis-gravel init`.)
+(Equivalent: `pipx run artanis-gravel init --yes`.)
 
 Under the hood: the wrapper (in `node_modules/@artanis-ai/gravel/bin/gravel.js` for npm, or `artanis_gravel._cli` for PyPI) fetches the matching Go binary from `github.com/artanis-ai/gravel/releases` on first invocation, sha256-verifies it, caches it at `~/.cache/artanis-gravel/v<version>/`, and execs it. The Go binary then runs the wizard, which detects the project's package manager from lockfiles and adds `@artanis-ai/gravel` (or `artanis-gravel`) to its dependencies before writing config files.
 
@@ -30,7 +30,7 @@ curl -fsSL https://raw.githubusercontent.com/artanis-ai/gravel/main/install.sh |
 
 (Windows PowerShell: `irm https://raw.githubusercontent.com/artanis-ai/gravel/main/install.ps1 | iex`.)
 
-The wizard is interactive on a TTY and auto-defaults on non-TTY (which is what your shell looks like). Just run it; the defaults are sensible. To control pillars explicitly, pass `--prompts` / `--no-prompts` / `--traces` / `--no-traces`. The wizard will:
+`--yes` (alias `--non-interactive`) accepts the default for every prompt without asking: the dashboard mounts at `/admin/ai`, the prompt scan accepts all hits, the deep-scan "did I find everything?" loop is skipped, and tracing is wired up if a `DATABASE_URL` is present (otherwise prompts-only). To control pillars explicitly alongside `--yes`, pass `--prompts` / `--no-prompts` / `--traces` / `--no-traces`. To override the mount path, pass `--mount-path /your/path`. The wizard will:
 
 1. **Mount the dashboard** at `/admin/ai` inside the user's app, write a `gravel.config.ts` (or `gravel_config.py`), and put an admin password in `.env.local` (or `.env`). The mount path is the only thing the user can override here.
 2. **Discover prompts** via a regex scan of conventional dirs (`prompts/`, `templates/`, etc., for `.md` / `.txt` files), then walk through each finding for accept/deny. After that it asks "Did I find everything?". If no, the user can either run a deeper LLM-assisted scan (delegated to whichever coding agent is on PATH: Claude Code, Codex) or specify file paths manually with optional line ranges.
