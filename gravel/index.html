@@ -155,6 +155,23 @@
             0%, 50% { opacity: 1; }
             50.01%, 100% { opacity: 0; }
         }
+        /* Subtle scale pulse on the URL bar host. The viewer's eye
+           lands on "your-app.com" → instantly understands the
+           dashboard is mounted INSIDE their own app. Reduced-motion
+           preference disables it. */
+        .your-app-pulse {
+            display: inline-block;
+            transform-origin: left center;
+            animation: your-app-pulse 2.6s ease-in-out infinite;
+        }
+        @keyframes your-app-pulse {
+            0%, 100% { transform: scale(1); }
+            45% { transform: scale(1.12); }
+            55% { transform: scale(1.12); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .your-app-pulse { animation: none; }
+        }
 
         /* Hero dashboard tabs — segmented control pill that matches
            Layout.tsx's Tabs component (rounded card raised on bg-warm/80
@@ -372,7 +389,7 @@
                                     <span class="h-3 w-3 rounded-full bg-accent/60"></span>
                                     <span class="h-3 w-3 rounded-full bg-forest/50"></span>
                                 </div>
-                                <div class="ml-3 flex-1 truncate rounded-md bg-cream px-3 py-1 text-xs font-mono"><span class="font-bold text-primary">your-app.com</span><span class="text-text-muted">/admin/ai/</span><span class="text-text-muted" id="dash-url-slug">prompts</span></div>
+                                <div class="ml-3 flex-1 truncate rounded-md bg-cream px-3 py-1 text-xs font-mono"><span class="font-bold text-primary your-app-pulse">your-app.com</span><span class="text-text-muted">/admin/ai/</span><span class="text-text-muted" id="dash-url-slug">prompts</span></div>
                             </div>
 
                             <!-- App chrome. Mirrors packages/dashboard/src/components/Layout.tsx

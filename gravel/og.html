@@ -108,13 +108,21 @@
       border-radius: 11px;
       padding: 13px 20px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 28px;
+      font-size: 32px;
       display: flex;
-      align-items: center;
+      align-items: baseline;
+      gap: 1px;
     }
+    /* "your-app.com" is the hook — it's how a reader instantly
+       understands the dashboard mounts INSIDE their own app. Bigger
+       than the path, with a faint underline-style emphasis. */
     .url-bar .host {
       color: #9B4340;
       font-weight: 700;
+      font-size: 40px;
+      letter-spacing: -0.01em;
+      border-bottom: 3px solid rgba(155, 67, 64, 0.35);
+      padding-bottom: 1px;
     }
     .url-bar .path {
       color: #6B5744;
@@ -211,7 +219,7 @@
         <span class="brand">Gravel</span>
       </div>
       <div class="tagline">
-        Cross-team prompt updates<br>for <span class="accent">vertical</span> agents
+        Prompt management<br>for <span class="accent">vertical</span> agents
       </div>
     </div>
 
