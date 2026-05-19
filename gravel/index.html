@@ -155,19 +155,23 @@
             0%, 50% { opacity: 1; }
             50.01%, 100% { opacity: 0; }
         }
-        /* Subtle scale pulse on the URL bar host. The viewer's eye
-           lands on "your-app.com" → instantly understands the
-           dashboard is mounted INSIDE their own app. Reduced-motion
-           preference disables it. */
+        /* Attention pulse on the URL bar host. The viewer's eye lands
+           on "your-app.com" → instantly understands the dashboard is
+           mounted INSIDE their own app. Layout-stable (no transform);
+           pulses a coloured text-shadow glow + a brief underline so
+           neighbours don't shift. Reduced-motion disables it. */
         .your-app-pulse {
-            display: inline-block;
-            transform-origin: left center;
+            position: relative;
+            text-shadow: 0 0 0 transparent;
             animation: your-app-pulse 2.6s ease-in-out infinite;
         }
         @keyframes your-app-pulse {
-            0%, 100% { transform: scale(1); }
-            45% { transform: scale(1.12); }
-            55% { transform: scale(1.12); }
+            0%, 100% {
+                text-shadow: 0 0 0 rgba(196, 78, 70, 0);
+            }
+            50% {
+                text-shadow: 0 0 14px rgba(196, 78, 70, 0.55);
+            }
         }
         @media (prefers-reduced-motion: reduce) {
             .your-app-pulse { animation: none; }
