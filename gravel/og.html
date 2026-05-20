@@ -97,8 +97,8 @@
       background: #F0E6D8;
       border-bottom: 1px solid rgba(46, 24, 16, 0.08);
     }
-    .dots { display: flex; gap: 11px; }
-    .dot { width: 22px; height: 22px; border-radius: 999px; }
+    .dots { display: flex; gap: 14px; }
+    .dot { width: 28px; height: 28px; border-radius: 999px; }
     .dot.r { background: #C97064; }
     .dot.y { background: #D4A76A; }
     .dot.g { background: #4A7C59; }
@@ -110,8 +110,20 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 32px;
       display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .url-bar .lock {
+      width: 38px;
+      height: 38px;
+      color: #6B5744;
+      flex-shrink: 0;
+    }
+    .url-bar .url-text {
+      display: flex;
       align-items: baseline;
       gap: 1px;
+      min-width: 0;
     }
     /* "your-app.com" is the hook — it's how a reader instantly
        understands the dashboard mounts INSIDE their own app. Bigger
@@ -228,7 +240,11 @@
       <div class="chrome">
         <span class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></span>
         <div class="url-bar">
-          <span class="host">your-app.com</span><span class="path">/admin/ai/prompts/triage.md</span>
+          <svg class="lock" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="5" y="11" width="14" height="9" rx="2"/>
+            <path d="M8 11V8a4 4 0 0 1 8 0v3" stroke-linecap="round"/>
+          </svg>
+          <span class="url-text"><span class="host">your-app.com</span><span class="path">/admin/ai/prompts/triage.md</span></span>
         </div>
       </div>
 
@@ -241,7 +257,7 @@
           </span>
           <span class="tab inactive">
             <svg fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6"/><polyline points="14 3 14 9 20 9"/><circle cx="17" cy="17" r="3"/><line x1="19.2" y1="19.2" x2="22" y2="22"/></svg>
-            Reviews
+            Review
           </span>
         </div>
       </div>
