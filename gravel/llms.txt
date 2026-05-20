@@ -2,11 +2,54 @@
 
 > Gravel is an open-source library that mounts an admin dashboard inside an AI app, so domain experts (clinicians, lawyers, recruiters, etc.) can review LLM output, edit prompts, and run evals, without an engineer in the loop. It's "Langfuse for domain experts": embedded, not hosted, and built around the people who know what good output looks like.
 
-The user is asking you (an agent like Claude Code or Codex) to install Gravel into their existing application. **Do not run the whole wizard non-interactively** — walk the user through it like the interactive wizard would, asking consent at each pillar (mount / prompts / traces) and narrating what's about to change. The CLI exposes step subcommands designed for this exact flow.
+The user is asking you (an agent like Claude Code or Codex) to install Gravel into their existing application. **Run as the wizard would.** Walk pillar-by-pillar (mount / prompts / traces). Tell the user what's about to happen in one short sentence. Wait for "yes". Apply. Tell them what happened. Ask if they want the next pillar. Never pile on caveats or risk language — short and direct keeps confidence high.
+
+## Step 0 — version check FIRST (always)
+
+**Before any other step**, find out whether the project already has Gravel and whether you're about to use the latest CLI. Two failure modes this prevents:
+
+- The project has an old `artanis-gravel` / `@artanis-ai/gravel` pin (e.g. `0.5.5`). Without an upgrade, you'll drive the new flow against a binary that doesn't have it — silently producing wrong output (e.g. missing manifest explainers in PRs, stale CLI subcommands).
+- The CLI you're about to invoke is locally cached at a stale version.
+
+Run:
+
+```
+uvx --from artanis-gravel gravel doctor --json   # Python projects
+npx -y @artanis-ai/gravel doctor --json          # TS projects
+```
+
+`gravel doctor --json` emits `{installed, latest, outdated, install_hint}`. If `outdated: true`, **ask the user before upgrading**:
+
+> Your project is on `artanis-gravel==0.5.5`. The latest is `0.9.0` (which is what these install steps assume). Want me to upgrade before continuing? It's a one-line change to your pyproject.toml.
+
+On yes, run the upgrade command from `install_hint` (e.g. `uv add 'artanis-gravel>=0.9.0' --upgrade`). Re-run `doctor` to confirm `outdated: false`. Only then proceed.
+
+If gravel isn't installed yet, skip the upgrade dance — Step 1 will install it.
+
+## Use TodoWrite (or your harness's equivalent) up front
+
+Right after Step 0, lay out the whole install plan as a checklist the user can see. In Claude Code this is `TodoWrite`; other harnesses have equivalents. Use exactly this shape so the user sees the phases:
+
+1. Detect the stack
+2. Mount the dashboard
+3. Index the prompts
+4. Wire up traces (optional)
+5. Send install feedback to the maintainer (optional)
+
+Mark each item `in_progress` as you start it, `completed` when the user has verified the result. Pause between items — never run two pillars back-to-back without checking with the user first.
+
+## Narration discipline (read this BEFORE applying anything)
+
+The user is trusting you to drive a tool you've never used in their codebase. The narration that earns that trust is **short, specific, and confident**:
+
+- **One sentence before each action.** "Writing `gravel.config.py` and `gravel_route.py`, plus adding the admin password to `.env.local`." That's the whole pre-action message.
+- **One sentence after.** "Done. Dashboard mounts at `http://localhost:8000/admin/ai`. Load it in a browser and tell me what you see."
+- **Never use hedging language.** "It's safe", "this might be risky", "I'm not sure if…" — these read as fear. If you actually aren't sure, ask a specific question (e.g. "you have a `db/` and a `migrations/` directory — which one holds your schema?") instead of broadcasting doubt.
+- **Don't offer to skip things by default.** The pillars are independent; the user decides what to skip.
 
 ## How to drive the install (the agent contract)
 
-The install has three independent pillars. For each one, you call `gravel <pillar> --plan` first (no writes; emits a JSON action list), tell the user what would happen, ask for consent in their words, and only then call `gravel <pillar> --apply`.
+The install has three independent pillars. For each one, you call `gravel <pillar> --plan` first (no writes; emits a JSON action list), tell the user in one sentence what would happen, wait for yes, then call `gravel <pillar> --apply`. After `--apply`, ask the user to verify the visible result, then ask if they want to continue to the next pillar.
 
 ### 1. Detect the stack
 
@@ -14,7 +57,7 @@ The install has three independent pillars. For each one, you call `gravel <pilla
 gravel detect --json
 ```
 
-Returns a stable JSON document describing language, framework, package manager, DB driver, auth provider, LLM SDKs in scope, and whether the repo is a git checkout. Print a one-sentence summary to the user so they know what you're seeing ("Detected Python + FastAPI + Postgres, with OpenAI and Anthropic SDKs"). Do **not** skip this step — it's how the rest of the conversation has the right context.
+Returns a stable JSON document describing language, framework, package manager, DB driver, auth provider, LLM SDKs in scope, and whether the repo is a git checkout. Print a one-sentence summary so the user sees what you see ("Detected Python + FastAPI + Postgres, with OpenAI and Anthropic SDKs"). Do **not** skip this step.
 
 ### 2. Pillar 1 — Dashboard (mount)
 
@@ -23,28 +66,36 @@ gravel mount --plan
 gravel mount --apply
 ```
 
-Mount installs the admin UI route + writes `gravel.config.{ts,py}` + generates a 32-byte admin password into `.env.local` + patches host-framework wiring (Next.js trailing-slash redirect, Clerk middleware publicRoutes, Vercel rewrites, FastAPI router include). The `--plan` JSON's `actions[]` lists every file it would touch with a one-line summary.
+Mount writes `gravel.config.{ts,py}` + the mount route + a 32-byte `GRAVEL_ADMIN_PASSWORD` in `.env.local`. It also patches host-framework wiring when relevant (Next.js trailing-slash redirect, Clerk middleware publicRoutes, Vercel rewrites, FastAPI router include) — all idempotent.
 
-**Walk the user through it.** Example:
+**About the admin password (explain when the topic comes up):** `GRAVEL_ADMIN_PASSWORD` is the *default* auth. Anyone who hits `/admin/ai` and enters that password becomes admin. In a localhost dev session the password is bypassed entirely (the SDK auto-admits requests from loopback). In production, the password is the simplest possible gate — you set it once, share it with your team. **If the user has real auth wired (Clerk, Auth0, NextAuth, custom), they don't need the password.** They wire `getUser` in `gravel.config.{ts,py}` to return a `{ id, role: 'admin' | 'user' }` from their existing session, and the password becomes irrelevant (the SDK warns and ignores it). Tell the user this *before* they ask "what's this password for?" — it's the single most common confusion point. Keep it short:
 
-> I'm about to mount the dashboard at `/admin/ai` and write five files: `gravel.config.py`, the mount route, the admin password into `.env.local`, plus patches to your Clerk middleware so the dashboard isn't auth-gated. OK to proceed?
+> The password is a fallback for projects without their own auth. Your Clerk session takes over once we wire `getUser` (one line in `gravel.config.py`), and the password is then ignored.
 
-Only run `--apply` on a yes. After applying, tell them where the dashboard will be reachable (the wizard prints the URL).
+**After apply, checkpoint with the user.** Don't move on until they've verified:
 
-### 3. Pillar 2 — Prompts (manifest + hook)
+> Dashboard mounted at `<mountPath>`. Load `http://<your-dev-url>/admin/ai/` in a browser — does it show the Prompts/Review tabs?
+
+If yes, ask:
+
+> Want me to scan your codebase for prompts and register them with the dashboard now?
+
+If no, debug what they're seeing before continuing.
+
+### 3. Pillar 2 — Prompts (manifest)
 
 ```
 gravel prompts --plan
 gravel prompts --apply --accept-all
 ```
 
-Scans conventional prompt dirs (`prompts/`, `templates/`, `assistants/`, `agents/`, `prompt/`) and any custom roots set in `gravel_config`. Writes `.gravel/manifest.json` indexing each prompt by id/path/hash. Optionally installs a pre-commit hook so the manifest stays in sync.
+Walks the repo (`git ls-files` when available; a `.gitignore`-respecting filesystem walk otherwise) and indexes every `.md` / `.markdown` / `.txt` / `.mdx` / `.mdc` file it finds. Writes `.gravel/manifest.json` keying each prompt by id/path/hash. `--accept-all` is required from agents (the human flow `gravel init` confirms per-prompt; agents drive in one shot).
 
-`--accept-all` is required from agents (humans use the interactive `gravel init` flow that asks per-prompt). If the user's prompts aren't under the conventional dirs, tell them: "I didn't find your prompts where I expected. Where do you keep them?" — then add their paths to `promptScanRoots` in `gravel_config` and re-plan.
+**Pre-commit hook is opt-in.** By default no hook is installed. If you want one (catches manifest drift in CI before merge), pass `--with-hook` on apply OR ask the user explicitly:
 
-**Ask before applying.** Example:
+> I can also install a pre-commit hook that runs `gravel manifest check` before each commit so the manifest stays in sync with the source files. Want it?
 
-> I found 5 prompts under `api/py/prompts/`. I'm about to write `.gravel/manifest.json` and install a pre-commit hook so the manifest stays in sync on commit. OK?
+If yes → re-run apply with `--with-hook`. If no → skip.
 
 ### 4. Pillar 3 — Traces (DB tables + auto-tracing)
 
@@ -53,9 +104,13 @@ gravel traces --plan
 gravel traces --apply
 ```
 
-Traces is **opt-in**. If the user just wants the prompt editor (no LLM-call observability), skip this pillar entirely — Gravel is designed to work prompts-only with no DB tables and no `DATABASE_URL`.
+Traces is **opt-in**. If the user just wants the prompt editor (no LLM-call observability), skip this pillar entirely. Gravel is designed to work prompts-only with no DB tables, no `DATABASE_URL`, no Postgres driver needed.
 
-If the user does want traces: `--plan` first. The plan may come back with a `blockers[]` if `DATABASE_URL` is missing, has placeholder credentials, or is unreachable — surface those to the user as questions, not warnings (they need real creds before this can run). On a successful plan, ask:
+If the user does want traces: `--plan` first. The plan may come back with `blockers[]` if `DATABASE_URL` is missing, points at a placeholder, or is unreachable. Surface those as concrete questions ("your `.env.local` has `DATABASE_URL=postgres://user:pass@host/db` — is that real?") not warnings.
+
+**Driver detection.** If you detect Python + `DATABASE_URL=postgresql://` and `psycopg2` / `psycopg2-binary` isn't in `pyproject.toml`, the plan will include adding `psycopg2-binary` to deps. Tell the user this in your one-line summary — they shouldn't be surprised by a new dep.
+
+On a successful plan, ask:
 
 > This will add two tables (`gravel_samples`, `gravel_feedback`) to your Postgres database and turn on auto-tracing for your OpenAI + Anthropic calls. OK?
 
@@ -68,12 +123,14 @@ The Gravel CLI is a single Go binary. The npm and PyPI wrappers lazy-fetch it on
 **TypeScript projects** (npm / pnpm / yarn / bun):
 
 ```
+npx -y @artanis-ai/gravel doctor --json    # Step 0
 npx -y @artanis-ai/gravel detect --json    # then mount/prompts/traces
 ```
 
 **Python projects** (uv / poetry / pip / pipenv):
 
 ```
+uvx --from artanis-gravel gravel doctor --json
 uvx --from artanis-gravel gravel detect --json
 ```
 
@@ -99,7 +156,7 @@ This walks pillar-by-pillar with TTY prompts. Agents don't typically use it beca
 
 ## Architecture
 
-Two tables go into the user's existing database (`gravel_samples`, `gravel_feedback`); the manifest at `.gravel/manifest.json` is the source of truth for prompts. Trace-eval calls cross the trust boundary to the Artanis judge service for paid scoring; everything else stays local. Prompts live where they live in the user's repo (`.md` / `.txt` files OR string literals the deep-scan finds); edits become PRs via the `gravel[bot]` GitHub App. The full data-plane / control-plane split is described in [ARCHITECTURE.md](https://github.com/artanis-ai/gravel/blob/main/ARCHITECTURE.md).
+Two tables go into the user's existing database (`gravel_samples`, `gravel_feedback`) **only when the traces pillar is applied**; the manifest at `.gravel/manifest.json` is the source of truth for prompts. Trace-eval calls cross the trust boundary to the Artanis judge service for paid scoring; everything else stays local. Prompts live where they live in the user's repo (`.md` / `.txt` / `.mdx` / `.mdc` files OR string literals the deep-scan finds); edits become PRs via the `gravel[bot]` GitHub App. The full data-plane / control-plane split is described in [ARCHITECTURE.md](https://github.com/artanis-ai/gravel/blob/main/ARCHITECTURE.md).
 
 ## Source
 
@@ -163,7 +220,7 @@ As secure as the user's actual app, since it's just part of it. It can also plug
 
 **Does it need a database?**
 
-If the user doesn't want to capture feedback on traces, then no — prompts-only mode is fully supported and doesn't create any DB tables. If they do want traces, it detects and piggybacks on their existing DB and adds two tables prefixed `gravel_*`.
+If the user doesn't want to capture feedback on traces, then no — prompts-only mode is fully supported and doesn't create any DB tables, doesn't pull in a Postgres driver, doesn't write a SQLite file. If they do want traces, it detects and piggybacks on their existing DB and adds two tables prefixed `gravel_*`.
 
 **Will it slow LLM calls down?**
 
