@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Decisions log — READ FIRST on continued work
+
+Before acting on any item that appears in a conversation summary, a `~/.claude/plans/*.md` plan file, a dogfooding-style feedback batch, or anything you remember from a prior session, **first read `~/.claude/projects/-home-amar-proj-code-artanis-home-page/memory/decisions_log.md`**. The original plan / brain-dump is the first word, not the last — refinements live in that file and supersede everything earlier.
+
+After any conversation that refines a previously-discussed plan item or locks in a non-obvious choice (format, copy, threshold, mechanism), **append an entry to the decisions log** using the format documented at the top of that file. Do this immediately when the refinement happens, not at the end of a session — sessions get compacted and refinements can vanish from context. Yousef gets visibly frustrated when refined decisions are forgotten; the log is the safety net.
+
 ## Project Overview
 
 This repo serves three properties on the `artanis.ai` domain via GitHub Pages:
