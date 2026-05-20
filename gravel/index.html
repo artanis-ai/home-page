@@ -1933,10 +1933,10 @@
                 })
             })
             // Click-hint reveal + dismiss. Fades in 1s after DOM ready
-            // so it doesn't fight the hero's entrance, then auto-fades
-            // out 2s later so it doesn't keep nagging. Any click on the
-            // card before that dismisses it immediately. pointer-events
-            // is none so the click always reaches the card underneath.
+            // so it doesn't fight the hero's entrance, then persists
+            // until the user clicks the card (people were missing it
+            // when it auto-faded). pointer-events is none so the click
+            // always reaches the card underneath.
             document.querySelectorAll('.click-hint').forEach((hint) => {
                 let dismissed = false
                 const dismiss = () => {
@@ -1948,7 +1948,6 @@
                 window.setTimeout(() => {
                     if (dismissed) return
                     hint.classList.add('is-visible')
-                    window.setTimeout(dismiss, 3000)
                 }, 1000)
                 const card = hint.parentElement
                 if (card) card.addEventListener('click', dismiss, { once: true })
