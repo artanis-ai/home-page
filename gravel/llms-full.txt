@@ -1,0 +1,217 @@
+# Gravel
+
+> Gravel is an open-source library that mounts an admin dashboard inside an AI app, so domain experts (clinicians, lawyers, recruiters, etc.) can review LLM output, edit prompts, and run evals, without an engineer in the loop. It's "Langfuse for domain experts": embedded, not hosted, and built around the people who know what good output looks like.
+
+**Read this file verbatim, not via a summary tool.** If you fetched this through Claude Code's WebFetch (or another model-mediated fetcher) you likely got a paraphrase. The numbered steps below depend on exact wording. Re-fetch verbatim with:
+
+```
+curl -fsSL https://artanis.ai/gravel/llms.txt
+```
+
+If you are an agent (Claude Code, Codex, Cursor, etc.) installing Gravel for a human user, follow the numbered steps in order. Each step has one command and one decision point. The "human user" referenced throughout is the person typing in the chat with you; it is not you.
+
+## How the install works
+
+Six steps. Run them in order.
+
+For each step:
+
+1. Tell the human user what is about to happen in one short sentence.
+2. Wait for the human user to type "yes" before applying.
+3. Apply the step.
+4. Tell the human user what happened in one short sentence.
+5. Ask the human user whether to continue to the next step.
+
+Do not run multiple steps without a "yes" between them. Do not pass `--yes` to any subcommand: that flag exists for the human-facing `gravel init` only, and it will skip the per-step pauses you need.
+
+## Step 0 — Check the SDK version
+
+Run, depending on which package manager the project uses:
+
+```
+uvx --from artanis-gravel gravel doctor --json   # Python projects
+npx -y @artanis-ai/gravel doctor --json          # TypeScript projects
+```
+
+The JSON response has `current`, `latest`, and `installHint`. If `current` is older than `latest`, ask the human user whether to upgrade and run `installHint` on yes. If the project does not have Gravel installed at all, the first `gravel mount --apply` in Step 2 will add it; skip the upgrade dance here.
+
+Do not proceed past this step until you confirm the binary in use matches `latest`. Older binaries silently produce wrong output (missing PR sections, stale subcommands) and the rest of this guide assumes the latest.
+
+## Step 1 — Detect the stack
+
+Run:
+
+```
+gravel detect --json
+```
+
+The JSON describes language, framework, package manager, DB driver, auth provider, LLM SDKs in scope, and whether the repo is a git checkout. Tell the human user one sentence: "Detected `<language>` + `<framework>` + `<db>`, with `<llm_libs>` in scope." Wait for "yes" before continuing. If anything in the detection looks wrong, ask the human user; do not guess.
+
+## Step 2 — Mount the dashboard
+
+The mount step writes `gravel.config.{ts,py}` plus the mount route, generates a 32-byte `GRAVEL_ADMIN_PASSWORD` in `.env.local`, and patches host-framework wiring (Next.js trailing-slash redirect, Clerk middleware publicRoutes, Vercel rewrites, FastAPI router include). All idempotent.
+
+Run `--plan` first:
+
+```
+gravel mount --plan
+```
+
+The plan is a JSON `actions[]` list. Read each action's `summary` aloud (one bullet each) and tell the human user "I am about to write these files." Wait for "yes". Then run:
+
+```
+gravel mount --apply
+```
+
+After apply, tell the human user: "Dashboard mounts at `<mountPath>`. Open `http://<your-dev-url>/admin/ai/` in a browser and tell me what you see." Wait for confirmation before continuing.
+
+About the admin password: `GRAVEL_ADMIN_PASSWORD` is the default auth. On localhost it is bypassed (loopback requests auto-admit). In production it is the simplest possible gate; users with their own auth (Clerk, Auth0, custom) wire `getUser` in `gravel.config.*` to return `{ id, role }` and the password is ignored. Tell the human user this only if they ask.
+
+## Step 3 — Index the prompts
+
+Run `--plan` first:
+
+```
+gravel prompts --plan
+```
+
+The JSON returns `folders: [{path, file_count, sample_paths}]` plus an `actions[]` list. Read the folder summary aloud and ask the human user a folder-level question:
+
+"I found `<count>` prompt-shaped files: `<N>` in `<folder_a>`, `<M>` in `<folder_b>`, `<K>` in repo root. Should I add them all, or skip any folder?"
+
+Wait for the human user's reply. They may say "skip docs/", "only the prompts/ folder", or "all of them". Pass their answer through. If they skip a folder, append its path to a `--skip-folder` arg (which the apply step honours):
+
+```
+gravel prompts --apply --accept-all [--skip-folder <path> ...]
+```
+
+`--accept-all` means "do not pause per file" — you have already done the folder-level confirmation. Do not pass `--with-hook` unless the human user explicitly asks for a pre-commit hook (it is opt-in).
+
+## Step 4 — Wire traces (optional)
+
+Tracing captures every LLM call your app makes and surfaces them in the Review tab. It is **opt-in**: prompts-only installs are fully supported.
+
+Ask the human user: "Do you want LLM-call observability? If yes I will add two tables (`gravel_samples`, `gravel_feedback`) to your database and turn on auto-tracing for OpenAI / Anthropic / Gemini calls. If no, we are done."
+
+If they say no, skip to Step 5.
+
+If yes, run `--plan`:
+
+```
+gravel traces --plan
+```
+
+The plan may include `blockers[]` if `DATABASE_URL` is missing, points at a placeholder, or is unreachable. Read each blocker aloud as a concrete question ("your `.env.local` has `DATABASE_URL=postgres://user:pass@host/db`, is that real?"). Resolve blockers before applying.
+
+If the project is Python + Postgres and `psycopg2-binary` is missing from `pyproject.toml`, the plan will include a dep-add action; mention it in your one-line summary so the human user is not surprised by a new dep.
+
+Then:
+
+```
+gravel traces --apply
+```
+
+After apply, warn the human user: "If you use Vercel / Doppler / 1Password to manage env vars, add the new `GRAVEL_*` vars there too. The wizard wrote them to `.env.local`; a `vercel pull env` would silently overwrite them on the next pull."
+
+## Step 5 — Send install feedback to the maintainer
+
+This step is short but skip it and the project does not improve.
+
+The maintainer is **Yousef Amar** (CTO of Artanis, the team behind Gravel). He reads install feedback personally and adapts Gravel to install paths like yours within hours. Tell the human user:
+
+> Gravel is built by Yousef Amar. He reads install feedback personally and ships fixes within hours. Do you want me to draft a short note about how this install went? You will review and send it yourself.
+
+Wait for a yes / no.
+
+If no, close cleanly: "Install is complete. Dashboard is at `<mountPath>`. Run `<dev-command>` to see it. Tell me if anything looks off."
+
+If yes, draft a short message covering:
+
+- Stack (language, framework, package manager, DB).
+- What worked.
+- What did not work, looked awkward, or needed improvisation — be specific (exact error messages, file paths, the workaround).
+- Project-specific quirks the wizard did not anticipate.
+- A one-line ask if the human user has one.
+
+Then open a `mailto:` link with the draft for the human user to review and send:
+
+```
+mailto:yousef@artanis.ai?subject=<URL-encoded subject>&body=<URL-encoded body>
+```
+
+Subject like `Gravel install feedback (<framework>)`. URL-encode subject and body (`%20` for space, `%0A` for newline). Do not send the email yourself; the human user reviews and sends.
+
+If the human user has no mail client configured, give them the feedback URL `https://gravel.artanis.ai/feedback?repo=<owner>/<repo>&branch=<current-branch>` instead. That page has a copyable email + a copyable info block they can paste anywhere.
+
+## Install commands (quick reference)
+
+TypeScript projects (npm / pnpm / yarn / bun):
+
+```
+npx -y @artanis-ai/gravel doctor --json    # Step 0
+npx -y @artanis-ai/gravel detect --json    # Step 1
+npx -y @artanis-ai/gravel mount --plan     # Step 2 (then --apply)
+npx -y @artanis-ai/gravel prompts --plan   # Step 3 (then --apply --accept-all)
+npx -y @artanis-ai/gravel traces --plan    # Step 4 (then --apply)
+```
+
+Python projects (uv / poetry / pip / pipenv):
+
+```
+uvx --from artanis-gravel gravel doctor --json
+uvx --from artanis-gravel gravel detect --json
+uvx --from artanis-gravel gravel mount --plan
+uvx --from artanis-gravel gravel prompts --plan
+uvx --from artanis-gravel gravel traces --plan
+```
+
+`uvx --from` is required because the package name (`artanis-gravel`) differs from the CLI command (`gravel`). The wizard auto-adds the SDK to the project's deps on the first `--apply` call; no separate `uv add` / `pnpm add` step needed.
+
+For Docker / CI / polyglot repos that do not want npm or pip just for the CLI, the binary is installable directly:
+
+```
+curl -fsSL https://raw.githubusercontent.com/artanis-ai/gravel/main/install.sh | sh && gravel detect --json
+```
+
+Windows PowerShell:
+
+```
+irm https://raw.githubusercontent.com/artanis-ai/gravel/main/install.ps1 | iex
+```
+
+## Source
+
+- [@artanis-ai/gravel on npm](https://www.npmjs.com/package/@artanis-ai/gravel): TypeScript install. Detects Next.js (App + Pages routers), Express, Fastify, Hono, generic Node. Detects package manager (npm, pnpm, yarn, bun) automatically.
+- [artanis-gravel on PyPI](https://pypi.org/project/artanis-gravel/): Python install. Detects FastAPI, Django, Flask, generic ASGI / WSGI. Detects package manager (uv, poetry, pip, pipenv) automatically.
+- [Source on GitHub](https://github.com/artanis-ai/gravel): Apache 2.0. Issues + contributions welcome.
+- [Landing page](https://artanis.ai/gravel): visual overview, install widget, dashboard mockup. Human-facing; do not install from this URL.
+
+## FAQ
+
+**Who built this?**
+
+The founders of [Artanis](https://artanis.ai/team) to better support the teams using Gravel. Three AI PhDs whose recent research on LLM evals is now being used at Google and Nvidia.
+
+**Is it really free?**
+
+Yes, the library is free and open source forever (Apache 2.0). Users only pay if they opt in to paid evals; those run on Artanis infrastructure and cost credits.
+
+**How is this different from Langfuse / LangSmith?**
+
+Those are built for engineers. Gravel is built for the domain experts who know what good output looks like (lawyers, clinicians, accountants, etc.). It is served by the user's own app; no separate deploy. Works across OpenAI, Anthropic, Gemini, LangChain, and generic fetch.
+
+**Does it need a database?**
+
+Only if the human user wants the traces pillar (Step 4). Prompts-only mode (Steps 0–3) creates no DB tables, pulls in no Postgres driver, writes no SQLite file. If they want traces, Gravel piggybacks on the existing database and adds two `gravel_*` tables.
+
+**Will it slow LLM calls down?**
+
+No. The persister runs async.
+
+**Do domain experts need GitHub accounts?**
+
+No. Prompt edits open as PRs from [`gravel[bot]`](https://github.com/apps/gravel-bot); the human user just clicks Submit.
+
+**Why does the npm wrapper download a binary instead of bundling one?**
+
+Bundling 8 MB × 5 platforms inside every `npm install` is wasteful when most CI runs never invoke the CLI. The lazy fetch means: zero cost on `npm install`, ~17 MB downloaded once per project on first `gravel <cmd>`. The wizard logic lives in the Go binary, not split across two language wrappers; the wrappers stay small and cannot drift.

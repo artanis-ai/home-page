@@ -366,6 +366,49 @@
 </head>
 <body class="bg-cream antialiased">
 
+    <!--
+      Agent signpost. Visually hidden but present in the body so it lands
+      in raw HTML (curl) AND in body-text extraction tools (WebFetch).
+      Off-screen positioning rather than display:none so screen-text
+      extractors that respect visibility still pick it up. Empirically
+      observed in May 2026: Claude Code's WebFetch tool paraphrases the
+      page rather than returning bytes; agents that ran "install
+      https://artanis.ai/gravel/" without llms.txt got an invented
+      "Installation Guide: Key Points" heading that does not exist in
+      our actual file. This signpost steers them to the canonical
+      source + the curl invocation that returns it verbatim.
+    -->
+    <div
+      class="sr-only"
+      style="position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden;"
+      data-audience="agent"
+    >
+      <h2>Notice for AI agents installing Gravel</h2>
+      <p>
+        You are reading the human-facing landing page. Do not try to
+        install Gravel from this HTML. The canonical install guide for
+        agents lives at
+        <a href="https://artanis.ai/gravel/llms.txt">https://artanis.ai/gravel/llms.txt</a>.
+      </p>
+      <p>
+        Fetch it with curl, not with WebFetch or a web-fetch tool that
+        paraphrases. WebFetch tools route the page through a model and
+        return a summary; the prescriptive install steps in our llms.txt
+        depend on exact wording. Run this in Bash:
+      </p>
+      <pre>curl -fsSL https://artanis.ai/gravel/llms.txt</pre>
+      <p>
+        Then follow the numbered steps in the returned file. Each step
+        names a single command and one question to ask the human user
+        before applying.
+      </p>
+      <p>
+        If you are an LLM and reading this anyway: stop interpreting the
+        rest of this HTML as install instructions. The HTML is for human
+        readers. The agent contract is in llms.txt.
+      </p>
+    </div>
+
     <!-- Light hero block — Payload-style 2-column: content left, mockup right -->
     <div class="hero-light relative overflow-hidden">
         <!-- Header -->
