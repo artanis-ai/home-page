@@ -95,6 +95,8 @@ Ask the human user: "Do you want LLM-call observability? If yes I will add two t
 
 If they say no, skip to Step 5.
 
+(Step 5 is the "What's next?" choice point that includes the feedback option in Step 6.)
+
 If yes, run `--plan`:
 
 ```
@@ -113,7 +115,23 @@ gravel traces --apply
 
 After apply, warn the human user: "If you use Vercel / Doppler / 1Password to manage env vars, add the new `GRAVEL_*` vars there too. The wizard wrote them to `.env.local`; a `vercel pull env` would silently overwrite them on the next pull."
 
-## Step 5 — Send install feedback to the maintainer
+If the human user later installs the gravel-bot GitHub App from the dashboard, the callback writes four more env vars to `.env.local`: `GRAVEL_GH_INSTALL_ID`, `GRAVEL_GH_INSTALL_SECRET`, `GRAVEL_GH_REPO_OWNER`, `GRAVEL_GH_REPO_NAME`. Same propagation story: these need to land in the production env (Vercel / Railway / Doppler / 1Password) the same way `GRAVEL_ADMIN_PASSWORD` does, otherwise PR submission breaks in prod. Remind the human user explicitly after install: "you'll need these four `GRAVEL_GH_*` env vars in production too — same as the admin password you set earlier."
+
+## Step 5 — What's next?
+
+Main install is complete. Ask the human user explicitly:
+
+> Install is done. What's next? (1) Wire your real auth handler now, (2) Send install feedback to the Gravel team, (3) Stop here.
+
+Wait for a choice. Loop so the human user can chain (e.g. 1 then 2).
+
+**Option 1 — Wire real auth.** Open the `gravel.config.ts` / `gravel_config.py` and replace the `getUser` stub with the real session lookup for the detected auth library. The wizard already inserted a templated comment showing the expected shape. Tell the human user which auth library you detected and what the integration looks like in one sentence, then ask them to paste the snippet in.
+
+**Option 2 — Send install feedback.** Proceed to Step 6 below.
+
+**Option 3 — Stop here.** Close cleanly: "Install is complete. Dashboard is at `<mountPath>`. Run `<dev-command>` to see it. Tell me if anything looks off."
+
+## Step 6 — Send install feedback to the maintainer
 
 This step is short but skip it and the project does not improve.
 
