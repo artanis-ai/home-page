@@ -91,7 +91,7 @@ gravel prompts --apply --accept-all [--skip-folder <path> ...]
 
 Tracing captures every LLM call your app makes and surfaces them in the Review tab. It is **opt-in**: prompts-only installs are fully supported.
 
-Ask the human user: "Do you want LLM-call observability? If yes I will add two tables (`gravel_samples`, `gravel_feedback`) to your database and turn on auto-tracing for OpenAI / Anthropic / Gemini calls. If no, we are done."
+Ask the human user: "Do you want LLM-call observability? If yes I will add two tables (`gravel_samples`, `gravel_feedback`) to your database and turn on auto-tracing for OpenAI / Anthropic / Gemini (incl. Vertex AI + Gemini Enterprise) calls. If no, we are done."
 
 If they say no, skip to Step 5.
 
@@ -198,7 +198,7 @@ Yes, the library is free and open source forever (Apache 2.0). Users only pay if
 
 **How is this different from Langfuse / LangSmith?**
 
-Those are built for engineers. Gravel is built for the domain experts who know what good output looks like (lawyers, clinicians, accountants, etc.). It is served by the user's own app; no separate deploy. Works across OpenAI, Anthropic, Gemini, LangChain, and generic fetch.
+Those are built for engineers. Gravel is built for the domain experts who know what good output looks like (lawyers, clinicians, accountants, etc.). It is served by the user's own app; no separate deploy. Works across OpenAI, Anthropic, Gemini (including Vertex AI + Gemini Enterprise Agent Platform via the unified `google-genai` SDK), LangChain, and generic fetch.
 
 **Does it need a database?**
 
