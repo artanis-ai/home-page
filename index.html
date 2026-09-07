@@ -339,6 +339,18 @@
         }
         .cloud-drift:nth-child(2) { animation-duration: 28s; animation-delay: -5s; }
         .cloud-drift:nth-child(3) { animation-duration: 24s; animation-delay: -12s; }
+
+        .update-body { color: #2D1810; font-size: 1.0625rem; line-height: 1.75; }
+        .update-body p, .update-body ul, .update-body ol { margin: 1.1em 0; }
+        .update-body ul { list-style: disc; padding-left: 1.5rem; }
+        .update-body ol { list-style: decimal; padding-left: 1.5rem; }
+        .update-body li > p { margin: 0.25em 0; }
+        .update-body a { color: #9B4340; text-decoration: underline; text-underline-offset: 2px; }
+        .update-body a:hover { color: #C4716A; }
+        .update-body img { max-width: 100%; height: auto; border-radius: 1rem; margin: 1.5em auto; display: block; }
+        .update-body h1, .update-body h2, .update-body h3 { font-weight: 600; margin: 1.5em 0 0.5em; }
+        .update-body blockquote { border-left: 3px solid #D4A76A; padding-left: 1rem; color: #6B5744; }
+        .update-body hr { border: 0; border-top: 1px solid #F5EDE3; margin: 2em 0; }
     </style>
 </head>
 <body class="bg-cream antialiased">
@@ -617,11 +629,7 @@
                         <a href="/updates/rss.xml"
                            class="text-sm font-semibold text-primary hover:text-primary-light">RSS</a>
                     </div>
-                    <ul id="updates-feed" class="space-y-4"></ul>
-                    <div class="mt-6 text-center">
-                        <a href="/updates/"
-                           class="text-sm font-semibold text-primary hover:text-primary-light">View all updates &rarr;</a>
-                    </div>
+                    <ul id="updates-feed" class="rounded-2xl bg-cream shadow-xl shadow-earth/10 divide-y divide-warm overflow-hidden"></ul>
                 </div>
             </div>
         </div>
@@ -948,6 +956,19 @@
             </div>
         </div>
     </div>
+    <!-- Monthly Update Modal -->
+    <div id="update-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6" onclick="if(event.target===this)closeUpdateModal()">
+        <div class="relative w-full max-w-2xl">
+            <button onclick="closeUpdateModal()" class="absolute -top-8 sm:-top-10 right-0 text-white/70 hover:text-white transition-colors text-sm font-medium flex items-center gap-1 z-10">
+                Close <span class="text-lg leading-none">&times;</span>
+            </button>
+            <article class="max-h-[85vh] overflow-y-auto rounded-xl sm:rounded-2xl bg-cream p-6 sm:p-10 shadow-2xl">
+                <h3 id="update-modal-title" class="font-display text-2xl font-semibold tracking-tight text-text-dark sm:text-3xl"></h3>
+                <p id="update-modal-date" class="mt-2 text-sm text-text-muted"></p>
+                <div id="update-modal-body" class="update-body mt-8"></div>
+            </article>
+        </div>
+    </div>
     <script>
         function openDemoModal() {
             var modal = document.getElementById('demo-modal');
@@ -963,7 +984,54 @@
             document.getElementById('demo-iframe').src = '';
             document.body.style.overflow = '';
         }
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDemoModal(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeDemoModal(); closeUpdateModal(); } });
+
+        // Monthly Updates: list from /updates/feed.json, body fragments from /updates/<slug>.html
+        var updatesBySlug = {};
+        function updateMonthYear(dateStr) {
+            return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+        }
+        function openUpdateModal(slug) {
+            var item = updatesBySlug[slug];
+            if (!item) return;
+            var modal = document.getElementById('update-modal');
+            var body = document.getElementById('update-modal-body');
+            document.getElementById('update-modal-title').textContent = item.title;
+            document.getElementById('update-modal-date').textContent = new Date(item.pubDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+            body.innerHTML = '';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            modal.querySelector('article').scrollTop = 0;
+            document.body.style.overflow = 'hidden';
+            history.replaceState(null, '', '#update-' + slug);
+            fetch('/updates/' + slug + '.html')
+                .then(function(r) { return r.text(); })
+                .then(function(html) { if (updatesBySlug[slug] === item && !modal.classList.contains('hidden')) body.innerHTML = html; })
+                .catch(function() {});
+        }
+        function closeUpdateModal() {
+            var modal = document.getElementById('update-modal');
+            if (modal.classList.contains('hidden')) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+            if (location.hash.indexOf('#update-') === 0) history.replaceState(null, '', location.pathname + location.search);
+        }
+        fetch('/updates/feed.json')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var el = document.getElementById('updates-feed');
+                if (!el) return;
+                el.innerHTML = (data.items || []).map(function(item) {
+                    updatesBySlug[item.slug] = item;
+                    return '<li><button type="button" onclick="openUpdateModal(\'' + item.slug + '\')" class="w-full flex items-baseline justify-between gap-4 px-5 py-3 text-left cursor-pointer hover:bg-warm transition-colors group">' +
+                        '<span class="text-sm font-semibold text-text-dark group-hover:text-primary transition-colors">' + item.title + '</span>' +
+                        '<time datetime="' + item.pubDate + '" class="shrink-0 text-xs text-text-muted tabular-nums">' + updateMonthYear(item.pubDate) + '</time>' +
+                        '</button></li>';
+                }).join('');
+                if (location.hash.indexOf('#update-') === 0) openUpdateModal(location.hash.slice(8));
+            })
+            .catch(function() {});
 
         // Blog + Newsletter feeds (via RSS2JSON)
         (function() {
@@ -1001,12 +1069,6 @@
                     '<p class="mt-2 text-xs text-text-muted">' + formatDate(item.pubDate) + '</p>' +
                     '</div></div></a></li>';
             }
-            function renderNewsletterItem(item) {
-                return '<li><a href="' + item.link + '" class="' + cardClass + '">' +
-                    '<h4 class="text-base font-semibold text-text-dark group-hover:text-primary transition-colors">' + item.title + '</h4>' +
-                    '<p class="mt-2 text-xs text-text-muted">' + formatDate(item.pubDate) + '</p>' +
-                    '</a></li>';
-            }
             function fetchFeed(url, elId, renderFn) {
                 fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url))
                     .then(function(r) { return r.json(); })
@@ -1018,14 +1080,6 @@
                     .catch(function() {});
             }
             fetchFeed('https://artanis.substack.com/feed', 'substack-feed', renderBlogItem);
-            fetch('/updates/feed.json')
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var el = document.getElementById('updates-feed');
-                    if (!el) return;
-                    el.innerHTML = (data.items || []).slice(0, 10).map(renderNewsletterItem).join('');
-                })
-                .catch(function() {});
         })();
     </script>
 </body>
