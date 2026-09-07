@@ -351,6 +351,11 @@
         .update-body h1, .update-body h2, .update-body h3 { font-weight: 600; margin: 1.5em 0 0.5em; }
         .update-body blockquote { border-left: 3px solid #D4A76A; padding-left: 1rem; color: #6B5744; }
         .update-body hr { border: 0; border-top: 1px solid #F5EDE3; margin: 2em 0; }
+        .update-scroll { scrollbar-width: thin; scrollbar-color: rgba(107, 66, 38, 0.22) transparent; scrollbar-gutter: stable; }
+        .update-scroll::-webkit-scrollbar { width: 12px; }
+        .update-scroll::-webkit-scrollbar-track { background: transparent; }
+        .update-scroll::-webkit-scrollbar-thumb { background: rgba(107, 66, 38, 0.22); border-radius: 9999px; border: 4px solid transparent; background-clip: padding-box; }
+        .update-scroll:hover::-webkit-scrollbar-thumb { background: rgba(107, 66, 38, 0.4); border: 4px solid transparent; background-clip: padding-box; }
     </style>
 </head>
 <body class="bg-cream antialiased">
@@ -962,7 +967,7 @@
             <button onclick="closeUpdateModal()" class="absolute -top-8 sm:-top-10 right-0 text-white/70 hover:text-white transition-colors text-sm font-medium flex items-center gap-1 z-10">
                 Close <span class="text-lg leading-none">&times;</span>
             </button>
-            <article class="max-h-[85vh] overflow-y-auto rounded-xl sm:rounded-2xl bg-cream p-6 sm:p-10 shadow-2xl">
+            <article class="update-scroll max-h-[85vh] overflow-y-auto rounded-xl sm:rounded-2xl bg-cream p-6 sm:p-10 shadow-2xl">
                 <h3 id="update-modal-title" class="font-display text-2xl font-semibold tracking-tight text-text-dark sm:text-3xl"></h3>
                 <p id="update-modal-date" class="mt-2 text-sm text-text-muted"></p>
                 <div id="update-modal-body" class="update-body mt-8"></div>
