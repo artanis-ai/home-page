@@ -8,8 +8,12 @@
  * Writes /updates/index.html, /updates/<slug>/index.html, /updates/feed.json
  * and /updates/rss.xml. Slugs are the original Buttondown archive slugs, so
  * buttondown.com/artanis/archive/<slug>/ maps 1:1 to artanis.ai/updates/<slug>/.
+ *
+ * Bodies are Buttondown's raw editor output: HTML for "fancy" mode, markdown
+ * for "plaintext" mode (only #8). Markdown bodies are converted with pandoc.
  */
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
@@ -23,7 +27,11 @@ const emails = JSON.parse(readFileSync(join(srcDir, 'emails.json'), 'utf8'))
   .filter((e) => e.email_type === 'public' && e.publish_date)
   .sort((a, b) => new Date(b.publish_date) - new Date(a.publish_date))
 
-function rewriteBody(html) {
+function rewriteBody(raw) {
+  const mode = raw.match(/<!--\s*buttondown-editor-mode:\s*(\w+)/)?.[1]
+  const html = mode === 'plaintext'
+    ? execFileSync('pandoc', ['-f', 'gfm', '-t', 'html', '--wrap=none'], { input: raw.replace(/<!--[^>]*-->/, ''), encoding: 'utf8' })
+    : raw
   return html
     .replace(/<!--\s*buttondown-editor-mode:[^>]*-->/g, '')
     .replace(/https:\/\/assets\.buttondown\.email\/images\/([0-9a-f-]+\.png)(\?[^"'\s)]*)?/g, '/img/updates/$1')
