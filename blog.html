@@ -145,12 +145,12 @@
                 <div>
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-lg font-semibold text-text-dark">Monthly Updates</h3>
-                        <a href="https://buttondown.com/artanis#subscribe-form" target="_blank" rel="noopener noreferrer"
-                           class="text-sm font-semibold text-primary hover:text-primary-light">Subscribe</a>
+                        <a href="/updates/rss.xml"
+                           class="text-sm font-semibold text-primary hover:text-primary-light">RSS</a>
                     </div>
-                    <ul id="buttondown-feed" class="space-y-4"></ul>
+                    <ul id="updates-feed" class="space-y-4"></ul>
                     <div class="mt-6 text-center">
-                        <a href="https://buttondown.com/artanis/archive/" target="_blank" rel="noopener noreferrer"
+                        <a href="/updates/"
                            class="text-sm font-semibold text-primary hover:text-primary-light">View all updates &rarr;</a>
                     </div>
                 </div>
@@ -232,7 +232,7 @@
         function renderNewsletterItem(item) {
             return `
                 <li>
-                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block rounded-2xl bg-cream p-5 shadow-xl shadow-earth/10 hover:shadow-earth/20 hover:border-primary-light border border-transparent transition-all group">
+                    <a href="${item.link}" class="block rounded-2xl bg-cream p-5 shadow-xl shadow-earth/10 hover:shadow-earth/20 hover:border-primary-light border border-transparent transition-all group">
                         <h4 class="text-base font-semibold text-text-dark group-hover:text-primary transition-colors">${item.title}</h4>
                         <p class="mt-2 text-xs text-text-muted">${formatDate(item.pubDate)}</p>
                     </a>
@@ -252,7 +252,12 @@
         }
 
         fetchRSS('https://artanis.substack.com/feed', 'substack-feed', renderBlogItem);
-        fetchRSS('https://buttondown.com/artanis/rss', 'buttondown-feed', renderNewsletterItem);
+        fetch('/updates/feed.json')
+            .then((r) => r.json())
+            .then((data) => {
+                document.getElementById('updates-feed').innerHTML = data.items.slice(0, 10).map(renderNewsletterItem).join('');
+            })
+            .catch((error) => console.error('Error fetching updates feed:', error));
     </script>
 </body>
 </html>

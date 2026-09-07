@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artanis #10: The missing core of the AI stack - Artanis AI</title>
+    <meta name="description" content="Artanis: Helping companies build AI they can actually trust. Previous updates at https://artanis.ai 🙋 Ways You Can Help - Balderton Demo Day 🙋 Balderton Capital is running a demo day for our incubat...">
+    <link rel="canonical" href="https://artanis.ai/updates/artanis-10-the-missing-core-of-the-ai-stack-8841/">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://artanis.ai/updates/artanis-10-the-missing-core-of-the-ai-stack-8841/">
+    <meta property="og:title" content="Artanis #10: The missing core of the AI stack - Artanis AI">
+    <meta property="og:description" content="Artanis: Helping companies build AI they can actually trust. Previous updates at https://artanis.ai 🙋 Ways You Can Help - Balderton Demo Day 🙋 Balderton Capital is running a demo day for our incubat...">
+    <meta property="og:image" content="https://artanis.ai/img/og-image.png">
+    <meta property="og:site_name" content="Artanis AI">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Artanis #10: The missing core of the AI stack - Artanis AI">
+    <meta name="twitter:description" content="Artanis: Helping companies build AI they can actually trust. Previous updates at https://artanis.ai 🙋 Ways You Can Help - Balderton Demo Day 🙋 Balderton Capital is running a demo day for our incubat...">
+    <meta name="twitter:image" content="https://artanis.ai/img/og-image.png">
+    <link rel="alternate" type="application/rss+xml" title="Artanis Monthly Updates" href="/updates/rss.xml">
+    <link rel="icon" href="/img/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="/img/favicon-96x96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                fontSize: {
+                    xs: ['0.75rem', { lineHeight: '1rem' }],
+                    sm: ['0.875rem', { lineHeight: '1.5rem' }],
+                    base: ['1rem', { lineHeight: '1.75rem' }],
+                    lg: ['1.125rem', { lineHeight: '2rem' }],
+                    xl: ['1.25rem', { lineHeight: '2rem' }],
+                    '2xl': ['1.5rem', { lineHeight: '2rem' }],
+                    '3xl': ['2rem', { lineHeight: '2.5rem' }],
+                    '4xl': ['2.5rem', { lineHeight: '3.5rem' }],
+                    '5xl': ['3rem', { lineHeight: '3.5rem' }],
+                    '6xl': ['3.75rem', { lineHeight: '1' }],
+                    '7xl': ['4.5rem', { lineHeight: '1.1' }],
+                    '8xl': ['6rem', { lineHeight: '1' }],
+                    '9xl': ['8rem', { lineHeight: '1' }],
+                },
+                extend: {
+                    borderRadius: { '4xl': '2rem' },
+                    fontFamily: {
+                        sans: ['DM Sans', 'sans-serif'],
+                        display: ['Fredoka', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#9B4340',
+                        'primary-light': '#C4716A',
+                        'primary-dark': '#7A3835',
+                        accent: '#D4A76A',
+                        'accent-light': '#F0D9A8',
+                        'earth-dark': '#4E3222',
+                        earth: '#6B4226',
+                        'earth-light': '#8B5E3C',
+                        'earth-warm': '#7A5238',
+                        forest: '#4A7C59',
+                        'forest-light': '#6BA37A',
+                        cream: '#FFFBF5',
+                        warm: '#F5EDE3',
+                        'text-dark': '#2D1810',
+                        'text-mid': '#6B5744',
+                        'text-muted': '#9A8B7A',
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .update-body { color: #2D1810; font-size: 1.0625rem; line-height: 1.75; }
+        .update-body p, .update-body ul, .update-body ol { margin: 1.1em 0; }
+        .update-body ul { list-style: disc; padding-left: 1.5rem; }
+        .update-body ol { list-style: decimal; padding-left: 1.5rem; }
+        .update-body li > p { margin: 0.25em 0; }
+        .update-body a { color: #9B4340; text-decoration: underline; text-underline-offset: 2px; }
+        .update-body a:hover { color: #C4716A; }
+        .update-body img { max-width: 100%; height: auto; border-radius: 1rem; margin: 1.5em auto; display: block; }
+        .update-body h1, .update-body h2, .update-body h3 { font-weight: 600; margin: 1.5em 0 0.5em; }
+        .update-body blockquote { border-left: 3px solid #D4A76A; padding-left: 1rem; color: #6B5744; }
+        .update-body hr { border: 0; border-top: 1px solid #F5EDE3; margin: 2em 0; }
+    </style>
+</head>
+<body class="bg-cream antialiased">
+
+    <header class="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-warm">
+        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+            <div class="flex items-center md:gap-x-12">
+                <a href="/" aria-label="Home">
+                    <img src="/img/artanis.png" alt="Artanis" class="h-10 w-auto">
+                </a>
+                <div class="hidden md:flex md:gap-x-6">
+                    <a href="/blog" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Blog</a>
+                    <a href="/updates/" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Updates</a>
+                    <a href="/team" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Team</a>
+                </div>
+            </div>
+            <button type="button" class="-mr-1 md:hidden" aria-label="Toggle Navigation" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                <svg aria-hidden="true" class="h-3.5 w-3.5 overflow-visible stroke-text-dark" fill="none" stroke-width="2" stroke-linecap="round">
+                    <path d="M0 1H14M0 7H14M0 13H14"></path>
+                </svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 md:hidden pb-4">
+            <div class="rounded-2xl bg-white p-4 text-lg tracking-tight text-text-dark shadow-xl ring-1 ring-earth-dark/5">
+                <a href="/blog" class="block w-full p-2">Blog</a>
+                <a href="/updates/" class="block w-full p-2">Updates</a>
+                <a href="/team" class="block w-full p-2">Team</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="bg-warm py-16 sm:py-24">
+        <article class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
+            <p class="text-sm font-semibold text-primary"><a href="/updates/" class="hover:text-primary-light">&larr; All monthly updates</a></p>
+            <h1 class="mt-6 font-display text-3xl font-semibold tracking-tight text-text-dark sm:text-4xl">Artanis #10: The missing core of the AI stack</h1>
+            <p class="mt-3 text-sm text-text-muted"><time datetime="2025-02-10T14:01:00.000Z">10 February 2025</time></p>
+            <div class="update-body mt-10 rounded-2xl bg-cream p-6 sm:p-10 shadow-xl shadow-earth/10">
+<p><em>Artanis: Helping companies build AI they can actually trust. Previous&nbsp;updates at&nbsp;</em><a target="_blank" rel="noopener noreferrer nofollow" href="https://artanis.ai"><em>https://artanis.ai</em></a><br><br><strong>🙋&nbsp;Ways You Can Help - Balderton Demo Day&nbsp;🙋</strong></p><p>Balderton Capital is running&nbsp;a demo day for our incubator cohort in Kings Cross. This is good timing, as we've built a ton of conviction recently in our vision and&nbsp;will pitch Artanis to the public for the first time!&nbsp;<a target="_blank" rel="noopener noreferrer nofollow" href="https://lu.ma/balderton.launched.aw2025"><strong>Sign up here</strong></a><strong>&nbsp;if you'd like to attend demo day on the evening of Tuesday 4 March.</strong><br><br><strong>🧐&nbsp;Special Edition - Big Decision Coming&nbsp;Up&nbsp;🧐</strong></p><p>We've got a big decision coming up. We need to grow the team, as we've had to turn down several customers recently. We've also solidified our thesis on the AI space (see below) and have a product vision we'd like to start building. We'll take a call soon on whether to keep bootstrapping, or fundraise to build our vision faster. To VC, or not to VC...?<br><br><strong>🎯&nbsp;We've found the missing core of the AI stack - Policy&nbsp;🎯</strong></p><p>Our thesis finally clicked for us in January. The reason people can't trust their AI products, and only human-in-the-loop use cases are being deployed, is they can't control the output. And they can't control the output because they've been ambiguous in the instructions they give the AI. We've solved this problem with&nbsp;<strong>Policy: The Missing Core of the AI stack.&nbsp;</strong><a target="_blank" rel="noopener noreferrer nofollow" href="https://artanis.substack.com/p/policy-the-missing-core-of-the-ai">For more info, read our 5-minute thesis on Substack</a>.<br><br><strong>📉&nbsp;Progress in January - demand growing, team turbulence&nbsp;📈</strong></p><p>Our&nbsp; consulting metrics from January are:</p><p>Primary metric: 4 customers (unchanged)<br>Secondary metric - revenue: £40k (<span style="color: rgb(225, 29, 72)">-£10k</span>)<br>Secondary metric - team size: 2 (<span style="color: rgb(101, 163, 13)">-1</span>)</p><p>The metrics above are&nbsp;<em>slightly&nbsp;</em>misleading because we've been turning down work recently. This has been a mixture of i) inbound leads and ii) existing customers wanting bigger contracts. As we're a new business, we've had a hard line around needing to prioritise quality over quantity. But we're optimistic about capacity going forward, given recent progress on our thesis and product vision.</p><p>We also decided&nbsp;that Jerome is best placed as an advisor, rather than a co-founder, as we wanted to build different businesses. We're still retaining him, as he's accelerated us a lot already, but it means Yousef and Sam are back to being an army of 2! And if you need some extra technical/commercial firepower for your startup, reach out to&nbsp;<a target="_blank" rel="noopener noreferrer nofollow" href="mailto:jeromeminney@gmail.com">jeromeminney@gmail.com</a>.<br><br><strong>🙏&nbsp;Shout-outs&nbsp;🙏</strong></p><p>Special thanks for January go to:</p><p>Sivesh S - for teaching us the dark arts<br>Christine F - for the great connection to Jonny<br>Harry D - for an inspiring offsite<br>Zahid M - for fundraising advice<br>Bertie V - for being a "good sport" and boosting our vision<br>Laura R - for the intro to Ben S<br>Jonny DMM - for the exciting new project (+ "base of data" anecdote)<br>Rod F - for support behind the scenes<br>Al R &amp; Marcus S - for being serial founder role models&nbsp;<br>Sophia,&nbsp;Ben, Dom, and Haseeb - for the extremely kind words about us<br>Ed S &amp; Ryo H - for first ticket enthusiasm<br>Jerome M - for handling it all very well<br>Callum NF - for an exciting opportunity<br>Srecko D - you know why<br>Henry M - for being an intro superstar<br>Pascual &amp; Jeppe -&nbsp; for playing it straight<br>Imran R - for organising our PyData talk</p><p>Sorry if we missed anyone off the list, January was a biggie!</p><p>Cheers,<br>Yousef &amp; Sam</p>
+            </div>
+            <nav class="mt-16 flex justify-between gap-6 text-sm font-semibold text-primary border-t border-warm pt-8">
+                <span class="min-w-0"><a href="/updates/artanis-9-record-revenue-and-some-growing-pains/" class="hover:text-primary-light">&larr; Artanis #9: Record revenue! And some growing pains...</a></span>
+                <span class="min-w-0 text-right"><a href="/updates/artanis-11-were-raising/" class="hover:text-primary-light">Artanis #11: We're raising!!! &rarr;</a></span>
+            </nav>
+        </article>
+    </main>
+
+    <footer style="background: #0f0a05;">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col items-center py-10 sm:flex-row sm:justify-between">
+                <p class="text-sm text-warm/50">
+                    &copy; 2026 Artanis Ltd. All rights reserved.
+                </p>
+                <div class="mt-6 flex gap-x-6 text-sm sm:mt-0">
+                    <a href="/terms" class="text-warm/50 hover:text-warm transition-colors">Terms</a>
+                    <a href="/privacy" class="text-warm/50 hover:text-warm transition-colors">Privacy</a>
+                    <a href="/dpa" class="text-warm/50 hover:text-warm transition-colors">DPA</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

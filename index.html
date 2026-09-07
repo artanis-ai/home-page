@@ -614,12 +614,12 @@
                 <div>
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-lg font-semibold text-text-dark">Monthly Updates</h3>
-                        <a href="https://buttondown.com/artanis#subscribe-form" target="_blank" rel="noopener noreferrer"
-                           class="text-sm font-semibold text-primary hover:text-primary-light">Subscribe</a>
+                        <a href="/updates/rss.xml"
+                           class="text-sm font-semibold text-primary hover:text-primary-light">RSS</a>
                     </div>
-                    <ul id="buttondown-feed" class="space-y-4"></ul>
+                    <ul id="updates-feed" class="space-y-4"></ul>
                     <div class="mt-6 text-center">
-                        <a href="https://buttondown.com/artanis/archive/" target="_blank" rel="noopener noreferrer"
+                        <a href="/updates/"
                            class="text-sm font-semibold text-primary hover:text-primary-light">View all updates &rarr;</a>
                     </div>
                 </div>
@@ -1002,7 +1002,7 @@
                     '</div></div></a></li>';
             }
             function renderNewsletterItem(item) {
-                return '<li><a href="' + item.link + '" target="_blank" rel="noopener noreferrer" class="' + cardClass + '">' +
+                return '<li><a href="' + item.link + '" class="' + cardClass + '">' +
                     '<h4 class="text-base font-semibold text-text-dark group-hover:text-primary transition-colors">' + item.title + '</h4>' +
                     '<p class="mt-2 text-xs text-text-muted">' + formatDate(item.pubDate) + '</p>' +
                     '</a></li>';
@@ -1018,7 +1018,14 @@
                     .catch(function() {});
             }
             fetchFeed('https://artanis.substack.com/feed', 'substack-feed', renderBlogItem);
-            fetchFeed('https://buttondown.com/artanis/rss', 'buttondown-feed', renderNewsletterItem);
+            fetch('/updates/feed.json')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var el = document.getElementById('updates-feed');
+                    if (!el) return;
+                    el.innerHTML = (data.items || []).slice(0, 10).map(renderNewsletterItem).join('');
+                })
+                .catch(function() {});
         })();
     </script>
 </body>
