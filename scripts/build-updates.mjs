@@ -166,21 +166,34 @@ const head = (title, description, path) => `<!DOCTYPE html>
                 </a>
                 <div class="hidden md:flex md:gap-x-6">
                     <a href="/blog" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Blog</a>
-                    <a href="/updates/" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Updates</a>
                     <a href="/team" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Team</a>
+                    <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">Docs <svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>
                 </div>
             </div>
-            <button type="button" class="-mr-1 md:hidden" aria-label="Toggle Navigation" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
-                <svg aria-hidden="true" class="h-3.5 w-3.5 overflow-visible stroke-text-dark" fill="none" stroke-width="2" stroke-linecap="round">
-                    <path d="M0 1H14M0 7H14M0 13H14"></path>
-                </svg>
-            </button>
+            <div class="flex items-center gap-x-5 md:gap-x-8">
+                <a href="https://app.artanis.ai"
+                   class="hidden md:inline-block rounded-lg px-2 py-1 text-sm text-text-mid hover:bg-warm hover:text-text-dark">
+                    Log in
+                </a>
+                <a href="https://calendar.notion.so/meet/yousef/sam"
+                   class="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-dark focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors">
+                    Sign up
+                </a>
+                <button type="button" class="-mr-1 md:hidden" aria-label="Toggle Navigation" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                    <svg aria-hidden="true" class="h-3.5 w-3.5 overflow-visible stroke-text-dark" fill="none" stroke-width="2" stroke-linecap="round">
+                        <path d="M0 1H14M0 7H14M0 13H14"></path>
+                    </svg>
+                </button>
+            </div>
         </nav>
         <div id="mobile-menu" class="hidden mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 md:hidden pb-4">
             <div class="rounded-2xl bg-white p-4 text-lg tracking-tight text-text-dark shadow-xl ring-1 ring-earth-dark/5">
                 <a href="/blog" class="block w-full p-2">Blog</a>
-                <a href="/updates/" class="block w-full p-2">Updates</a>
                 <a href="/team" class="block w-full p-2">Team</a>
+                <a href="https://docs.artanis.ai/" target="_blank" rel="noopener noreferrer" class="block w-full p-2">Docs</a>
+                <hr class="m-2 border-warm">
+                <a href="https://app.artanis.ai" class="block w-full p-2">Log In</a>
+                <a href="https://calendar.notion.so/meet/yousef/sam" class="block w-full p-2">Sign up</a>
             </div>
         </div>
     </header>
