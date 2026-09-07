@@ -81,6 +81,13 @@ The site has a simple, focused structure with 5 main sections:
 - Responsive grid: 1 column (mobile), 2 columns (tablet), 3 columns (desktop)
 - No manual updates needed for new posts
 
+**Monthly Updates (self-hosted newsletter archive, Buttondown closed Sep 2026):**
+- Source of truth is `updates/_src/` (verbatim Buttondown export: `emails.json` + one body per slug). Never hand-edit generated files.
+- `node scripts/build-updates.mjs` regenerates `updates/feed.json`, `updates/<slug>.html` body fragments and `updates/rss.xml`. Needs `pandoc` on PATH (issue #8 is markdown, the rest are HTML).
+- Homepage and `blog.html` list all issues as compact rows from `feed.json` and open each in `#update-modal`, loading the fragment on click. Deep link: `/#update-<slug>` (slugs = original Buttondown archive slugs). Do not add `/updates/` pages: the root site is single-page by design.
+- Images live in `img/updates/<uuid>.png`; the build rewrites `assets.buttondown.email` URLs to them.
+- The newsletter ended with #26; there is no subscribe flow, only the RSS link.
+
 **Team Members (3 people):**
 - Photos stored in `img/` directory (downloaded from Squarespace)
 - Photos: sam.jpg, yousef.jpg, olly.jpg (not .png)
