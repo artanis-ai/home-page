@@ -19,7 +19,7 @@
     "openai": "^4.80.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250410.0",
+    "@cloudflare/workers-types": "^5.20260917.1",
     "@types/ws": "^8.18.1",
     "tsx": "^4.21.0",
     "typescript": "^5.8.0",
